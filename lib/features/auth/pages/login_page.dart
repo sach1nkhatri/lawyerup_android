@@ -102,7 +102,12 @@ class LoginPage extends StatelessWidget {
                                   color: accentTeal,
                                   shape: BoxShape.circle,
                                 ),
-                                child: const Icon(Icons.arrow_forward, size: 20),
+                                child: InkWell(
+                                  onTap: () {
+                                    Navigator.pushReplacementNamed(context, '/dashboard');
+                                  },
+                                  child: const Icon(Icons.arrow_forward, size: 20),
+                                ),
                               ),
                             ],
                           ),
