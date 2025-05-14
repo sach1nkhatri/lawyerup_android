@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../features/splash/pages/splash_page.dart';
 import '../features/welcome/pages/welcome_page.dart';
 import '../features/tutorials/pages/tutorial_1_page.dart';
@@ -12,6 +13,9 @@ import '../features/news/pages/news_page.dart';
 import '../features/pdf_library/pages/pdf_library_page.dart';
 import '../features/lawyer_up/pages/lawyer_up_page.dart';
 
+// import '../features/profile/pages/profile_page.dart';       // ✅ NEW
+import '../features/settings/pages/settings_page.dart';     // ✅ NEW
+import '../shared/widgets/bottom_nav.dart';                 // no routing needed, just UI
 
 class AppRouter {
   static const String splash = '/';
@@ -27,8 +31,9 @@ class AppRouter {
   static const String pdf = '/pdfpage';
   static const String lawyer = '/lawyerup';
 
-
-
+  // ✅ New routes for bottom navigation pages
+  static const String profile = '/profile';
+  static const String settings = '/settings';
 
   static final Map<String, WidgetBuilder> routes = {
     splash: (context) => const SplashPage(),
@@ -43,5 +48,9 @@ class AppRouter {
     news: (context) => const NewsPage(),
     pdf: (context) => const PdfLibraryPage(),
     lawyer: (context) => const LawyerUpPage(),
+
+    // ✅ Route screen handlers
+    // profile: (context) => const ProfilePage(),
+    settings: (context) => const SettingsPage(),
   };
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lawyerup_android/routes/app_router.dart';
 
 
 
@@ -22,13 +23,11 @@ class BottomNav extends StatelessWidget {
       Icons.chat_bubble_outline,
       Icons.settings_outlined,
     ];
-
     return Container(
       height: 70,
       color: backgroundColor,
       child: Row(
         children: [
-          // Profile - center left
           Expanded(
             child: Center(
               child: GestureDetector(
@@ -41,8 +40,6 @@ class BottomNav extends StatelessWidget {
               ),
             ),
           ),
-
-          // Chat - center middle
           Expanded(
             child: Center(
               child: GestureDetector(
@@ -55,12 +52,10 @@ class BottomNav extends StatelessWidget {
               ),
             ),
           ),
-
-          // Settings - center right
           Expanded(
             child: Center(
               child: GestureDetector(
-                onTap: () => onTap?.call(2),
+                onTap:() => Navigator.pushNamed(context, AppRouter.settings),
                 child: Icon(
                   icons[2],
                   size: 28,

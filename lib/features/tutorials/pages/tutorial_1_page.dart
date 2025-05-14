@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lawyerup_android/features/tutorials/pages/tutorial_2_page.dart';
 import '../../../routes/app_router.dart';
 
 class Tutorial1Page extends StatelessWidget {
@@ -47,7 +48,7 @@ class Tutorial1Page extends StatelessWidget {
             child: Center(
               child: ElevatedButton.icon(
                 onPressed: () {
-                  Navigator.pushNamed(context, AppRouter.tutorial2);
+                  Navigator.of(context).push(_createSwipeRoute(const Tutorial2Page()));
                 },
                 icon: const Icon(Icons.arrow_forward_ios, size: 18),
                 label: const Text('Next'),
@@ -56,7 +57,7 @@ class Tutorial1Page extends StatelessWidget {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),
-                  backgroundColor: const Color(0xFF18EFCB), // Editable
+                  backgroundColor: const Color(0xFF18EFCB),
                   foregroundColor: Colors.black,
                   textStyle: const TextStyle(
                     fontSize: 16,
@@ -93,4 +94,21 @@ class TutorialDot extends StatelessWidget {
       ),
     );
   }
+}
+
+Route _createSwipeRoute(Widget page) {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => page,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      const begin = Offset(1.0, 0.0);
+      const end = Offset.zero;
+      const curve = Curves.easeInOut;
+
+      final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
 }
