@@ -1,7 +1,59 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  bool isLoading = false;
+
+  Future<void> loginUser() async {
+    setState(() => isLoading = true);
+
+    final url = Uri.parse('http://192.168.1.68:5000/api/auth/login');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'email': _emailController.text,
+          'password': _passwordController.text,
+        }),
+      );
+
+      final data = json.decode(response.body);
+
+      if (response.statusCode == 200) {
+        final token = data['token'];
+        final user = data['user'];
+
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('token', token);
+        await prefs.setString('user', json.encode(user));
+
+        Navigator.pushReplacementNamed(context, '/dashboard');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(data['message'] ?? 'Login failed')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Could not connect to server')),
+      );
+    }
+
+    setState(() => isLoading = false);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,21 +83,14 @@ class LoginPage extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Column(
                 children: [
-                  // Centered form content
                   Expanded(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // Hammer icon
-                        Image.asset(
-                          'assets/images/hammer.png',
-                          width: 70,
-                          height: 70,
-                        ),
+                        Image.asset('assets/images/hammer.png', width: 70),
 
                         const SizedBox(height: 24),
 
-                        // Title
                         const Text(
                           'Signin to your Account',
                           style: TextStyle(
@@ -57,24 +102,9 @@ class LoginPage extends StatelessWidget {
 
                         const SizedBox(height: 30),
 
-                        // Username/Email field
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          decoration: BoxDecoration(
-                            color: tealFieldColor,
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          child: const TextField(
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              hintText: 'Username or Email',
-                            ),
-                          ),
-                        ),
-
+                        _buildRoundedField(_emailController, 'Username or Email'),
                         const SizedBox(height: 16),
 
-                        // Password + arrow button
                         Container(
                           decoration: BoxDecoration(
                             color: tealFieldColor,
@@ -82,12 +112,13 @@ class LoginPage extends StatelessWidget {
                           ),
                           child: Row(
                             children: [
-                              const Expanded(
+                              Expanded(
                                 child: Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 16),
+                                  padding: const EdgeInsets.symmetric(horizontal: 16),
                                   child: TextField(
+                                    controller: _passwordController,
                                     obscureText: true,
-                                    decoration: InputDecoration(
+                                    decoration: const InputDecoration(
                                       border: InputBorder.none,
                                       hintText: 'Enter your password',
                                     ),
@@ -98,15 +129,18 @@ class LoginPage extends StatelessWidget {
                                 height: 50,
                                 width: 50,
                                 margin: const EdgeInsets.only(right: 4),
-                                decoration: BoxDecoration(
+                                decoration: const BoxDecoration(
                                   color: accentTeal,
                                   shape: BoxShape.circle,
                                 ),
                                 child: InkWell(
-                                  onTap: () {
-                                    Navigator.pushReplacementNamed(context, '/dashboard');
-                                  },
-                                  child: const Icon(Icons.arrow_forward, size: 20),
+                                  onTap: isLoading ? null : loginUser,
+                                  child: isLoading
+                                      ? const Padding(
+                                    padding: EdgeInsets.all(10),
+                                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                                  )
+                                      : const Icon(Icons.arrow_forward, size: 20),
                                 ),
                               ),
                             ],
@@ -119,9 +153,8 @@ class LoginPage extends StatelessWidget {
                           "Don't have an account",
                           style: TextStyle(color: Colors.black54),
                         ),
-
-                        GestureDetector(
-                          onTap: () {
+                        TextButton(
+                          onPressed: () {
                             Navigator.pushNamed(context, '/signup');
                           },
                           child: const Text(
@@ -144,9 +177,9 @@ class LoginPage extends StatelessWidget {
                       width: double.infinity,
                       child: ElevatedButton.icon(
                         onPressed: () {
-                          // Google login
+                          // Google login (future)
                         },
-                        icon: const Icon(Icons.g_mobiledata, size: 28), // placeholder
+                        icon: const Icon(Icons.g_mobiledata, size: 28),
                         label: const Text('Log in with Google'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.black,
@@ -165,6 +198,23 @@ class LoginPage extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildRoundedField(TextEditingController controller, String hint) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFB5F7ED),
+        borderRadius: BorderRadius.circular(30),
+      ),
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          border: InputBorder.none,
+          hintText: hint,
+        ),
       ),
     );
   }
