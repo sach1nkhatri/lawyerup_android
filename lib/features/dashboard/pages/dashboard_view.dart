@@ -15,6 +15,7 @@ class DashboardView extends StatelessWidget {
         backgroundColor: const Color(0xFF1E2B3A),
         elevation: 0,
         centerTitle: true,
+        automaticallyImplyLeading: false, //for removing return button
         title: const Text(
           "Home",
           style: TextStyle(

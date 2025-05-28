@@ -12,11 +12,11 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-  int _currentIndex = 0;
+  int _currentIndex = 1;
 
   final List<Widget> _pages = const [
-    DashboardView(),
     ChatPage(),        // Index 0
+    DashboardView(),   //index 1
     SettingsPage(),    // Index 2
   ];
 
