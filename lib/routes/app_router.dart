@@ -1,5 +1,10 @@
-import 'package:flutter/material.dart';
+/// 🔀 AppRouter
+///
+/// Use `Navigator.pushNamed` for one-off screens like splash, login, signup, welcome, news, etc.
+///
+/// DO NOT use named routes for switching AI Chat / Dashboard / Settings — those are fragments inside `DashboardPage` and should be switched via index only.
 
+import 'package:flutter/material.dart';
 import '../features/splash/pages/splash_page.dart';
 import '../features/welcome/pages/welcome_page.dart';
 import '../features/tutorials/pages/tutorial_1_page.dart';
@@ -12,10 +17,7 @@ import '../features/ai_chat/pages/chat_page.dart';
 import '../features/news/pages/news_page.dart';
 import '../features/pdf_library/pages/pdf_library_page.dart';
 import '../features/lawyer_up/pages/lawyer_up_page.dart';
-
-// import '../features/profile/pages/profile_page.dart';       // ✅ NEW
-import '../features/settings/pages/settings_page.dart';     // ✅ NEW
-import '../shared/widgets/bottom_nav.dart';                 // no routing needed, just UI
+import '../features/settings/pages/settings_page.dart';
 
 class AppRouter {
   static const String splash = '/';
@@ -50,7 +52,6 @@ class AppRouter {
     lawyer: (context) => const LawyerUpPage(),
 
     // ✅ Route screen handlers
-    // profile: (context) => const ProfilePage(),
     settings: (context) => const SettingsPage(),
   };
 }

@@ -1,47 +1,39 @@
 import 'package:flutter/material.dart';
-import '../../../shared/widgets/bottom_nav.dart';
-import '../../../shared/widgets/logo_header.dart'; // <-- Add this import
-import '../widgets/quick_links.dart';
-import '../widgets/news_card.dart';
-import '../widgets/bookings_card.dart';
+import 'package:lawyerup_android/features/ai_chat/pages/chat_page.dart';
+import 'package:lawyerup_android/features/dashboard/pages/dashboard_view.dart';
+import 'package:lawyerup_android/features/settings/pages/settings_page.dart';
+import 'package:lawyerup_android/shared/widgets/bottom_nav.dart';
 
-class DashboardPage extends StatelessWidget {
+class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
+
+  @override
+  State<DashboardPage> createState() => _DashboardPageState();
+}
+
+class _DashboardPageState extends State<DashboardPage> {
+  int _currentIndex = 1;
+
+  final List<Widget> _pages = const [
+    ChatPage(),        // Index 0
+    DashboardView(),   //index 1
+    SettingsPage(),    // Index 2
+  ];
+
+  void _onTabTapped(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF1E2B3A),
-        elevation: 0,
-        centerTitle: true,
-        title: const Text(
-          "Home",
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
-          ),
-        ),
+      body: _pages[_currentIndex],
+      bottomNavigationBar: BottomNav(
+        currentIndex: _currentIndex,
+        onTap: _onTabTapped, // ✅ Properly passed callback
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            Center(child: LogoHeader()), // 👈 Logo under AppBar only here
-            SizedBox(height: 24),
-            QuickLinks(),
-            SizedBox(height: 32),
-            NewsCard(),
-            SizedBox(height: 32),
-            BookingsCard(),
-            SizedBox(height: 20),
-          ],
-        ),
-      ),
-      bottomNavigationBar: const BottomNav(currentIndex: 1),
     );
   }
 }
