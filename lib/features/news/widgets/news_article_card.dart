@@ -16,31 +16,71 @@ class NewsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(date, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
-        const SizedBox(height: 4),
-        Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-        const SizedBox(height: 4),
-        const Text("By Post Report", style: TextStyle(fontSize: 12)),
-        const SizedBox(height: 4),
-        Text(description, style: const TextStyle(fontSize: 13)),
-        if (imagePath != null) ...[
-          const SizedBox(height: 12),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(6),
-            child: Image.asset(
-              imagePath!,
-              fit: BoxFit.cover,
-              width: double.infinity,
-              height: 180,
-            ),
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 6,
+            offset: Offset(0, 2),
           ),
         ],
-        const SizedBox(height: 12),
-        const Divider(thickness: 1),
-      ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            date,
+            style: const TextStyle(
+              fontFamily: 'Lora',
+              fontSize: 12,
+              color: Colors.grey,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            title,
+            style: const TextStyle(
+              fontFamily: 'PlayfairDisplay',
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 6),
+          const Text(
+            "By Post Report",
+            style: TextStyle(
+              fontFamily: 'Lora',
+              fontSize: 12,
+              fontStyle: FontStyle.italic,
+              color: Colors.black54,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            description,
+            style: const TextStyle(
+              fontFamily: 'Lora',
+              fontSize: 14,
+              height: 1.6,
+            ),
+          ),
+          if (imagePath != null) ...[
+            const SizedBox(height: 14),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Image.asset(
+                imagePath!,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ],
+        ],
+      ),
     );
   }
 }
