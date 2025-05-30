@@ -16,7 +16,13 @@ class Tutorial2Page extends StatelessWidget {
             left: -7,
             right: -7,
             bottom: -8,
-            child: Image.asset(
+            child: MediaQuery.of(context).size.shortestSide >= 600 // Tablet or iPad check
+                ? Image.asset(
+              'assets/images/tab_2.png',
+              fit: BoxFit.fill,
+              filterQuality: FilterQuality.high,
+            )
+                : Image.asset(
               'assets/images/Tutorial 2.png',
               fit: BoxFit.fill,
               filterQuality: FilterQuality.high,
