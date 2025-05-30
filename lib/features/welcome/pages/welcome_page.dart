@@ -11,39 +11,32 @@ class WelcomePage extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          Positioned(
+// Inside Stack children:
+          MediaQuery.of(context).size.shortestSide >= 600
+              ? Positioned(
             top: 10,
             left: -7,
             right: -7,
             bottom: -8,
             child: Image.asset(
-              'assets/images/welcomescreendesign.png',
+              'assets/images/tabwelcome.png',
+              fit: BoxFit.contain, // Or adjust as needed
+              alignment: Alignment.topCenter,
+              filterQuality: FilterQuality.high,
+            ),
+          )
+              : Positioned(
+            top: 10,
+            left: -7,
+            right: -7,
+            bottom: -8,
+            child: Image.asset(
+              'assets/images/welcomescreen.png',
               fit: BoxFit.fill,
               filterQuality: FilterQuality.high,
             ),
           ),
 
-          const Positioned(
-            top: 530,
-            left: 20,
-            right: 20,
-            child: Text(
-              'Get started with LawyerUp Ai',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-                shadows: [
-                  Shadow(
-                    blurRadius: 8,
-                    color: Colors.black45,
-                    offset: Offset(1, 2),
-                  )
-                ],
-              ),
-            ),
-          ),
 
           Positioned(
             bottom: 40,
