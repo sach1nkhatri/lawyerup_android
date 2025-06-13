@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:lawyerup_android/features/onboarding/presentation/pages/tutorial_1_page.dart';
 
-import '../../../tutorials/presentation/pages/tutorial_1_page.dart';
 
 
 

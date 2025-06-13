@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:lawyerup_android/features/tutorials/presentation/pages/tutorial_2_page.dart';
+import 'package:lawyerup_android/features/onboarding/presentation/pages/tutorial_3_page.dart';
 
 
-class Tutorial1Page extends StatelessWidget {
-  const Tutorial1Page({Key? key}) : super(key: key);
+class Tutorial2Page extends StatelessWidget {
+  const Tutorial2Page({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -18,17 +18,16 @@ class Tutorial1Page extends StatelessWidget {
             bottom: -8,
             child: MediaQuery.of(context).size.shortestSide >= 600 // Tablet or iPad check
                 ? Image.asset(
-              'assets/images/tab_1.png',
+              'assets/images/tab_2.png',
               fit: BoxFit.fill,
               filterQuality: FilterQuality.high,
             )
                 : Image.asset(
-              'assets/images/Tutorial 1.png',
+              'assets/images/Tutorial 2.png',
               fit: BoxFit.fill,
               filterQuality: FilterQuality.high,
             ),
           ),
-
 
           // Page indicator (3 circles)
           Positioned(
@@ -38,12 +37,13 @@ class Tutorial1Page extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: const [
-                TutorialDot(isActive: true, color: Color(0xFF18EFCB)),  // active
+                TutorialDot(isActive: false, color: Color(0xFFAAAAAA)), // dot 1
                 SizedBox(width: 8),
-                TutorialDot(isActive: false, color: Color(0xFFAAAAAA)), // inactive
+                TutorialDot(isActive: true, color: Color(0xFF18EFCB)),  // dot 2 ✅
                 SizedBox(width: 8),
-                TutorialDot(isActive: false, color: Color(0xFFAAAAAA)), // inactive
+                TutorialDot(isActive: false, color: Color(0xFFAAAAAA)), // dot 3
               ],
+
             ),
           ),
 
@@ -55,7 +55,7 @@ class Tutorial1Page extends StatelessWidget {
             child: Center(
               child: ElevatedButton.icon(
                 onPressed: () {
-                  Navigator.of(context).push(_createSwipeRoute(const Tutorial2Page()));
+                  Navigator.of(context).push(_createSwipeRoute(const Tutorial3Page()));
                 },
                 icon: const Icon(Icons.arrow_forward_ios, size: 18),
                 label: const Text('Next'),
@@ -74,6 +74,7 @@ class Tutorial1Page extends StatelessWidget {
               ),
             ),
           ),
+
         ],
       ),
     );
@@ -102,7 +103,6 @@ class TutorialDot extends StatelessWidget {
     );
   }
 }
-
 Route _createSwipeRoute(Widget page) {
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) => page,

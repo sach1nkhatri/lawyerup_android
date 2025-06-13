@@ -12,13 +12,14 @@ import '../features/auth/presentation/pages/signup_page.dart';
 import '../features/dashboard/presentation/pages/dashboard_page.dart';
 import '../features/lawyer_up/presentation/pages/lawyer_up_page.dart';
 import '../features/news/presentation/pages/news_page.dart';
+import '../features/onboarding/presentation/pages/tutorial_1_page.dart';
+import '../features/onboarding/presentation/pages/tutorial_2_page.dart';
+import '../features/onboarding/presentation/pages/tutorial_3_page.dart';
+import '../features/onboarding/presentation/pages/welcome_page.dart';
 import '../features/pdf_library/presentation/pages/pdf_library_page.dart';
 import '../features/settings/presentation/pages/settings_page.dart';
 import '../features/splash/presentation/pages/splash_page.dart';
-import '../features/tutorials/presentation/pages/tutorial_1_page.dart';
-import '../features/tutorials/presentation/pages/tutorial_2_page.dart';
-import '../features/tutorials/presentation/pages/tutorial_3_page.dart';
-import '../features/welcome/presentation/pages/welcome_page.dart';
+
 
 
 class AppRouter {
