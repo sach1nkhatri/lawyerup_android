@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../../app/routes/app_router.dart';
 
-import '../../../../routes/app_router.dart';
 
 
 class SplashPage extends StatefulWidget {

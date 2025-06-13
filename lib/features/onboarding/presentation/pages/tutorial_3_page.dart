@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../../routes/app_router.dart';
+import '../../../../app/routes/app_router.dart';
+
 
 
 class Tutorial3Page extends StatelessWidget {

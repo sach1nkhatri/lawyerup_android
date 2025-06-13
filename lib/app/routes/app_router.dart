@@ -1,24 +1,19 @@
-/// 🔀 AppRouter
-///
-/// Use `Navigator.pushNamed` for one-off screens like splash, login, signup, welcome, news, etc.
-///
-/// DO NOT use named routes for switching AI Chat / Dashboard / Settings — those are fragments inside `DashboardPage` and should be switched via index only.
-
 import 'package:flutter/material.dart';
 
-import '../features/ai_chat/presentation/pages/chat_page.dart';
-import '../features/auth/presentation/pages/login_page.dart';
-import '../features/auth/presentation/pages/signup_page.dart';
-import '../features/dashboard/presentation/pages/dashboard_page.dart';
-import '../features/lawyer_up/presentation/pages/lawyer_up_page.dart';
-import '../features/news/presentation/pages/news_page.dart';
-import '../features/onboarding/presentation/pages/tutorial_1_page.dart';
-import '../features/onboarding/presentation/pages/tutorial_2_page.dart';
-import '../features/onboarding/presentation/pages/tutorial_3_page.dart';
-import '../features/onboarding/presentation/pages/welcome_page.dart';
-import '../features/pdf_library/presentation/pages/pdf_library_page.dart';
-import '../features/settings/presentation/pages/settings_page.dart';
-import '../features/splash/presentation/pages/splash_page.dart';
+import '../../features/ai_chat/presentation/pages/chat_page.dart';
+import '../../features/auth/presentation/pages/login_page.dart';
+import '../../features/auth/presentation/pages/signup_page.dart';
+import '../../features/dashboard/presentation/pages/dashboard_page.dart';
+import '../../features/lawyer_up/presentation/pages/lawyer_up_page.dart';
+import '../../features/news/presentation/pages/news_page.dart';
+import '../../features/onboarding/presentation/pages/tutorial_1_page.dart';
+import '../../features/onboarding/presentation/pages/tutorial_2_page.dart';
+import '../../features/onboarding/presentation/pages/tutorial_3_page.dart';
+import '../../features/onboarding/presentation/pages/welcome_page.dart';
+import '../../features/pdf_library/presentation/pages/pdf_library_page.dart';
+import '../../features/settings/presentation/pages/settings_page.dart';
+import '../../features/splash/presentation/pages/splash_page.dart';
+
 
 
 
@@ -36,7 +31,7 @@ class AppRouter {
   static const String pdf = '/pdfpage';
   static const String lawyer = '/lawyerup';
 
-  // ✅ New routes for bottom navigation pages
+  //  New routes for bottom navigation pages
   static const String profile = '/profile';
   static const String settings = '/settings';
 
@@ -53,8 +48,6 @@ class AppRouter {
     news: (context) => const NewsPage(),
     pdf: (context) => const PdfLibraryPage(),
     lawyer: (context) => const LawyerUpPage(),
-
-    // ✅ Route screen handlers
     settings: (context) => const SettingsPage(),
   };
 }
