@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import '../../../../app/routes/app_router.dart';
 
-import '../../../../routes/app_router.dart';
 
 
 class SplashPage extends StatefulWidget {
-  const SplashPage({Key? key}) : super(key: key);
+  const SplashPage({super.key});
 
   @override
   State<SplashPage> createState() => _SplashPageState();

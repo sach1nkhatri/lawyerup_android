@@ -1,12 +1,13 @@
-import '../../domain/entities/user_status.dart';
+import '../entities/user_status.dart';
 import '../../data/datasources/local/splash_local_data_source.dart';
 
-class CheckFirstLaunchUseCase {
-  final SplashLocalDataSource dataSource;
+class CheckFirstLaunch {
+  final SplashLocalDataSource localDataSource;
 
-  CheckFirstLaunchUseCase(this.dataSource);
+  CheckFirstLaunch(this.localDataSource);
 
   Future<UserStatus> call() async {
-    return await dataSource.getUserStatus();
+    final isFirstTime = await localDataSource.checkIfFirstLaunch();
+    return isFirstTime ? UserStatus.firstTime : UserStatus.returning;
   }
 }

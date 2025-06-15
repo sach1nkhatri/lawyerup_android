@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../../shared/widgets/logo_header.dart';
+
+import '../../../../app/shared/widgets/logo_header.dart';
 import '../widgets/quick_links.dart';
 import '../widgets/news_card.dart';
 import '../widgets/bookings_card.dart';
