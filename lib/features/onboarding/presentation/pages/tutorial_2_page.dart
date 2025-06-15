@@ -3,7 +3,7 @@ import 'package:lawyerup_android/features/onboarding/presentation/pages/tutorial
 
 
 class Tutorial2Page extends StatelessWidget {
-  const Tutorial2Page({Key? key}) : super(key: key);
+  const Tutorial2Page({super.key});
 
   @override
   Widget build(BuildContext context) {

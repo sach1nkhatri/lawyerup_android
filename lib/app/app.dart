@@ -5,7 +5,7 @@ import 'theme/app_theme.dart';
 
 
 class LawyerUpApp extends StatelessWidget {
-  const LawyerUpApp({Key? key}) : super(key: key);
+  const LawyerUpApp({super.key});
 
   @override
   Widget build(BuildContext context) {

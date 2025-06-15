@@ -1,5 +1,4 @@
 enum UserStatus {
   firstTime,
-  tutorialCompleted,
-  loggedIn,
+  returning,
 }

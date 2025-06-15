@@ -4,7 +4,7 @@ import 'package:lawyerup_android/features/onboarding/presentation/pages/tutorial
 
 
 class Tutorial1Page extends StatelessWidget {
-  const Tutorial1Page({Key? key}) : super(key: key);
+  const Tutorial1Page({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -5,7 +5,7 @@ import 'package:lawyerup_android/features/onboarding/presentation/pages/tutorial
 
 
 class WelcomePage extends StatelessWidget {
-  const WelcomePage({Key? key}) : super(key: key);
+  const WelcomePage({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -5,7 +5,7 @@ import '../../../../app/routes/app_router.dart';
 
 
 class Tutorial3Page extends StatelessWidget {
-  const Tutorial3Page({Key? key}) : super(key: key);
+  const Tutorial3Page({super.key});
 
   @override
   Widget build(BuildContext context) {
