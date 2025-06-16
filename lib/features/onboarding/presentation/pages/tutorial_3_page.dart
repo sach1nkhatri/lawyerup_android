@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 
 import '../../../../app/routes/app_router.dart';
 
@@ -55,9 +56,15 @@ class Tutorial3Page extends StatelessWidget {
             right: 0,
             child: Center(
               child: ElevatedButton.icon(
-                onPressed: () {
-                  // Navigate to next page: change to your actual next screen
-                  Navigator.pushNamed(context, AppRouter.login);
+                onPressed: () async {
+                  final box = await Hive.openBox('settingsBox');
+                  await box.put('onboardingComplete', true); // ✅ mark onboarding done
+
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    AppRouter.login,
+                        (route) => false, // ✅ prevent going back to welcome/tutorial
+                  );
                 },
                 icon: const Icon(Icons.arrow_forward_ios, size: 18),
                 label: const Text('Finish'),
