@@ -1,16 +1,14 @@
-
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../../../../app/constant/api_endpoints.dart';
 import '../models/user_model.dart';
 import 'auth_remote_datasource.dart';
 
 class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
-  final String baseUrl = 'http://localhost:3000/api/v1/';
-
   @override
   Future<UserModel> login(String email, String password) async {
     final response = await http.post(
-      Uri.parse('\${baseUrl}auth/login'),
+      Uri.parse(ApiEndpoints.login),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'email': email, 'password': password}),
     );
@@ -18,7 +16,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
     if (response.statusCode == 200) {
       return UserModel.fromJson(jsonDecode(response.body)['user']);
     } else {
-      throw Exception('Login failed: \${response.body}');
+      throw Exception('Login failed: ${response.body}');
     }
   }
 
@@ -31,7 +29,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
     required String contactNumber,
   }) async {
     final response = await http.post(
-      Uri.parse('\${baseUrl}auth/register'),
+      Uri.parse(ApiEndpoints.register),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'fullName': fullName,
@@ -45,7 +43,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
     if (response.statusCode == 200) {
       return UserModel.fromJson(jsonDecode(response.body)['user']);
     } else {
-      throw Exception('Signup failed: \${response.body}');
+      throw Exception('Signup failed: ${response.body}');
     }
   }
 }
