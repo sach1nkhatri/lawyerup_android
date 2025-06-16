@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import '../../../../app/routes/app_router.dart';
-
-
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -23,8 +22,21 @@ class _SplashPageState extends State<SplashPage>
       duration: const Duration(seconds: 3),
     )..forward();
 
-    Future.delayed(const Duration(seconds: 3), () {
-      Navigator.pushReplacementNamed(context, AppRouter.welcome);
+    Future.delayed(const Duration(seconds: 3), () async {
+      final box = await Hive.openBox('settingsBox');
+      final onboardingDone = box.get('onboardingComplete', defaultValue: false);
+      final isLoggedIn = box.get('isLoggedIn', defaultValue: false);
+
+      String route;
+      if (!onboardingDone) {
+        route = AppRouter.welcome;
+      } else if (isLoggedIn) {
+        route = AppRouter.dashboard;
+      } else {
+        route = AppRouter.login;
+      }
+
+      Navigator.pushReplacementNamed(context, route);
     });
   }
 
@@ -65,19 +77,13 @@ class _SplashPageState extends State<SplashPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // White background
+      backgroundColor: Colors.white,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // App logo image
-            Image.asset(
-              'assets/images/logo2.png',
-              width: 160,
-              height: 160,
-            ),
+            Image.asset('assets/images/logo2.png', width: 160, height: 160),
             const SizedBox(height: 16),
-            // Brand wordmark
             const Text(
               'LαɯყҽɾUρ',
               style: TextStyle(
@@ -88,7 +94,6 @@ class _SplashPageState extends State<SplashPage>
               ),
             ),
             const SizedBox(height: 30),
-            // Square-styled progress bar
             buildSquareProgressBar(),
           ],
         ),

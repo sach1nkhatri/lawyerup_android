@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import '../../../../app/routes/app_router.dart';
 import '../widgets/settings_section.dart';
 
 class SettingsPage extends StatelessWidget {
@@ -63,6 +65,41 @@ class SettingsPage extends StatelessWidget {
             switches: [false],
             buttons: ["English", "GetPlus+"],
           ),
+          const SizedBox(height: 32),
+
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () async {
+                  final box = await Hive.openBox('settingsBox');
+                  await box.delete('lawyerup_token');
+                  await box.delete('lawyerup_user');
+                  await box.put('isLoggedIn', false);
+
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    AppRouter.login,
+                        (route) => false,
+                  );
+                },
+                icon: const Icon(Icons.logout),
+                label: const Text('Logout'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.redAccent,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  textStyle: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 32),
+
         ],
       ),
     );

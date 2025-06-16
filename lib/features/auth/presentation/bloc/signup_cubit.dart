@@ -1,8 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../../../domain/entities/user_entity.dart';
-import '../../../domain/usecases/signup_usecase.dart';
-part 'signup_state.dart';
+import 'package:hive/hive.dart';
+import '../../domain/usecases/signup_usecase.dart';
+import '../../data/models/user_model.dart';
+import 'signup_state.dart';
 
 class SignupCubit extends Cubit<SignupState> {
   final SignupUseCase signupUseCase;
@@ -25,6 +25,14 @@ class SignupCubit extends Cubit<SignupState> {
         role: role,
         contactNumber: contactNumber,
       );
+
+      // Save token & user to Hive
+      final model = user as UserModel;
+      final box = Hive.box('settingsBox');
+      await box.put('lawyerup_token', model.token); // if backend returns token
+      await box.put('lawyerup_user', model.toJson());
+      await box.put('isLoggedIn', true);
+
       emit(SignupSuccess(user));
     } catch (e) {
       emit(SignupError(e.toString()));
