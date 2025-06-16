@@ -42,7 +42,7 @@ class AppRouter {
     tutorial2: (context) => const Tutorial2Page(),
     tutorial3: (context) => const Tutorial3Page(),
     login: (context) => const LoginPage(),
-    signup: (context) => const SignUpPage(),
+    signup: (context) => const SignupPage(),
     dashboard: (context) => const DashboardPage(),
     chat: (context) => const ChatPage(),
     news: (context) => const NewsPage(),

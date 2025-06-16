@@ -1,8 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../domain/entities/user_entity.dart';
-import '../../../domain/usecases/login_usecase.dart';
-
-part 'login_state.dart';
+import '../../domain/usecases/login_usecase.dart';
+import 'login_state.dart';
 
 class LoginCubit extends Cubit<LoginState> {
   final LoginUseCase loginUseCase;
@@ -12,8 +10,8 @@ class LoginCubit extends Cubit<LoginState> {
   Future<void> login(String email, String password) async {
     emit(LoginLoading());
     try {
-      final user = await loginUseCase(email, password);
-      emit(LoginSuccess(user));
+      await loginUseCase(email, password);
+      emit(LoginSuccess());
     } catch (e) {
       emit(LoginError(e.toString()));
     }

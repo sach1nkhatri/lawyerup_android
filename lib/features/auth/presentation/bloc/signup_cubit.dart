@@ -1,8 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../../../domain/entities/user_entity.dart';
-import '../../../domain/usecases/signup_usecase.dart';
-part 'signup_state.dart';
+import '../../domain/usecases/signup_usecase.dart';
+import 'signup_state.dart';
 
 class SignupCubit extends Cubit<SignupState> {
   final SignupUseCase signupUseCase;

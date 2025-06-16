@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lawyerup_android/app/app.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'app/service_locater/service_locater.dart';
+import 'app/service_locater/service_locator.dart';
 
 
 void main() async {
