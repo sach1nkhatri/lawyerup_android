@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 
 
-import '../../../../app/shared/widgets/bottom_nav.dart';
+import '../widgets/bottom_nav.dart';
 import '../../../ai_chat/presentation/pages/chat_page.dart';
 import '../../../settings/presentation/pages/settings_page.dart';
 import 'dashboard_view.dart';

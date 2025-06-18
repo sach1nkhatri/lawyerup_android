@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../../../../app/constant/api_endpoints.dart';
-import '../models/user_model.dart';
+import '../../../../../app/constant/api_endpoints.dart';
+import '../../models/user_model.dart';
 import 'auth_remote_datasource.dart';
 
 class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
