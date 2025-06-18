@@ -1,7 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
+
 import '../../domain/usecases/signup_usecase.dart';
 import '../../data/models/user_model.dart';
+import '../../domain/entities/user_entity.dart';
 import 'signup_state.dart';
 
 class SignupCubit extends Cubit<SignupState> {
@@ -18,7 +20,7 @@ class SignupCubit extends Cubit<SignupState> {
   }) async {
     emit(SignupLoading());
     try {
-      final user = await signupUseCase(
+      final UserEntity user = await signupUseCase(
         fullName: fullName,
         email: email,
         password: password,
@@ -26,10 +28,11 @@ class SignupCubit extends Cubit<SignupState> {
         contactNumber: contactNumber,
       );
 
-      // Save token & user to Hive
-      final model = user as UserModel;
+      // ✅ Convert to UserModel before storing
+      final model = UserModel.fromEntity(user);
+
       final box = Hive.box('settingsBox');
-      await box.put('lawyerup_token', model.token); // if backend returns token
+      await box.put('lawyerup_token', model.token);
       await box.put('lawyerup_user', model.toJson());
       await box.put('isLoggedIn', true);
 
