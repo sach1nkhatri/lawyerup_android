@@ -1,7 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
+
 import '../../domain/usecases/login_usecase.dart';
-import '../../data/models/user_model.dart'; // adjust path if needed
+import '../../data/models/user_model.dart';
 import 'login_state.dart';
 
 class LoginCubit extends Cubit<LoginState> {
@@ -13,7 +14,9 @@ class LoginCubit extends Cubit<LoginState> {
     emit(LoginLoading());
     try {
       final user = await loginUseCase(email, password);
-      final model = user as UserModel;
+
+      // ✅ Safe conversion instead of invalid cast
+      final model = UserModel.fromEntity(user);
 
       // Save token & user to Hive
       final box = Hive.box('settingsBox');

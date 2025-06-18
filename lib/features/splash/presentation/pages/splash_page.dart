@@ -20,7 +20,8 @@ class _SplashPageState extends State<SplashPage>
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 3),
-    )..forward();
+    )
+      ..forward();
 
     Future.delayed(const Duration(seconds: 3), () async {
       final box = await Hive.openBox('settingsBox');
@@ -78,23 +79,46 @@ class _SplashPageState extends State<SplashPage>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+      body: SafeArea(
+        child: Stack(
           children: [
-            Image.asset('assets/images/logo2.png', width: 160, height: 160),
-            const SizedBox(height: 16),
-            const Text(
-              'LαɯყҽɾUρ',
-              style: TextStyle(
-                fontSize: 26,
-                fontWeight: FontWeight.w600,
-                color: Colors.deepPurple,
-                letterSpacing: 1.2,
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                      'assets/images/logo2.png', width: 160, height: 160),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'LαɯყҽɾUρ',
+                    style: TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.deepPurple,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+                  buildSquareProgressBar(),
+                ],
               ),
             ),
-            const SizedBox(height: 30),
-            buildSquareProgressBar(),
+
+            // ✅ Footer Text
+            Positioned(
+              bottom: 16,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Text(
+                  'Developed by Sachin Khatri • v1.0.3',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
