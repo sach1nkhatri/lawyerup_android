@@ -1,19 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:lawyerup_android/app/app.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'core/network/hive_service.dart'; // teacher-style
 import 'app/service_locater/service_locator.dart';
-
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Hive.initFlutter();
+  final hiveService = HiveService();
+  await hiveService.init();
 
-  // ✅ Open the settings box for app flags (e.g. firstLaunch)
-  await Hive.openBox('settingsBox');
-
-  // ✅ Initialize all services, cubits, etc.
-  await initServiceLocator();
+  await initServiceLocator(); //Where are you my little services
 
   runApp(const LawyerUpApp());
 }
