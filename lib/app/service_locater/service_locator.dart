@@ -1,5 +1,6 @@
 import 'package:get_it/get_it.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:http/http.dart' as http;
 
 // AUTH
 import '../../features/auth/data/datasources/remote_datasource/auth_remote_datasource.dart';
@@ -14,6 +15,12 @@ import '../../features/auth/presentation/bloc/login_cubit.dart';
 import '../../features/auth/presentation/bloc/signup_cubit.dart';
 
 // SPLASH / ONBOARDING
+import '../../features/news/data/datasources/remote/news_remote_data_source.dart';
+import '../../features/news/data/datasources/remote/news_remote_data_source_impl.dart';
+import '../../features/news/data/repositories/news_repository_impl.dart';
+import '../../features/news/domain/repositories/news_repository.dart';
+import '../../features/news/domain/usecases/get_all_news.dart';
+import '../../features/news/presentation/bloc/news_bloc.dart';
 import '../../features/onboarding/domain/repositories/splash_repository.dart';
 import '../../features/onboarding/domain/repositories/splash_repository_impl.dart';
 import '../../features/onboarding/domain/usecases/complete_onboarding.dart';
@@ -60,4 +67,25 @@ Future<void> initServiceLocator() async {
   // ✅ Auth Cubits (ViewModels)
   sl.registerFactory(() => LoginCubit(sl()));
   sl.registerFactory(() => SignupCubit(sl()));
+
+
+  // ✅ HTTP Client (shared)
+  sl.registerLazySingleton(() => http.Client());
+
+  // ✅ News Data Source
+  sl.registerLazySingleton<NewsRemoteDataSource>(
+        () => NewsRemoteDataSourceImpl(sl()),
+  );
+
+  // ✅ News Repository
+  sl.registerLazySingleton<NewsRepository>(
+        () => NewsRepositoryImpl(sl()),
+  );
+
+  // ✅ News Use Case
+  sl.registerLazySingleton(() => GetAllNews(sl()));
+
+  // ✅ News Bloc
+  sl.registerFactory(() => NewsBloc(sl()));
+
 }
