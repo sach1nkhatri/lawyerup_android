@@ -4,7 +4,6 @@ import 'dart:convert';
 
 import '../../../../app/constant/api_endpoints.dart';
 
-
 class NewsPreviewPage extends StatefulWidget {
   final String newsId;
 
@@ -16,44 +15,59 @@ class NewsPreviewPage extends StatefulWidget {
 
 class _NewsPreviewPageState extends State<NewsPreviewPage> {
   Map<String, dynamic>? news;
-  final _controller = TextEditingController();
+  final TextEditingController _commentController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _fetchNewsDetails();
+    _fetchNews();
   }
 
-  Future<void> _fetchNewsDetails() async {
-    final res = await http.get(Uri.parse('${ApiEndpoints.getAllNews}/${widget.newsId}'));
-    if (res.statusCode == 200) {
+  Future<void> _fetchNews() async {
+    final response =
+    await http.get(Uri.parse('${ApiEndpoints.getAllNews}/${widget.newsId}'));
+    if (response.statusCode == 200) {
       setState(() {
-        news = json.decode(res.body);
+        news = json.decode(response.body);
       });
     }
   }
 
-  Future<void> _submitComment() async {
-    final text = _controller.text.trim();
+  Future<void> _postComment() async {
+    final text = _commentController.text.trim();
     if (text.isEmpty) return;
 
     final res = await http.post(
       Uri.parse(ApiEndpoints.commentNews(widget.newsId)),
       headers: {
-        'Authorization': 'Bearer YOUR_TOKEN_HERE', // Replace this
-        'Content-Type': 'application/json'
+        'Authorization': 'Bearer YOUR_TOKEN_HERE', // Replace later
+        'Content-Type': 'application/json',
       },
-      body: json.encode({ 'text': text }),
+      body: json.encode({'text': text}),
     );
 
     if (res.statusCode == 200) {
-      _controller.clear();
-      _fetchNewsDetails(); // reload updated comments
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to post comment')),
-      );
+      _commentController.clear();
+      _fetchNews(); // reload comments
     }
+  }
+
+  Future<void> _like() async {
+    await http.post(
+      Uri.parse(ApiEndpoints.likeNews(widget.newsId)),
+      body: json.encode({"userId": "demoUserId"}), // Replace with real userId
+      headers: {'Content-Type': 'application/json'},
+    );
+    _fetchNews();
+  }
+
+  Future<void> _dislike() async {
+    await http.post(
+      Uri.parse(ApiEndpoints.dislikeNews(widget.newsId)),
+      body: json.encode({"userId": "demoUserId"}), // Replace with real userId
+      headers: {'Content-Type': 'application/json'},
+    );
+    _fetchNews();
   }
 
   @override
@@ -63,46 +77,91 @@ class _NewsPreviewPageState extends State<NewsPreviewPage> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text(news!['title'])),
-      body: Column(
-        children: [
-          Image.network(news!['image']),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Text(news!['summary']),
-          ),
-          const Divider(),
-          Expanded(
-            child: ListView.builder(
-              itemCount: news!['comments'].length,
-              itemBuilder: (_, i) {
-                final comment = news!['comments'][i];
-                return ListTile(
-                  leading: const Icon(Icons.comment),
-                  title: Text(comment['user']),
-                  subtitle: Text(comment['text']),
-                );
-              },
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF1E2B3A),
+        title: Text(news!['title']),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(
+            news!['date'] ?? '',
+            style: const TextStyle(
+              fontFamily: 'Lora',
+              fontSize: 12,
+              color: Colors.grey,
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    decoration: const InputDecoration(hintText: "Add a comment"),
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.send),
-                  onPressed: _submitComment,
-                )
-              ],
+          const SizedBox(height: 10),
+          Text(
+            news!['title'],
+            style: const TextStyle(
+              fontFamily: 'PlayfairDisplay',
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 6),
+          const Text(
+            "By Post Report",
+            style: TextStyle(
+              fontFamily: 'Lora',
+              fontSize: 12,
+              fontStyle: FontStyle.italic,
+              color: Colors.black54,
+            ),
+          ),
+          const SizedBox(height: 14),
+          Text(
+            news!['summary'],
+            style: const TextStyle(
+              fontFamily: 'Lora',
+              fontSize: 14,
+              height: 1.6,
+            ),
+          ),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.thumb_up_alt_outlined),
+                onPressed: _like,
+              ),
+              Text('${news!['likes']}'),
+              const SizedBox(width: 16),
+              IconButton(
+                icon: const Icon(Icons.thumb_down_alt_outlined),
+                onPressed: _dislike,
+              ),
+              Text('${news!['dislikes']}'),
+              const Spacer(),
+              const Icon(Icons.comment),
+              const SizedBox(width: 4),
+              Text('${news!['comments'].length}'),
+            ],
+          ),
+          const Divider(height: 32),
+          const Text("Comments", style: TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          ...news!['comments'].map<Widget>((c) {
+            return ListTile(
+              leading: const Icon(Icons.comment),
+              title: Text(c['user']),
+              subtitle: Text(c['text']),
+            );
+          }).toList(),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _commentController,
+            decoration: InputDecoration(
+              hintText: "Add a comment...",
+              suffixIcon: IconButton(
+                icon: const Icon(Icons.send),
+                onPressed: _postComment,
+              ),
             ),
           )
-        ],
+        ]),
       ),
     );
   }
