@@ -16,45 +16,30 @@ class NewsPage extends StatelessWidget {
     return BlocProvider(
       create: (_) => sl<NewsBloc>()..add(LoadNews()),
       child: Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          backgroundColor: const Color(0xFF1E2B3A),
-          elevation: 0,
-          centerTitle: true,
-          title: const Text(
-            "News & Article",
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-        ),
+        appBar: AppBar(title: const Text("Latest News")),
         body: BlocBuilder<NewsBloc, NewsState>(
           builder: (context, state) {
             if (state is NewsLoading) {
               return const Center(child: CircularProgressIndicator());
             } else if (state is NewsLoaded) {
+              final List<News> newsList = state.newsList;
+
               return ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: state.newsList.length,
-                itemBuilder: (context, index) {
-                  final News news = state.newsList[index];
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => NewsPreviewPage(newsId: news.id),
-                        ),
-                      );
-                    },
-                    child: NewsCard(
-                      date: news.date,
-                      title: news.title,
-                      description: news.summary,
-                      likes: news.likes,
-                      dislikes: news.dislikes,
+                padding: const EdgeInsets.all(12),
+                itemCount: newsList.length,
+                itemBuilder: (_, index) {
+                  final news = newsList[index];
+                  return NewsArticleCard(
+                    title: news.title,
+                    summary: news.summary,
+                    image: news.image,
+                    likes: news.likes,
+                    dislikes: news.dislikes,
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => NewsPreviewPage(newsId: news.id),
+                      ),
                     ),
                   );
                 },
