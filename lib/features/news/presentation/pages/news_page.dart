@@ -32,6 +32,17 @@ class NewsPage extends StatelessWidget {
                 itemCount: newsList.length,
                 itemBuilder: (_, index) {
                   final news = newsList[index];
+                  final userBox = Hive.box<UserHiveModel>('users');
+                  final user = userBox.getAt(0);
+
+                  if (user == null) {
+                    return const SizedBox(); // avoids crash if Hive is empty
+                  }
+
+                  final token = user.token;
+                  final userId = user.uid;
+
+
                   return NewsArticleCard(
                     title: news.title,
                     summary: news.summary,
@@ -41,19 +52,6 @@ class NewsPage extends StatelessWidget {
                     author: news.author,
                     date: DateTime.parse(news.date),
                     onTap: () {
-                      final userBox = Hive.box<UserHiveModel>('users');
-                      final user = userBox.getAt(0);
-
-                      if (user == null) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("User not found in local storage.")),
-                        );
-                        return;
-                      }
-
-                      final token = user.token;
-                      final userId = user.uid;
-
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -71,7 +69,6 @@ class NewsPage extends StatelessWidget {
             } else if (state is NewsError) {
               return Center(child: Text(state.message));
             }
-
             return const SizedBox();
           },
         ),

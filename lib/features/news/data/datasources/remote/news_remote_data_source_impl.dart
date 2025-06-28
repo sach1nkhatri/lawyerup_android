@@ -1,25 +1,8 @@
 import 'package:dio/dio.dart';
+import '../../../../../app/constant/api_endpoints.dart';
 import '../../models/news_model.dart';
 import 'news_remote_data_source.dart';
 
-
-// class NewsRemoteDataSourceImpl implements NewsRemoteDataSource {
-//   final http.Client client;
-//
-//   NewsRemoteDataSourceImpl(this.client);
-//
-//   @override
-//   Future<List<NewsModel>> getAllNews() async {
-//     final response = await client.get(Uri.parse('${ApiEndpoints.baseUrl}news'));
-//
-//     if (response.statusCode == 200) {
-//       final List<dynamic> data = json.decode(response.body);
-//       return data.map((json) => NewsModel.fromJson(json)).toList();
-//     } else {
-//       throw Exception('Failed to load news');
-//     }
-//   }
-// }
 class NewsRemoteDataSourceImpl implements NewsRemoteDataSource {
   final Dio dio;
 
@@ -27,7 +10,27 @@ class NewsRemoteDataSourceImpl implements NewsRemoteDataSource {
 
   @override
   Future<List<NewsModel>> getAllNews() async {
-    final res = await dio.get("news");
+    final res = await dio.get(ApiEndpoints.getAllNews);
     return (res.data as List).map((e) => NewsModel.fromJson(e)).toList();
+  }
+
+  // ✅ Add Comment
+  Future<List<Map<String, dynamic>>> addComment({
+    required String newsId,
+    required String commentText,
+    required String token,
+  }) async {
+    final res = await dio.post(
+      ApiEndpoints.commentNews(newsId),
+      data: {'text': commentText},
+      options: Options(
+        headers: {
+          'Authorization': token,
+          'Content-Type': 'application/json',
+        },
+      ),
+    );
+
+    return List<Map<String, dynamic>>.from(res.data['comments']);
   }
 }

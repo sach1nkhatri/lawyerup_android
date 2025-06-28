@@ -61,7 +61,7 @@ Future<void> initServiceLocator() async {
         () => AuthRepositoryImpl(
       remoteDatasource: sl<AuthRemoteDatasource>(),
       localDatasource: sl<AuthLocalDatasource>(),
-      useLocal: true, // Flip for Hive-only testing
+      useLocal: false, // Flip for Hive-only testing
     ),
   );
 
