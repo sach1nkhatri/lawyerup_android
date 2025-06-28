@@ -35,6 +35,8 @@ class NewsPage extends StatelessWidget {
                     image: news.image,
                     likes: news.likes,
                     dislikes: news.dislikes,
+                    author: news.author,
+                    date: DateTime.parse(news.date), // parse string date from model
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
