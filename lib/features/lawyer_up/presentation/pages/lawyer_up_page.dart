@@ -52,12 +52,26 @@ class LawyerUpPage extends StatelessWidget {
               ),
             ),
           ),
+          const SizedBox(height: 4),
           Expanded(
-            child: ListView.separated(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: 3,
-              separatorBuilder: (_, __) => const SizedBox(height: 12),
-              itemBuilder: (context, index) => const LawyerCard(),
+            child: GridView.count(
+              crossAxisCount: 2,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 20,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              physics: const BouncingScrollPhysics(),
+              childAspectRatio: 0.7,
+              children: List.generate(4, (index) {
+                return LawyerCard(
+                  name: "Advocate Mr Bean",
+                  specialty: "Criminal Lawyer",
+                  rating: 5,
+                  imagePath: "assets/images/lawyer.png",
+                  onViewProfile: () {
+                    // Navigate to profile
+                  },
+                );
+              }),
             ),
           ),
         ],

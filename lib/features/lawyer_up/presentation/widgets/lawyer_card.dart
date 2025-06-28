@@ -1,49 +1,99 @@
 import 'package:flutter/material.dart';
 
 class LawyerCard extends StatelessWidget {
-  const LawyerCard({super.key});
+  final String name;
+  final String specialty;
+  final double rating;
+  final String imagePath;
+  final VoidCallback onViewProfile;
+
+  const LawyerCard({
+    super.key,
+    required this.name,
+    required this.specialty,
+    required this.rating,
+    required this.imagePath,
+    required this.onViewProfile,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFFA5F6EF),
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4)],
+        color: Colors.cyan.shade50,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 6,
+            offset: Offset(0, 4),
+          ),
+        ],
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center, // ✅ center the children vertically
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
             child: Image.asset(
-              'assets/images/photopro.png',
-              height: 80,
-              width: 80,
+              imagePath,
+              height: 120,
+              width: double.infinity,
               fit: BoxFit.cover,
             ),
           ),
-          const SizedBox(width: 16),
-          Expanded(
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center, // optional
-              children: const [
-                Text("Name", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                Text("Specializations"),
-                Text("Contact"),
-                Text("Education"),
-                SizedBox(height: 8),
+              children: [
+                Text(
+                  name,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                Text(
+                  specialty,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: Colors.black54,
+                  ),
+                ),
+                const SizedBox(height: 6),
                 Row(
-                  children: [
-                    Icon(Icons.star, size: 18, color: Colors.amber),
-                    Icon(Icons.star, size: 18, color: Colors.amber),
-                    Icon(Icons.star, size: 18, color: Colors.amber),
-                    Icon(Icons.star, size: 18, color: Colors.amber),
-                    Icon(Icons.star_border, size: 18, color: Colors.black87),
-                  ],
-                )
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(
+                    5,
+                        (index) => Icon(
+                      index < rating ? Icons.star : Icons.star_border,
+                      color: Colors.amber,
+                      size: 18,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: onViewProfile,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.lightBlue.shade400,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 2,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  ),
+                  child: const Text(
+                    'View Profile',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 13,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
               ],
             ),
           ),
