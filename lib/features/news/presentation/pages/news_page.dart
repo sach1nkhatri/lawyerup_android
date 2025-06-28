@@ -1,69 +1,55 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../app/service_locater/service_locator.dart';
+import '../../domain/entities/news.dart';
+import '../bloc/news_bloc.dart';
+import '../bloc/news_event.dart';
+import '../bloc/news_state.dart';
 import '../widgets/news_article_card.dart';
+import 'news_preview_page.dart';
 
 class NewsPage extends StatelessWidget {
   const NewsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final List<Map<String, String>> newsData = [
-      {
-        "date": "Wed, Apr 20, 2025",
-        "title": "Cyber Law bill is passes by the executive bodies of the Nepal.",
-        "description": "The new bill is passed and will be implemented from today",
-      },
-      {
-        "date": "Wed, Apr 20, 2025",
-        "title": "New Property Rights Act Proposed in Parliament",
-        "description": "The draft law seeks to streamline property registration and ownership disputes.",
-      },
-      {
-        "date": "Wed, Apr 20, 2025",
-        "title": "Amendment to Labor Law Enhances Worker Protection",
-        "description": "Key changes include increased minimum wage and stricter safety standards.",
-      },
-      {
-        "date": "Wed, Apr 20, 2025",
-        "title": "Amendment to Labor Law Enhances Worker Protection",
-        "description": "Key changes include increased minimum wage and stricter safety standards.",
-      },
-      {
-        "date": "Wed, Apr 20, 2025",
-        "title": "Amendment to Labor Law Enhances Worker Protection",
-        "description": "Key changes include increased minimum wage and stricter safety standards.",
-      },
-    ];
+    return BlocProvider(
+      create: (_) => sl<NewsBloc>()..add(LoadNews()),
+      child: Scaffold(
+        appBar: AppBar(title: const Text("Latest News")),
+        body: BlocBuilder<NewsBloc, NewsState>(
+          builder: (context, state) {
+            if (state is NewsLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is NewsLoaded) {
+              final List<News> newsList = state.newsList;
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF1E2B3A),
-        elevation: 0,
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
+              return ListView.builder(
+                padding: const EdgeInsets.all(12),
+                itemCount: newsList.length,
+                itemBuilder: (_, index) {
+                  final news = newsList[index];
+                  return NewsArticleCard(
+                    title: news.title,
+                    summary: news.summary,
+                    image: news.image,
+                    likes: news.likes,
+                    dislikes: news.dislikes,
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => NewsPreviewPage(newsId: news.id),
+                      ),
+                    ),
+                  );
+                },
+              );
+            } else if (state is NewsError) {
+              return Center(child: Text(state.message));
+            }
+            return const SizedBox();
+          },
         ),
-        title: const Text(
-          "News & Article",
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
-        ),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          ...newsData.map((news) => NewsCard(
-            date: news['date']!,
-            title: news['title']!,
-            description: news['description']!,
-          )),
-          const NewsCard(
-            date: "Wed, Apr 20, 2025",
-            title: "Justice in Action",
-            description: "Symbolic representation of the legal system in modern times.",
-            imagePath: 'assets/images/judiciary.png',
-          ),
-        ],
       ),
     );
   }
