@@ -3,8 +3,8 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:dio/dio.dart';
 
-
-
+//NEWS
+import '../../features/news/presentation/bloc/news_preview_bloc.dart';
 //DIO
 import '../../core/network/dio_client.dart';
 // AUTH
@@ -95,5 +95,10 @@ Future<void> initServiceLocator() async {
   // ✅ DIO
   sl.registerLazySingleton<DioClient>(() => DioClient());
   sl.registerLazySingleton<Dio>(() => sl<DioClient>().dio);
+
+  // ✅ News Preview Bloc (needs token and userId passed at runtime)
+  sl.registerFactoryParam<NewsPreviewBloc, String, String>(
+        (token, userId) => NewsPreviewBloc(token: token, userId: userId),
+  );
 
 }

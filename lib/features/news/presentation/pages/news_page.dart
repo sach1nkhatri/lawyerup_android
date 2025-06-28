@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+
 import '../../../../app/service_locater/service_locator.dart';
+import '../../../auth/data/models/user_hive_model.dart';
 import '../../domain/entities/news.dart';
 import '../bloc/news_bloc.dart';
 import '../bloc/news_event.dart';
@@ -36,19 +39,39 @@ class NewsPage extends StatelessWidget {
                     likes: news.likes,
                     dislikes: news.dislikes,
                     author: news.author,
-                    date: DateTime.parse(news.date), // parse string date from model
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => NewsPreviewPage(newsId: news.id),
-                      ),
-                    ),
+                    date: DateTime.parse(news.date),
+                    onTap: () {
+                      final userBox = Hive.box<UserHiveModel>('users');
+                      final user = userBox.getAt(0);
+
+                      if (user == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text("User not found in local storage.")),
+                        );
+                        return;
+                      }
+
+                      final token = user.token;
+                      final userId = user.uid;
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => NewsPreviewPage(
+                            news: news,
+                            token: 'Bearer $token',
+                            userId: userId,
+                          ),
+                        ),
+                      );
+                    },
                   );
                 },
               );
             } else if (state is NewsError) {
               return Center(child: Text(state.message));
             }
+
             return const SizedBox();
           },
         ),
