@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import '../../../../app/routes/app_router.dart';
+import '../../../../app/service_locater/service_locator.dart';
+import '../../../auth/domain/repositories/auth_repository.dart';
 import '../widgets/settings_section.dart';
 
 class SettingsPage extends StatelessWidget {
@@ -29,7 +31,7 @@ class SettingsPage extends StatelessWidget {
                 backgroundColor: Colors.redAccent,
                 child: CircleAvatar(
                   radius: 40,
-                  backgroundImage: AssetImage('assets/images/profile.png'), // replace with your image
+                  backgroundImage: AssetImage('assets/images/profile.png'),
                 ),
               ),
               const SizedBox(width: 16),
@@ -47,7 +49,6 @@ class SettingsPage extends StatelessWidget {
           ),
           const SizedBox(height: 32),
 
-          // Sections
           const SettingsSection(
             title: "Account",
             items: ["Edit Profile", "Change Password", "Privacy"],
@@ -73,11 +74,14 @@ class SettingsPage extends StatelessWidget {
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: () async {
-                  final box = await Hive.openBox('settingsBox');
-                  await box.delete('lawyerup_token');
-                  await box.delete('lawyerup_user');
-                  await box.put('isLoggedIn', false);
+                  // ✅ Call proper repository logout
+                  await sl<AuthRepository>().logout();
 
+                  // ✅ Optional: also clear any extra local boxes
+                  final settingsBox = await Hive.openBox('settingsBox');
+                  await settingsBox.clear();
+
+                  // ✅ Navigate to login
                   Navigator.pushNamedAndRemoveUntil(
                     context,
                     AppRouter.login,
@@ -99,7 +103,6 @@ class SettingsPage extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 32),
-
         ],
       ),
     );

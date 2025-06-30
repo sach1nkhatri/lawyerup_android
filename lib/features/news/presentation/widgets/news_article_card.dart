@@ -31,7 +31,7 @@ class NewsArticleCard extends StatelessWidget {
       onTap: onTap,
       child: Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        elevation: 4,
+        elevation: 4, color: Colors.blue.shade50,
         margin: const EdgeInsets.symmetric(vertical: 8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -56,7 +56,7 @@ class NewsArticleCard extends StatelessWidget {
                 'by $author • ${_formatDate(date)}',
                 style: TextStyle(
                   fontSize: 12,
-                  color: Colors.grey[600],
+                  color: Colors.black,
                   fontStyle: FontStyle.italic,
                 ),
               ),
@@ -76,12 +76,12 @@ class NewsArticleCard extends StatelessWidget {
                   Row(
                     children: [
                       Icon(Icons.thumb_up_alt_outlined,
-                          size: 16, color: Colors.grey[700]),
+                          size: 16, color: Colors.green[700]),
                       const SizedBox(width: 4),
                       Text('$likes'),
                       const SizedBox(width: 16),
                       Icon(Icons.thumb_down_alt_outlined,
-                          size: 16, color: Colors.grey[700]),
+                          size: 16, color: Colors.red[700]),
                       const SizedBox(width: 4),
                       Text('$dislikes'),
                     ],

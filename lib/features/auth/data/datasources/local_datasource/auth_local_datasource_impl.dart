@@ -5,7 +5,7 @@ import '../../models/user_hive_model.dart';
 import 'auth_local_datasource.dart';
 
 class AuthLocalDatasourceImpl implements AuthLocalDatasource {
-  final Box<UserHiveModel> box = Hive.box<UserHiveModel>(HiveConstants.userBox);
+  final box = Hive.box<UserHiveModel>('users');
 
   @override
   Future<UserEntity> login(String email, String password) async {
@@ -13,7 +13,12 @@ class AuthLocalDatasourceImpl implements AuthLocalDatasource {
       final user = box.values.firstWhere(
             (u) => u.email == email && u.token == password,
       );
-      return user.toEntity(); // ✅ FIXED: Convert HiveModel → Entity
+
+      return UserEntity(
+        uid: user.uid,
+        email: user.email,
+        token: 'local-token-${user.uid}', // ✅ Fake token for offline login
+      );
     } catch (_) {
       throw Exception("Invalid credentials");
     }
@@ -33,10 +38,10 @@ class AuthLocalDatasourceImpl implements AuthLocalDatasource {
     final newUser = UserHiveModel(
       uid: DateTime.now().millisecondsSinceEpoch.toString(),
       email: email,
-      token: password,
+      token: password, // ✅ Password used as token in local mode only
     );
 
     await box.add(newUser);
-    return newUser.toEntity(); // ✅ FIXED
+    return newUser.toEntity();
   }
 }
