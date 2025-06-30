@@ -55,64 +55,71 @@ class _NewsPreviewViewState extends State<_NewsPreviewView> {
           return Scaffold(
             appBar: AppBar(
               backgroundColor: const Color(0xFF1C2D3D),
-              title: Text(news.title, style: const TextStyle(fontFamily: 'Lora')),
+              iconTheme: const IconThemeData(color: Colors.white), // back button color
+              title: Text(
+                news.title,
+                style: const TextStyle(
+                  fontFamily: 'Lora',
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white, // title text color
+                ),
+              ),
             ),
-            body: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.network(imageUrl, fit: BoxFit.cover),
-                        ),
-                        const SizedBox(height: 8),
-                        Text('by ${news.author} • ${_formatDate(news.date)}',
-                            style: const TextStyle(fontFamily: 'PlayfairDisplay', color: Colors.grey)),
-                        const SizedBox(height: 8),
-                        Text(news.summary, style: const TextStyle(fontFamily: 'PlayfairDisplay')),
-                        const SizedBox(height: 12),
-                        Row(
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.thumb_up_alt_outlined, color: Colors.green),
-                              onPressed: () {
-                                context.read<NewsPreviewBloc>().add(LikePressed());
-                              },
-                            ),
-                            Text('${news.likes}', style: const TextStyle(fontFamily: 'PlayfairDisplay')),
-                            const SizedBox(width: 16),
-                            IconButton(
-                              icon: const Icon(Icons.thumb_down_alt_outlined, color: Colors.red),
-                              onPressed: () {
-                                context.read<NewsPreviewBloc>().add(DislikePressed());
-                              },
-                            ),
-                            Text('${news.dislikes}', style: const TextStyle(fontFamily: 'PlayfairDisplay')),
-                          ],
-                        ),
-                        if (state.error != null)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
-                            child: Text(state.error!, style: const TextStyle(color: Colors.red)),
-                          ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Expanded(
-                    child: Container(
+            resizeToAvoidBottomInset: true,
+            body: SafeArea(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.blue.shade50.withOpacity(0.4),
+                        color: Color(0xA0BCF1EB),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.network(imageUrl, fit: BoxFit.cover),
+                          ),
+                          const SizedBox(height: 8),
+                          Text('by ${news.author} • ${_formatDate(news.date)}',
+                              style: const TextStyle(fontFamily: 'PlayfairDisplay', color: Colors.black)),
+                          const SizedBox(height: 8),
+                          Text(news.summary, style: const TextStyle(fontFamily: 'PlayfairDisplay')),
+                          const SizedBox(height: 12),
+                          Row(
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.thumb_up_alt_outlined, color: Colors.green),
+                                onPressed: () => context.read<NewsPreviewBloc>().add(LikePressed()),
+                              ),
+                              Text('${news.likes}', style: const TextStyle(fontFamily: 'PlayfairDisplay')),
+                              const SizedBox(width: 16),
+                              IconButton(
+                                icon: const Icon(Icons.thumb_down_alt_outlined, color: Colors.red),
+                                onPressed: () => context.read<NewsPreviewBloc>().add(DislikePressed()),
+                              ),
+                              Text('${news.dislikes}', style: const TextStyle(fontFamily: 'PlayfairDisplay')),
+                            ],
+                          ),
+                          if (state.error != null)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8.0),
+                              child: Text(state.error!, style: const TextStyle(color: Colors.red)),
+                            ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.shade100.withOpacity(0.4),
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Column(
@@ -120,61 +127,66 @@ class _NewsPreviewViewState extends State<_NewsPreviewView> {
                         children: [
                           const Text('Comments', style: TextStyle(fontFamily: 'Lora', fontWeight: FontWeight.bold)),
                           const SizedBox(height: 8),
-                          Expanded(
-                            child: news.comments.isEmpty
-                                ? const Text("No comments yet.", style: TextStyle(fontFamily: 'PlayfairDisplay'))
-                                : ListView.separated(
-                              itemCount: news.comments.length,
-                              separatorBuilder: (_, __) => const Divider(),
-                              itemBuilder: (_, index) {
-                                final comment = news.comments[index];
-                                return ListTile(
-                                  title: Text(comment['text'], style: const TextStyle(fontFamily: 'PlayfairDisplay')),
-                                  subtitle: Text('— ${comment['user']}', style: const TextStyle(fontFamily: 'PlayfairDisplay', fontSize: 13)),
-                                );
-                              },
-                            ),
+                          news.comments.isEmpty
+                              ? const Text("No comments yet.", style: TextStyle(fontFamily: 'PlayfairDisplay'))
+                              : ListView.separated(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: news.comments.length,
+                            separatorBuilder: (_, __) => const Divider(),
+                            itemBuilder: (_, index) {
+                              final comment = news.comments[index];
+                              return ListTile(
+                                title: Text(comment['text'], style: const TextStyle(fontFamily: 'PlayfairDisplay')),
+                                subtitle: Text('— ${comment['user']}',
+                                    style: const TextStyle(fontFamily: 'PlayfairDisplay', fontSize: 13)),
+                              );
+                            },
                           ),
                           const SizedBox(height: 12),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: Colors.grey[100],
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: Colors.grey.shade300),
-                            ),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: TextField(
-                                    controller: _controller,
-                                    minLines: 1,
-                                    maxLines: 4,
-                                    style: const TextStyle(fontFamily: 'PlayfairDisplay'),
-                                    decoration: const InputDecoration(
-                                      hintText: "Add a comment",
-                                      border: InputBorder.none,
+                          SafeArea(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[100],
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: Colors.grey.shade300),
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Flexible(
+                                    child: TextField(
+                                      controller: _controller,
+                                      minLines: 1,
+                                      maxLines: 4,
+                                      style: const TextStyle(fontFamily: 'PlayfairDisplay'),
+                                      decoration: const InputDecoration(
+                                        hintText: "Add a comment",
+                                        border: InputBorder.none,
+                                        isCollapsed: true,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.send, color: Colors.deepPurple),
-                                  onPressed: () {
-                                    final text = _controller.text.trim();
-                                    if (text.isNotEmpty) {
-                                      context.read<NewsPreviewBloc>().add(SubmitComment(text));
-                                      _controller.clear();
-                                    }
-                                  },
-                                )
-                              ],
+                                  IconButton(
+                                    icon: const Icon(Icons.send, color: Colors.deepPurple),
+                                    onPressed: () {
+                                      final text = _controller.text.trim();
+                                      if (text.isNotEmpty) {
+                                        context.read<NewsPreviewBloc>().add(SubmitComment(text));
+                                        _controller.clear();
+                                      }
+                                    },
+                                  )
+                                ],
+                              ),
                             ),
                           ),
                         ],
                       ),
                     ),
-                  )
-                ],
+                  ],
+                ),
               ),
             ),
           );
