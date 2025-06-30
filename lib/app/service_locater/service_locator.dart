@@ -1,7 +1,12 @@
 import 'package:get_it/get_it.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 
+//NEWS
+import '../../features/news/presentation/bloc/news_preview_bloc.dart';
+//DIO
+import '../../core/network/dio_client.dart';
 // AUTH
 import '../../features/auth/data/datasources/remote_datasource/auth_remote_datasource.dart';
 import '../../features/auth/data/datasources/remote_datasource/auth_remote_datasource_impl.dart';
@@ -56,7 +61,7 @@ Future<void> initServiceLocator() async {
         () => AuthRepositoryImpl(
       remoteDatasource: sl<AuthRemoteDatasource>(),
       localDatasource: sl<AuthLocalDatasource>(),
-      useLocal: true, // Flip for Hive-only testing
+      useLocal: false, // Flip for Hive-only testing
     ),
   );
 
@@ -87,5 +92,13 @@ Future<void> initServiceLocator() async {
 
   // ✅ News Bloc
   sl.registerFactory(() => NewsBloc(sl()));
+  // ✅ DIO
+  sl.registerLazySingleton<DioClient>(() => DioClient());
+  sl.registerLazySingleton<Dio>(() => sl<DioClient>().dio);
+
+  // ✅ News Preview Bloc (needs token and userId passed at runtime)
+  sl.registerFactoryParam<NewsPreviewBloc, String, String>(
+        (token, userId) => NewsPreviewBloc(token: token, userId: userId),
+  );
 
 }

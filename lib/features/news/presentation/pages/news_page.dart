@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+
 import '../../../../app/service_locater/service_locator.dart';
+import '../../../auth/data/models/user_hive_model.dart';
 import '../../domain/entities/news.dart';
 import '../bloc/news_bloc.dart';
 import '../bloc/news_event.dart';
@@ -16,15 +19,14 @@ class NewsPage extends StatelessWidget {
     return BlocProvider(
       create: (_) => sl<NewsBloc>()..add(LoadNews()),
       child: Scaffold(
-        backgroundColor: Colors.white,
         appBar: AppBar(
-          backgroundColor: const Color(0xFF1E2B3A),
-          elevation: 0,
-          centerTitle: true,
+          backgroundColor: const Color(0xFF1C2D3D),
+          iconTheme: const IconThemeData(color: Colors.white),
           title: const Text(
-            "News & Article",
+            "Latest News",
             style: TextStyle(
-              fontSize: 18,
+              fontFamily: 'Lora',
+              fontSize: 22,
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
@@ -35,32 +37,56 @@ class NewsPage extends StatelessWidget {
             if (state is NewsLoading) {
               return const Center(child: CircularProgressIndicator());
             } else if (state is NewsLoaded) {
+              final List<News> newsList = state.newsList;
+
               return ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: state.newsList.length,
-                itemBuilder: (context, index) {
-                  final News news = state.newsList[index];
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => NewsPreviewPage(newsId: news.id),
-                        ),
-                      );
-                    },
-                    child: NewsCard(
-                      date: news.date,
+                padding: const EdgeInsets.all(12),
+                itemCount: newsList.length,
+                itemBuilder: (_, index) {
+                  final news = newsList[index];
+                  final userBox = Hive.box<UserHiveModel>('users');
+                  final user = userBox.getAt(0);
+
+                  if (user == null) {
+                    return const SizedBox();
+                  }
+
+                  final token = user.token;
+                  final userId = user.uid;
+
+                  return DefaultTextStyle(
+                    style: const TextStyle(fontFamily: 'PlayfairDisplay'),
+                    child: NewsArticleCard(
                       title: news.title,
-                      description: news.summary,
+                      summary: news.summary,
+                      image: news.image,
                       likes: news.likes,
                       dislikes: news.dislikes,
+                      author: news.author,
+                      date: DateTime.parse(news.date),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => NewsPreviewPage(
+                              news: news,
+                              token: 'Bearer $token',
+                              userId: userId,
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   );
                 },
               );
             } else if (state is NewsError) {
-              return Center(child: Text(state.message));
+              return Center(
+                child: Text(
+                  state.message,
+                  style: const TextStyle(fontFamily: 'PlayfairDisplay'),
+                ),
+              );
             }
             return const SizedBox();
           },
@@ -69,3 +95,4 @@ class NewsPage extends StatelessWidget {
     );
   }
 }
+

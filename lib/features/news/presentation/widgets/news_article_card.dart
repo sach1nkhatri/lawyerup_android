@@ -1,85 +1,101 @@
 import 'package:flutter/material.dart';
+import '../../../../app/constant/api_endpoints.dart';
 
-class NewsCard extends StatelessWidget {
-  final String date;
+class NewsArticleCard extends StatelessWidget {
   final String title;
-  final String description;
+  final String summary;
+  final String image;
   final int likes;
   final int dislikes;
-  final String? imagePath;
+  final String author;
+  final DateTime date;
+  final VoidCallback onTap;
 
-  const NewsCard({
-    super.key,
-    required this.date,
+  const NewsArticleCard({
     required this.title,
-    required this.description,
-    this.likes = 0,
-    this.dislikes = 0,
-    this.imagePath,
+    required this.summary,
+    required this.image,
+    required this.likes,
+    required this.dislikes,
+    required this.author,
+    required this.date,
+    required this.onTap,
+    super.key,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 6,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(date,
-              style: const TextStyle(
-                  fontFamily: 'Lora', fontSize: 12, color: Colors.grey)),
-          const SizedBox(height: 6),
-          Text(title,
-              style: const TextStyle(
-                  fontFamily: 'PlayfairDisplay',
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold)),
-          const SizedBox(height: 6),
-          const Text("By Post Report",
-              style: TextStyle(
-                  fontFamily: 'Lora',
-                  fontSize: 12,
-                  fontStyle: FontStyle.italic,
-                  color: Colors.black54)),
-          const SizedBox(height: 10),
-          Text(description,
-              style: const TextStyle(
-                  fontFamily: 'Lora', fontSize: 14, height: 1.6)),
-          if (imagePath != null) ...[
-            const SizedBox(height: 14),
+    final fullImageUrl = "${ApiEndpoints.baseHost}$image";
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        elevation: 4, color: Colors.blue.shade50,
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
             ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Image.asset(imagePath!, fit: BoxFit.cover),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(12),
+                topRight: Radius.circular(12),
+              ),
+              child: Image.network(
+                fullImageUrl,
+                height: 180,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) =>
+                const Icon(Icons.broken_image),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 10, 12, 4),
+              child: Text(
+                'by $author • ${_formatDate(date)}',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.black,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(summary, maxLines: 2, overflow: TextOverflow.ellipsis),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Icon(Icons.thumb_up_alt_outlined,
+                          size: 16, color: Colors.green[700]),
+                      const SizedBox(width: 4),
+                      Text('$likes'),
+                      const SizedBox(width: 16),
+                      Icon(Icons.thumb_down_alt_outlined,
+                          size: 16, color: Colors.red[700]),
+                      const SizedBox(width: 4),
+                      Text('$dislikes'),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ],
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Icon(Icons.thumb_up_alt_outlined,
-                  size: 16, color: Colors.green[700]),
-              const SizedBox(width: 4),
-              Text('$likes'),
-              const SizedBox(width: 16),
-              Icon(Icons.thumb_down_alt_outlined,
-                  size: 16, color: Colors.red[700]),
-              const SizedBox(width: 4),
-              Text('$dislikes'),
-            ],
-          ),
-        ],
+        ),
       ),
     );
+  }
+
+  String _formatDate(DateTime date) {
+    return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
   }
 }

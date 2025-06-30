@@ -1,168 +1,205 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../app/constant/api_endpoints.dart';
+import '../../../../app/service_locater/service_locator.dart';
+import '../../domain/entities/news.dart';
+import '../bloc/news_preview_bloc.dart';
+import '../bloc/news_preview_event.dart';
+import '../bloc/news_preview_state.dart';
 
-class NewsPreviewPage extends StatefulWidget {
-  final String newsId;
+class NewsPreviewPage extends StatelessWidget {
+  final News news;
+  final String token;
+  final String userId;
 
-  const NewsPreviewPage({super.key, required this.newsId});
-
-  @override
-  State<NewsPreviewPage> createState() => _NewsPreviewPageState();
-}
-
-class _NewsPreviewPageState extends State<NewsPreviewPage> {
-  Map<String, dynamic>? news;
-  final TextEditingController _commentController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchNews();
-  }
-
-  Future<void> _fetchNews() async {
-    final response =
-    await http.get(Uri.parse('${ApiEndpoints.getAllNews}/${widget.newsId}'));
-    if (response.statusCode == 200) {
-      setState(() {
-        news = json.decode(response.body);
-      });
-    }
-  }
-
-  Future<void> _postComment() async {
-    final text = _commentController.text.trim();
-    if (text.isEmpty) return;
-
-    final res = await http.post(
-      Uri.parse(ApiEndpoints.commentNews(widget.newsId)),
-      headers: {
-        'Authorization': 'Bearer YOUR_TOKEN_HERE', // Replace later
-        'Content-Type': 'application/json',
-      },
-      body: json.encode({'text': text}),
-    );
-
-    if (res.statusCode == 200) {
-      _commentController.clear();
-      _fetchNews(); // reload comments
-    }
-  }
-
-  Future<void> _like() async {
-    await http.post(
-      Uri.parse(ApiEndpoints.likeNews(widget.newsId)),
-      body: json.encode({"userId": "demoUserId"}), // Replace with real userId
-      headers: {'Content-Type': 'application/json'},
-    );
-    _fetchNews();
-  }
-
-  Future<void> _dislike() async {
-    await http.post(
-      Uri.parse(ApiEndpoints.dislikeNews(widget.newsId)),
-      body: json.encode({"userId": "demoUserId"}), // Replace with real userId
-      headers: {'Content-Type': 'application/json'},
-    );
-    _fetchNews();
-  }
+  const NewsPreviewPage({
+    super.key,
+    required this.news,
+    required this.token,
+    required this.userId,
+  });
 
   @override
   Widget build(BuildContext context) {
-    if (news == null) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
-
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF1E2B3A),
-        title: Text(news!['title']),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(
-            news!['date'] ?? '',
-            style: const TextStyle(
-              fontFamily: 'Lora',
-              fontSize: 12,
-              color: Colors.grey,
-            ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            news!['title'],
-            style: const TextStyle(
-              fontFamily: 'PlayfairDisplay',
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 6),
-          const Text(
-            "By Post Report",
-            style: TextStyle(
-              fontFamily: 'Lora',
-              fontSize: 12,
-              fontStyle: FontStyle.italic,
-              color: Colors.black54,
-            ),
-          ),
-          const SizedBox(height: 14),
-          Text(
-            news!['summary'],
-            style: const TextStyle(
-              fontFamily: 'Lora',
-              fontSize: 14,
-              height: 1.6,
-            ),
-          ),
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.thumb_up_alt_outlined),
-                onPressed: _like,
-              ),
-              Text('${news!['likes']}'),
-              const SizedBox(width: 16),
-              IconButton(
-                icon: const Icon(Icons.thumb_down_alt_outlined),
-                onPressed: _dislike,
-              ),
-              Text('${news!['dislikes']}'),
-              const Spacer(),
-              const Icon(Icons.comment),
-              const SizedBox(width: 4),
-              Text('${news!['comments'].length}'),
-            ],
-          ),
-          const Divider(height: 32),
-          const Text("Comments", style: TextStyle(fontWeight: FontWeight.bold)),
-          const SizedBox(height: 8),
-          ...news!['comments'].map<Widget>((c) {
-            return ListTile(
-              leading: const Icon(Icons.comment),
-              title: Text(c['user']),
-              subtitle: Text(c['text']),
-            );
-          }).toList(),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _commentController,
-            decoration: InputDecoration(
-              hintText: "Add a comment...",
-              suffixIcon: IconButton(
-                icon: const Icon(Icons.send),
-                onPressed: _postComment,
-              ),
-            ),
-          )
-        ]),
-      ),
+    return BlocProvider(
+      create: (_) => sl<NewsPreviewBloc>(param1: token, param2: userId)
+        ..add(InitPreview(news)),
+      child: const _NewsPreviewView(),
     );
+  }
+}
+
+class _NewsPreviewView extends StatefulWidget {
+  const _NewsPreviewView({super.key});
+
+  @override
+  State<_NewsPreviewView> createState() => _NewsPreviewViewState();
+}
+
+class _NewsPreviewViewState extends State<_NewsPreviewView> {
+  final _controller = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<NewsPreviewBloc, NewsPreviewState>(
+      builder: (context, state) {
+        if (state is NewsPreviewLoading) {
+          return const Scaffold(body: Center(child: CircularProgressIndicator()));
+        }
+
+        if (state is NewsPreviewLoaded) {
+          final news = state.news;
+          final imageUrl = "${ApiEndpoints.baseHost}${news.image}";
+
+          return Scaffold(
+            appBar: AppBar(
+              backgroundColor: const Color(0xFF1C2D3D),
+              iconTheme: const IconThemeData(color: Colors.white), // back button color
+              title: Text(
+                news.title,
+                style: const TextStyle(
+                  fontFamily: 'Lora',
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white, // title text color
+                ),
+              ),
+            ),
+            resizeToAvoidBottomInset: true,
+            body: SafeArea(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Color(0xA0BCF1EB),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.network(imageUrl, fit: BoxFit.cover),
+                          ),
+                          const SizedBox(height: 8),
+                          Text('by ${news.author} • ${_formatDate(news.date)}',
+                              style: const TextStyle(fontFamily: 'PlayfairDisplay', color: Colors.black)),
+                          const SizedBox(height: 8),
+                          Text(news.summary, style: const TextStyle(fontFamily: 'PlayfairDisplay')),
+                          const SizedBox(height: 12),
+                          Row(
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.thumb_up_alt_outlined, color: Colors.green),
+                                onPressed: () => context.read<NewsPreviewBloc>().add(LikePressed()),
+                              ),
+                              Text('${news.likes}', style: const TextStyle(fontFamily: 'PlayfairDisplay')),
+                              const SizedBox(width: 16),
+                              IconButton(
+                                icon: const Icon(Icons.thumb_down_alt_outlined, color: Colors.red),
+                                onPressed: () => context.read<NewsPreviewBloc>().add(DislikePressed()),
+                              ),
+                              Text('${news.dislikes}', style: const TextStyle(fontFamily: 'PlayfairDisplay')),
+                            ],
+                          ),
+                          if (state.error != null)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8.0),
+                              child: Text(state.error!, style: const TextStyle(color: Colors.red)),
+                            ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.shade100.withOpacity(0.4),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('Comments', style: TextStyle(fontFamily: 'Lora', fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 8),
+                          news.comments.isEmpty
+                              ? const Text("No comments yet.", style: TextStyle(fontFamily: 'PlayfairDisplay'))
+                              : ListView.separated(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: news.comments.length,
+                            separatorBuilder: (_, __) => const Divider(),
+                            itemBuilder: (_, index) {
+                              final comment = news.comments[index];
+                              return ListTile(
+                                title: Text(comment['text'], style: const TextStyle(fontFamily: 'PlayfairDisplay')),
+                                subtitle: Text('— ${comment['user']}',
+                                    style: const TextStyle(fontFamily: 'PlayfairDisplay', fontSize: 13)),
+                              );
+                            },
+                          ),
+                          const SizedBox(height: 12),
+                          SafeArea(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[100],
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: Colors.grey.shade300),
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Flexible(
+                                    child: TextField(
+                                      controller: _controller,
+                                      minLines: 1,
+                                      maxLines: 4,
+                                      style: const TextStyle(fontFamily: 'PlayfairDisplay'),
+                                      decoration: const InputDecoration(
+                                        hintText: "Add a comment",
+                                        border: InputBorder.none,
+                                        isCollapsed: true,
+                                      ),
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.send, color: Colors.deepPurple),
+                                    onPressed: () {
+                                      final text = _controller.text.trim();
+                                      if (text.isNotEmpty) {
+                                        context.read<NewsPreviewBloc>().add(SubmitComment(text));
+                                        _controller.clear();
+                                      }
+                                    },
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }
+
+        return const SizedBox();
+      },
+    );
+  }
+
+  String _formatDate(String dateString) {
+    final date = DateTime.tryParse(dateString);
+    if (date == null) return '';
+    return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
   }
 }

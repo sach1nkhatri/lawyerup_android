@@ -111,7 +111,7 @@ class _SplashPageState extends State<SplashPage>
               right: 0,
               child: Center(
                 child: Text(
-                  'Developed by Sachin Khatri • v1.0.3',
+                  'Developed by Sachin Khatri • v1.0.4',
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.grey[600],
