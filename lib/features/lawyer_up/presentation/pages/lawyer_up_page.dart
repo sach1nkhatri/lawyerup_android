@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../app/shared/widgets/loading_widget.dart';
+import '../../../../core/error/error_widget.dart';
+import '../../domain/entities/lawyer.dart';
+import '../bloc/lawyer_list_bloc.dart';
+import '../bloc/lawyer_list_state.dart';
 import '../widgets/lawyer_card.dart';
 
 class LawyerUpPage extends StatelessWidget {
@@ -7,74 +13,53 @@ class LawyerUpPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1E2B3A),
-        elevation: 0,
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
+        backgroundColor: const Color(0xFF1C2D3D),
+        iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
-          "LawyerUP",
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+          "Find a Lawyer",
+          style: TextStyle(
+            fontFamily: 'Lora',
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 12),
-            child: Icon(Icons.toggle_on, color: Colors.white),
-          ),
-        ],
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(24),
-                boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4)],
-              ),
-              child: Row(
-                children: const [
-                  Icon(Icons.search, color: Colors.grey),
-                  SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      "Search for lawyers",
-                      style: TextStyle(color: Colors.black54, fontSize: 14),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 4),
-          Expanded(
-            child: GridView.count(
-              crossAxisCount: 2,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 20,
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              physics: const BouncingScrollPhysics(),
-              childAspectRatio: 0.7,
-              children: List.generate(4, (index) {
-                return LawyerCard(
-                  name: "Advocate Mr Bean",
-                  specialty: "Criminal Lawyer",
-                  rating: 5,
-                  imagePath: "assets/images/lawyer.png",
-                  onViewProfile: () {
-                    // Navigate to profile
+      body: BlocBuilder<LawyerListBloc, LawyerListState>(
+        builder: (context, state) {
+          if (state is LawyerListLoading) {
+            return const LoadingWidget();
+          } else if (state is LawyerListLoaded) {
+            final List<Lawyer> lawyers = state.lawyers;
+
+            if (lawyers.isEmpty) {
+              return const Center(child: Text('No lawyers available.'));
+            }
+
+            return ListView.builder(
+              itemCount: lawyers.length,
+              itemBuilder: (context, index) {
+                final lawyer = lawyers[index];
+
+                return InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(
+                      context,
+                      '/preview', // ✅ Ensure this route is defined in app_router.dart
+                      arguments: lawyer, // ✅ Passing lawyer data to preview
+                    );
                   },
+                  child: LawyerCard(lawyer: lawyer),
                 );
-              }),
-            ),
-          ),
-        ],
+              },
+            );
+          } else if (state is LawyerListError) {
+            return CustomErrorWidget(message: state.message);
+          }
+
+          return const SizedBox(); // fallback for other states
+        },
       ),
     );
   }
