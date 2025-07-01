@@ -35,6 +35,11 @@ import '../../features/news/presentation/bloc/news_bloc.dart';
 import '../../features/onboarding/domain/repositories/splash_repository.dart';
 import '../../features/onboarding/domain/repositories/splash_repository_impl.dart';
 import '../../features/onboarding/domain/usecases/complete_onboarding.dart';
+import '../../features/pdf_library/data/datasources/remote/pdf_remote_datasource.dart';
+import '../../features/pdf_library/data/datasources/remote/pdf_repository_impl.dart';
+import '../../features/pdf_library/domain/repositories/pdf_repository.dart';
+import '../../features/pdf_library/domain/usecases/get_all_pdfs_usecase.dart';
+import '../../features/pdf_library/presentation/bloc/pdf_bloc.dart';
 import '../../features/splash/data/datasources/local/splash_local_data_source.dart';
 import '../../features/splash/data/datasources/local/splash_local_data_source_impl.dart';
 import '../constant/hive_constants.dart';
@@ -43,26 +48,26 @@ import '../constant/hive_constants.dart';
 final sl = GetIt.instance;
 
 Future<void> initServiceLocator() async {
-  // ✅ Splash/Onboarding Local Data Source (Hive injected)
+  // Splash/Onboarding Local Data Source (Hive injected)
   sl.registerLazySingleton<SplashLocalDataSource>(
         () => SplashLocalDataSourceImpl(
       settingsBox: Hive.box(HiveConstants.settingsBox),
     ),
   );
 
-  // ✅ Splash Repository
+  // Splash Repository
   sl.registerLazySingleton<SplashRepository>(
         () => SplashRepositoryImpl(sl()),
   );
 
-  // ✅ Splash Use Case
+  // Splash Use Case
   sl.registerLazySingleton(() => CompleteOnboarding(sl()));
 
-  // ✅ Auth Data Sources
+  // Auth Data Sources
   sl.registerLazySingleton<AuthRemoteDatasource>(() => AuthRemoteDatasourceImpl());
   sl.registerLazySingleton<AuthLocalDatasource>(() => AuthLocalDatasourceImpl());
 
-  // ✅ Auth Repository
+  // Auth Repository
   sl.registerLazySingleton<AuthRepository>(
         () => AuthRepositoryImpl(
       remoteDatasource: sl<AuthRemoteDatasource>(),
@@ -71,59 +76,73 @@ Future<void> initServiceLocator() async {
     ),
   );
 
-  // ✅ Auth Use Cases
+  // Auth Use Cases
   sl.registerLazySingleton(() => LoginUseCase(sl()));
   sl.registerLazySingleton(() => SignupUseCase(sl()));
 
-  // ✅ Auth Cubits (ViewModels)
+  // Auth Cubits (ViewModels)
   sl.registerFactory(() => LoginCubit(sl()));
   sl.registerFactory(() => SignupCubit(sl()));
 
 
-  // ✅ HTTP Client (shared)
+  // HTTP Client (shared)
   sl.registerLazySingleton(() => http.Client());
 
-  // ✅ News Data Source
+  // News Data Source
   sl.registerLazySingleton<NewsRemoteDataSource>(
         () => NewsRemoteDataSourceImpl(sl()),
   );
 
-  // ✅ News Repository
+  // News Repository
   sl.registerLazySingleton<NewsRepository>(
         () => NewsRepositoryImpl(sl()),
   );
 
-  // ✅ News Use Case
+  // News Use Case
   sl.registerLazySingleton(() => GetAllNews(sl()));
 
-  // ✅ News Bloc
+  // News Bloc
   sl.registerFactory(() => NewsBloc(sl()));
-  // ✅ DIO
+  // DIO
   sl.registerLazySingleton<DioClient>(() => DioClient());
   sl.registerLazySingleton<Dio>(() => sl<DioClient>().dio);
 
-  // ✅ News Preview Bloc (needs token and userId passed at runtime)
+  // News Preview Bloc (needs token and userId passed at runtime)
   sl.registerFactoryParam<NewsPreviewBloc, String, String>(
         (token, userId) => NewsPreviewBloc(token: token, userId: userId),
   );
 
 // Lawyer Feature
 
-// ✅ Data Source
+// Data Source
   sl.registerLazySingleton<LawyerRemoteDataSource>(
         () => LawyerRemoteDataSourceImpl(sl()), // Dio is already registered above
   );
 
-// ✅ Repository
+// Repository
   sl.registerLazySingleton<LawyerRepository>(
         () => LawyerRepositoryImpl(sl()),
   );
 
-// ✅ Use Case
+// Use Case
   sl.registerLazySingleton(() => GetAllLawyers(sl()));
 
-// ✅ BLoC
+// BLoC
   sl.registerFactory(() => LawyerListBloc(sl()));
 
+
+  // PDF Feature
+
+// Data Source
+  sl.registerLazySingleton<PdfRemoteDataSource>(() => PdfRemoteDataSource(sl()));
+
+// Repository
+  sl.registerLazySingleton<PdfRepository>(() => PdfRepositoryImpl(sl()));
+
+// Use Case
+  sl.registerLazySingleton(() => GetAllPdfsUseCase(sl()));
+
+// Bloc
+  sl.registerFactory(() => PdfBloc(sl()));
 
 }

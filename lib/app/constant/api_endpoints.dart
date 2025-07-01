@@ -5,6 +5,8 @@ class ApiEndpoints {
   static const String baseHost = "http://10.0.2.2:5000";
   // static const String baseHost = "http://localhost:5000";
 
+  static const pdfList = 'pdfs'; // 👈 Just 'pdfs', not full path
+
   static const String baseUrl = "$baseHost/api/";
 
   // Auth
@@ -34,4 +36,5 @@ class ApiEndpoints {
   static String updateLawyer(String id) => "$baseUrl/lawyers/$id";
   static String deleteLawyer(String id) => "$baseUrl/lawyers/$id";
   static const String getLawyerByUser = "${baseUrl}lawyers/by-user"; // Optional
+
 }
