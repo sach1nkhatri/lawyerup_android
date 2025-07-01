@@ -10,6 +10,6 @@ abstract class AuthRepository {
     required String role,
     required String contactNumber,
   });
-  Future<void> logout(); // ✅ Add this line
+  Future<void> logout(); // Future Logout Void
 }
 

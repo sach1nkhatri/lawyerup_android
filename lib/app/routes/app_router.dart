@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lawyerup_android/features/lawyer_up/presentation/bloc/lawyer_list_event.dart';
 
 import '../../features/ai_chat/presentation/pages/chat_page.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
@@ -14,8 +16,8 @@ import '../../features/pdf_library/presentation/pages/pdf_library_page.dart';
 import '../../features/settings/presentation/pages/settings_page.dart';
 import '../../features/splash/presentation/pages/splash_page.dart';
 
-
-
+import '../../features/lawyer_up/presentation/bloc/lawyer_list_bloc.dart';
+import '../service_locater/service_locator.dart';
 
 class AppRouter {
   static const String splash = '/';
@@ -30,8 +32,6 @@ class AppRouter {
   static const String news = '/news';
   static const String pdf = '/pdfpage';
   static const String lawyer = '/lawyerup';
-
-  //  New routes for bottom navigation pages
   static const String profile = '/profile';
   static const String settings = '/settings';
 
@@ -47,7 +47,12 @@ class AppRouter {
     chat: (context) => const ChatPage(),
     news: (context) => const NewsPage(),
     pdf: (context) => const PdfLibraryPage(),
-    lawyer: (context) => const LawyerUpPage(),
     settings: (context) => const SettingsPage(),
+
+    // ✅ Injecting LawyerListBloc for lawyer page
+    lawyer: (context) => BlocProvider(
+      create: (_) => sl<LawyerListBloc>()..add(FetchAllLawyers()),
+      child: const LawyerUpPage(),
+    ),
   };
 }

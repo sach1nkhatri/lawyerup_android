@@ -4,6 +4,12 @@ import 'package:http/http.dart' as http;
 import 'package:dio/dio.dart';
 
 //NEWS
+import '../../features/lawyer_up/data/datasources/remote/lawyer_remote_data_source.dart';
+import '../../features/lawyer_up/data/repositories/lawyer_repository_impl.dart';
+import '../../features/lawyer_up/domain/repositories/lawyer_repository.dart';
+import '../../features/lawyer_up/domain/usecases/get_all_lawyers.dart';
+import '../../features/lawyer_up/domain/usecases/get_lawyer_detail.dart';
+import '../../features/lawyer_up/presentation/bloc/lawyer_list_bloc.dart';
 import '../../features/news/presentation/bloc/news_preview_bloc.dart';
 //DIO
 import '../../core/network/dio_client.dart';
@@ -100,5 +106,26 @@ Future<void> initServiceLocator() async {
   sl.registerFactoryParam<NewsPreviewBloc, String, String>(
         (token, userId) => NewsPreviewBloc(token: token, userId: userId),
   );
+
+  // ✅ Lawyer Feature
+
+// 👉 Data Source
+  sl.registerLazySingleton<LawyerRemoteDataSource>(
+        () => LawyerRemoteDataSourceImpl(sl()),
+  );
+
+// 👉 Repository
+  sl.registerLazySingleton<LawyerRepository>(
+        () => LawyerRepositoryImpl(sl()),
+  );
+
+// 👉 Use Cases
+  sl.registerLazySingleton(() => GetAllLawyers(sl()));
+  sl.registerLazySingleton(() => GetLawyerDetail(sl()));
+
+// 👉 BLoCs
+  sl.registerFactory(() => LawyerListBloc(sl()));
+  // sl.registerFactory(() => LawyerDetailBloc(sl()));
+
 
 }
