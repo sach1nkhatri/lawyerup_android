@@ -4,7 +4,7 @@ class Lawyer {
   final String id;
   final String fullName;
   final String specialization; // From latest education
-  final String barRegNumber;   // From root-level specialization
+  final String barRegNumber; // From root-level specialization
   final String email;
   final String phone;
   final String address;
@@ -40,4 +40,5 @@ class Lawyer {
     required this.schedule,
     required this.reviews,
   });
+
 }

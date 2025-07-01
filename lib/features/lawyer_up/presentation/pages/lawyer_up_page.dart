@@ -13,7 +13,19 @@ class LawyerUpPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Find a Lawyer")),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF1C2D3D),
+        iconTheme: const IconThemeData(color: Colors.white),
+        title: const Text(
+          "Find a Lawyer",
+          style: TextStyle(
+            fontFamily: 'Lora',
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+      ),
       body: BlocBuilder<LawyerListBloc, LawyerListState>(
         builder: (context, state) {
           if (state is LawyerListLoading) {
@@ -29,14 +41,24 @@ class LawyerUpPage extends StatelessWidget {
               itemCount: lawyers.length,
               itemBuilder: (context, index) {
                 final lawyer = lawyers[index];
-                return LawyerCard(lawyer: lawyer);
+
+                return InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(
+                      context,
+                      '/preview', // ✅ Ensure this route is defined in app_router.dart
+                      arguments: lawyer, // ✅ Passing lawyer data to preview
+                    );
+                  },
+                  child: LawyerCard(lawyer: lawyer),
+                );
               },
             );
           } else if (state is LawyerListError) {
-            return CustomErrorWidget(message: state.message); // ✅ FIXED
+            return CustomErrorWidget(message: state.message);
           }
 
-          return const SizedBox(); // default fallback
+          return const SizedBox(); // fallback for other states
         },
       ),
     );

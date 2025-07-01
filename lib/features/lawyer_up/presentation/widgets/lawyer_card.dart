@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../../../app/constant/api_endpoints.dart';
 import '../../domain/entities/lawyer.dart';
 
@@ -24,6 +25,7 @@ class LawyerCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       elevation: 4,
+      color: Colors.cyan[50],
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(12.0),
@@ -32,12 +34,19 @@ class LawyerCard extends StatelessWidget {
             // 🖼 Profile Photo
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: Image.network(
-                imageUrl,
-                width: 70,
-                height: 70,
+              child: CachedNetworkImage(
+                imageUrl: imageUrl,
+                width: 130,
+                height: 130,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => const Icon(Icons.person, size: 70),
+                placeholder: (context, url) => Image.asset(
+                  'assets/images/avatar_placeholder.png',
+                  width: 130,
+                  height: 130,
+                  fit: BoxFit.cover,
+                ),
+                errorWidget: (context, url, error) =>
+                const Icon(Icons.person, size: 70),
               ),
             ),
             const SizedBox(width: 12),
@@ -55,17 +64,11 @@ class LawyerCard extends StatelessWidget {
                     lawyer.specialization,
                     style: const TextStyle(fontSize: 14, color: Colors.grey),
                   ),
-                  // Optional field (remove or fix if not in model)
-                  // Text(
-                  //   lawyer.barRegNumber ?? '',
-                  //   style: const TextStyle(fontSize: 12),
-                  // ),
                   const SizedBox(height: 4),
                   Text(stars, style: const TextStyle(fontSize: 16)),
                 ],
               ),
             ),
-
             const Icon(Icons.chevron_right, size: 24)
           ],
         ),
