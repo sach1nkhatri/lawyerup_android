@@ -16,7 +16,7 @@ class ApiEndpoints {
   // Static
   static const String uploads = "$baseHost/uploads/";
 
-  // 🔥 News
+  // News
   static const String getAllNews = "${baseUrl}news";
   static String likeNews(String id) => "${baseUrl}news/$id/like";
   static String unlikeNews(String id) => "${baseUrl}news/$id/unlike";
@@ -25,4 +25,13 @@ class ApiEndpoints {
   static String commentNews(String id) => "${baseUrl}news/$id/comment";
   static String deleteComment(String newsId, int index) =>
       "${baseUrl}news/$newsId/comment/$index";
+
+  // Lawyer
+  static const String getAllLawyers = "${baseUrl}lawyers"; // for listing
+  static const String createLawyer = "${baseUrl}lawyers"; // For POST
+
+  static String getLawyerById(String id) => "$baseUrl/lawyers/$id";
+  static String updateLawyer(String id) => "$baseUrl/lawyers/$id";
+  static String deleteLawyer(String id) => "$baseUrl/lawyers/$id";
+  static const String getLawyerByUser = "${baseUrl}lawyers/by-user"; // Optional
 }

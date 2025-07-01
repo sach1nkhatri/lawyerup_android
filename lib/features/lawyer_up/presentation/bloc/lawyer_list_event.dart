@@ -7,4 +7,5 @@ abstract class LawyerListEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class FetchAllLawyers extends LawyerListEvent {}
+// 🔍 Event to fetch all lawyers
+class FetchAllLawyersEvent extends LawyerListEvent {}

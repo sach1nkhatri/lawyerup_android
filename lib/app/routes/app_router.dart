@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:lawyerup_android/features/lawyer_up/presentation/bloc/lawyer_list_event.dart';
 
 import '../../features/ai_chat/presentation/pages/chat_page.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/signup_page.dart';
 import '../../features/dashboard/presentation/pages/dashboard_page.dart';
+import '../../features/lawyer_up/presentation/bloc/lawyer_list_bloc.dart';
 import '../../features/lawyer_up/presentation/pages/lawyer_up_page.dart';
 import '../../features/news/presentation/pages/news_page.dart';
 import '../../features/onboarding/presentation/pages/tutorial_1_page.dart';
@@ -16,8 +16,8 @@ import '../../features/pdf_library/presentation/pages/pdf_library_page.dart';
 import '../../features/settings/presentation/pages/settings_page.dart';
 import '../../features/splash/presentation/pages/splash_page.dart';
 
-import '../../features/lawyer_up/presentation/bloc/lawyer_list_bloc.dart';
 import '../service_locater/service_locator.dart';
+import '../../features/lawyer_up/presentation/bloc/lawyer_list_event.dart';
 
 class AppRouter {
   static const String splash = '/';
@@ -49,9 +49,9 @@ class AppRouter {
     pdf: (context) => const PdfLibraryPage(),
     settings: (context) => const SettingsPage(),
 
-    // ✅ Injecting LawyerListBloc for lawyer page
+    // ✅ Lawyer Page with LawyerListBloc
     lawyer: (context) => BlocProvider(
-      create: (_) => sl<LawyerListBloc>()..add(FetchAllLawyers()),
+      create: (_) => sl<LawyerListBloc>()..add(FetchAllLawyersEvent()),
       child: const LawyerUpPage(),
     ),
   };

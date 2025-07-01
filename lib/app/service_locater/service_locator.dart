@@ -107,25 +107,23 @@ Future<void> initServiceLocator() async {
         (token, userId) => NewsPreviewBloc(token: token, userId: userId),
   );
 
-  // ✅ Lawyer Feature
+// Lawyer Feature
 
-// 👉 Data Source
+// ✅ Data Source
   sl.registerLazySingleton<LawyerRemoteDataSource>(
-        () => LawyerRemoteDataSourceImpl(sl()),
+        () => LawyerRemoteDataSourceImpl(sl()), // Dio is already registered above
   );
 
-// 👉 Repository
+// ✅ Repository
   sl.registerLazySingleton<LawyerRepository>(
         () => LawyerRepositoryImpl(sl()),
   );
 
-// 👉 Use Cases
+// ✅ Use Case
   sl.registerLazySingleton(() => GetAllLawyers(sl()));
-  sl.registerLazySingleton(() => GetLawyerDetail(sl()));
 
-// 👉 BLoCs
+// ✅ BLoC
   sl.registerFactory(() => LawyerListBloc(sl()));
-  // sl.registerFactory(() => LawyerDetailBloc(sl()));
 
 
 }

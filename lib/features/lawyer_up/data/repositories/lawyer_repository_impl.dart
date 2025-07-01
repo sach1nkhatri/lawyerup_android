@@ -11,10 +11,12 @@ class LawyerRepositoryImpl implements LawyerRepository {
   Future<Lawyer> getLawyerDetail(String lawyerId) async {
     final model = await remoteDataSource.getLawyerDetail(lawyerId);
 
+    // Extract specialization from the latest education
     String specialization = model.education.isNotEmpty
         ? model.education.last.specialization
         : 'N/A';
 
+    // Map root-level specialization to barRegNumber (temporary use)
     String barRegNumber = model.specialization;
 
     return Lawyer(
@@ -44,7 +46,7 @@ class LawyerRepositoryImpl implements LawyerRepository {
     final models = await remoteDataSource.getAllLawyers();
 
     return models.map((model) {
-      final specialization = model.education.isNotEmpty
+      String specialization = model.education.isNotEmpty
           ? model.education.last.specialization
           : 'N/A';
 
