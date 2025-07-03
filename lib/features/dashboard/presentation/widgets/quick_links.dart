@@ -25,7 +25,7 @@ class QuickLinks extends StatelessWidget {
 
               _tile(context, "Law Pdf", "assets/images/law.png", tileWidth),
 
-              _tile(context, "LawAI", "assets/images/chatbot.png", tileWidth),
+              _tile(context, "Bookings", "assets/images/bookings.png", tileWidth),
             ],
           ),
         );
@@ -45,8 +45,9 @@ class QuickLinks extends StatelessWidget {
       ),
       child: InkWell(
         onTap: () {
-          if (title == "LawAI") {
-            Navigator.pushNamed(context, '/chat');
+          if (title == "Bookings") {
+            Navigator.pushNamed(context, '/bookings', arguments: 'user'); // or 'lawyer'
+
           } else if (title == "News & Articles") {
             Navigator.pushNamed(context, '/news');
           } else if (title == "Law Pdf") {
