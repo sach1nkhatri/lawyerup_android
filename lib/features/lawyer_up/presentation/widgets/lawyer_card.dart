@@ -39,6 +39,9 @@ class LawyerCard extends StatelessWidget {
                 width: 130,
                 height: 130,
                 fit: BoxFit.cover,
+                fadeInDuration: Duration.zero,
+                fadeOutDuration: Duration.zero,
+                placeholderFadeInDuration: Duration.zero,
                 placeholder: (context, url) => Image.asset(
                   'assets/images/avatar_placeholder.png',
                   width: 130,
