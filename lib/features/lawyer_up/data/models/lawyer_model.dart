@@ -143,9 +143,10 @@ class ReviewModel {
 
   factory ReviewModel.fromJson(Map<String, dynamic> json) {
     return ReviewModel(
-      name: json['name'] ?? '',
+      name: json['user'] ?? '', // ✅ FIXED: using 'user' field
       comment: json['comment'] ?? '',
       rating: (json['rating'] ?? 0).toDouble(),
     );
   }
 }
+

@@ -1,5 +1,4 @@
 import 'package:hive/hive.dart';
-
 import '../../domain/entities/user_entity.dart';
 
 part 'user_hive_model.g.dart';
@@ -10,26 +9,32 @@ class UserHiveModel extends HiveObject {
   final String uid;
 
   @HiveField(1)
-  final String email;
+  final String fullName;
 
   @HiveField(2)
+  final String email;
+
+  @HiveField(3)
+  final String role;
+
+  @HiveField(4)
   final String token;
 
   UserHiveModel({
     required this.uid,
+    required this.fullName,
     required this.email,
+    required this.role,
     required this.token,
   });
 
-  factory UserHiveModel.fromEntity(UserEntity entity) {
-    return UserHiveModel(
-      uid: entity.uid,
-      email: entity.email,
-      token: entity.token,
-    );
-  }
-
   UserEntity toEntity() {
-    return UserEntity(uid: uid, email: email, token: token);
+    return UserEntity(
+      uid: uid,
+      fullName: fullName,
+      email: email,
+      role: role,
+      token: token,
+    );
   }
 }

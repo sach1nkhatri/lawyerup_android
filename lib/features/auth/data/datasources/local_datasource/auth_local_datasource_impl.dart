@@ -5,43 +5,28 @@ import '../../models/user_hive_model.dart';
 import 'auth_local_datasource.dart';
 
 class AuthLocalDatasourceImpl implements AuthLocalDatasource {
-  final box = Hive.box<UserHiveModel>('users');
+  final box = Hive.box<UserHiveModel>(HiveConstants.userBox);
 
   @override
-  Future<UserEntity> login(String email, String password) async {
-    try {
-      final user = box.values.firstWhere(
-            (u) => u.email == email && u.token == password,
-      );
-
-      return UserEntity(
-        uid: user.uid,
-        email: user.email,
-        token: 'local-token-${user.uid}', // ✅ Fake token for offline login
-      );
-    } catch (_) {
-      throw Exception("Invalid credentials");
-    }
+  Future<void> cacheUser(UserEntity user) async {
+    final userHive = UserHiveModel(
+      uid: user.uid,
+      fullName: user.fullName,
+      email: user.email,
+      role: user.role,
+      token: user.token,
+    );
+    await box.put('user', userHive);
   }
 
   @override
-  Future<UserEntity> signup({
-    required String fullName,
-    required String email,
-    required String password,
-    required String role,
-    required String contactNumber,
-  }) async {
-    final exists = box.values.any((u) => u.email == email);
-    if (exists) throw Exception("User already exists");
+  Future<UserEntity?> getSavedUser() async {
+    final userHive = box.get('user');
+    return userHive?.toEntity();
+  }
 
-    final newUser = UserHiveModel(
-      uid: DateTime.now().millisecondsSinceEpoch.toString(),
-      email: email,
-      token: password, // ✅ Password used as token in local mode only
-    );
-
-    await box.add(newUser);
-    return newUser.toEntity();
+  @override
+  Future<void> clearUser() async {
+    await box.delete('user');
   }
 }

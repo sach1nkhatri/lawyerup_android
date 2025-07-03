@@ -14,7 +14,8 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
     );
 
     if (response.statusCode == 200) {
-      return UserModel.fromJson(jsonDecode(response.body)['user']);
+      final data = jsonDecode(response.body);
+      return UserModel.fromJson(data['user'], data['token']);
     } else {
       throw Exception('Login failed: ${response.body}');
     }
@@ -40,8 +41,10 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       }),
     );
 
-    if (response.statusCode == 200) {
-      return UserModel.fromJson(jsonDecode(response.body)['user']);
+
+    if (response.statusCode == 201) {
+      final data = jsonDecode(response.body);
+      return UserModel.fromJson(data['user'], data['token']);
     } else {
       throw Exception('Signup failed: ${response.body}');
     }
