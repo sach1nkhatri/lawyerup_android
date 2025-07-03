@@ -9,7 +9,7 @@ class UserModel extends UserEntity {
     required super.token,
   });
 
-  /// ✅ Add this to fix the error
+
   factory UserModel.fromEntity(UserEntity entity) {
     return UserModel(
       uid: entity.uid,

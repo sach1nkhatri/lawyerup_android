@@ -28,7 +28,7 @@ class SignupCubit extends Cubit<SignupState> {
         contactNumber: contactNumber,
       );
 
-      // ✅ Convert to UserModel before storing
+      // Convert to UserModel before storing
       final model = UserModel.fromEntity(user);
 
       final box = Hive.box('settingsBox');

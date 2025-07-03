@@ -39,7 +39,7 @@ class QuickLinks extends StatelessWidget {
       width: width,
       height: 130,
       decoration: BoxDecoration(
-        color: const Color(0xFFA5F6EF),
+        color: const Color(0xFFFFFFFF),
         borderRadius: BorderRadius.circular(24),
         boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4)],
       ),
