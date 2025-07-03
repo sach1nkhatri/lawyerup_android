@@ -5,7 +5,7 @@ class HiveService {
   Future<void> init() async {
     await Hive.initFlutter();
 
-    // 🧠 Open all required boxes before usage
+    //  Open all required boxes before usage
     await Hive.openBox(HiveConstants.userBox);
     await Hive.openBox(HiveConstants.settingsBox);
 

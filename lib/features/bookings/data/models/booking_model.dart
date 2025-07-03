@@ -45,7 +45,7 @@ class BookingModel {
       lawyer: UserModel.fromJson(json['lawyer']),
       lawyerList: json['lawyerList'] != null
           ? LawyerProfileModel.fromJson(json['lawyerList'])
-          : LawyerProfileModel.empty(), // ✅ fallback
+          : LawyerProfileModel.empty(), // fallback
       date: json['date'],
       time: json['time'],
       duration: json['duration'],
@@ -69,7 +69,7 @@ class BookingModel {
       id: id,
       user: user.toEntity(),
       lawyer: lawyer.toEntity(),
-      lawyerList: lawyerList?.toEntity(), // ✅ nullable safe
+      lawyerList: lawyerList?.toEntity(),
       date: date,
       time: time,
       duration: duration,

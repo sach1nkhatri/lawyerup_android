@@ -40,7 +40,6 @@ class AuthRepositoryImpl implements AuthRepository {
     return userModel;
   }
 
-  @override
   Future<UserEntity?> getSavedUser() async {
     return await localDatasource.getSavedUser();
   }

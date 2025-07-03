@@ -15,7 +15,7 @@ class LoginCubit extends Cubit<LoginState> {
     try {
       final user = await loginUseCase(email, password);
 
-      // ✅ Safe conversion instead of invalid cast
+      //  Safe conversion instead of invalid cast
       final model = UserModel.fromEntity(user);
 
       // Save token & user to Hive
