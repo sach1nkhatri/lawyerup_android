@@ -1,48 +1,74 @@
-import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
 import '../../../../app/constant/api_endpoints.dart';
 import '../../domain/entities/lawyer.dart';
+import '../widgets/review_section.dart';
 
-class LawyerDetailTabView extends StatefulWidget {
+class LawyerDetailTabView extends StatelessWidget {
   final Lawyer lawyer;
 
   const LawyerDetailTabView({super.key, required this.lawyer});
 
-  @override
-  State<LawyerDetailTabView> createState() => _LawyerDetailTabViewState();
-}
-
-class _LawyerDetailTabViewState extends State<LawyerDetailTabView>
-    with TickerProviderStateMixin {
-  late final TabController _tabController;
-  late final String imageUrl;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 3, vsync: this);
-
-    imageUrl = "${ApiEndpoints.baseHost}${widget.lawyer.profilePhoto?.startsWith('/') ?? false
-        ? widget.lawyer.profilePhoto
-        : '/${widget.lawyer.profilePhoto}'}";
+  String _stars(double rating) {
+    int rounded = rating.round();
+    return '⭐' * rounded + '☆' * (5 - rounded);
   }
 
-  void _showAppointmentModal() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+  Widget _tabCard(List<Widget> children) {
+    return SingleChildScrollView(
+      child: Column(
+        children: children.map((child) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: child,
+          );
+        }).toList(),
       ),
-      builder: (_) => Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: const [
-            Text("🗓 Book Appointment", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            SizedBox(height: 12),
-            Text("Appointment UI coming soon..."),
-            SizedBox(height: 16),
+    );
+  }
+
+  Widget _infoRow(String title, String value) {
+    return RichText(
+      text: TextSpan(
+        text: "$title: ",
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+          color: Colors.black,
+        ),
+        children: [
+          TextSpan(
+            text: value,
+            style: const TextStyle(fontWeight: FontWeight.normal),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _infoBox(String title, String value, {bool link = false}) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: RichText(
+        text: TextSpan(
+          style: const TextStyle(color: Colors.black),
+          children: [
+            TextSpan(
+              text: "$title\n",
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            TextSpan(
+              text: value,
+              style: TextStyle(
+                fontSize: 14,
+                decoration: link ? TextDecoration.underline : null,
+                color: link ? Colors.purple : Colors.black,
+              ),
+            ),
           ],
         ),
       ),
@@ -51,176 +77,123 @@ class _LawyerDetailTabViewState extends State<LawyerDetailTabView>
 
   @override
   Widget build(BuildContext context) {
-    final lawyer = widget.lawyer;
+    final rating = lawyer.reviews.isNotEmpty
+        ? lawyer.reviews.map((r) => r.rating).reduce((a, b) => a + b) / lawyer.reviews.length
+        : 0.0;
 
-    return Column(
-      children: [
-        // 🖼 Profile + Tabs
-        Column(
-          children: [
-            ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-              child: CachedNetworkImage(
-                imageUrl: imageUrl,
-                width: double.infinity,
-                height: 220,
-                fit: BoxFit.cover,
-                placeholder: (context, url) => Image.asset(
-                  'assets/images/avatar_placeholder.png',
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  height: 220,
+    final imageUrl = "${ApiEndpoints.baseHost}${lawyer.profilePhoto}";
+
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          // 🖼 Image
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 24.0),
+            child: Center(
+              child: Container(
+                width: 120,
+                height: 120,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.grey[200],
+                  image: DecorationImage(
+                    image: CachedNetworkImageProvider(
+                      "${ApiEndpoints.baseHost}${lawyer.profilePhoto}",
+                    ),
+                    fit: BoxFit.cover,
+                  ),
                 ),
-                errorWidget: (context, url, error) =>
-                const Icon(Icons.person, size: 100),
               ),
             ),
-            Container(
-              color: const Color(0xFFE0F7FA),
-              child: TabBar(
-                controller: _tabController,
-                labelColor: Colors.black,
-                indicatorColor: Colors.lightBlue,
-                indicatorWeight: 3,
-                labelStyle: const TextStyle(fontWeight: FontWeight.bold),
-                tabs: const [
-                  Tab(text: 'Profile'),
-                  Tab(text: 'Info'),
-                  Tab(text: 'Work'),
+          ),
+
+
+          // 🧾 Tabs + Detail Cards
+          DefaultTabController(
+            length: 3,
+            child: Container(
+              color: const Color(0xE6D9FFFF),
+              child: Column(
+                children: [
+                  const TabBar(
+                    tabs: [
+                      Tab(text: 'Profile'),
+                      Tab(text: 'Info'),
+                      Tab(text: 'Work'),
+                    ],
+                    labelColor: Colors.black,
+                    labelStyle: TextStyle(fontWeight: FontWeight.bold),
+                    indicatorColor: Colors.blue,
+                    indicatorWeight: 3,
+                  ),
+                  Container(
+                    height: 350,
+                    padding: const EdgeInsets.all(12),
+                    child: TabBarView(
+                      children: [
+                        // 🔹 Profile Tab
+                        _tabCard([
+                          _infoBox("Description", lawyer.description),
+                          _infoBox("Special Case", lawyer.specialCase),
+                          _infoBox("Social Link", lawyer.socialLink, link: true),
+                        ]),
+
+                        // 🔹 Info Tab
+                        _tabCard([
+                          _infoRow("Name", lawyer.fullName),
+                          _infoRow("Speciality", lawyer.specialization),
+                          _infoRow("Bar Reg Number", lawyer.barRegNumber),
+                          _infoRow("Address", lawyer.address),
+                          _infoRow("Contact", lawyer.phone),
+                        ]),
+
+                        // 🔹 Work Tab
+                        _tabCard([
+                          const Text("Education", style: TextStyle(fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 6),
+                          ...lawyer.education.map((e) => Text("🎓 ${e.degree}, ${e.institute} (${e.year}) - ${e.specialization}")),
+                          const SizedBox(height: 16),
+                          const Text("Work Experience", style: TextStyle(fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 6),
+                          ...lawyer.workExperience.map((w) => Text("📁 ${w.court} (${w.from} to ${w.to})")),
+                        ]),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
-          ],
-        ),
+          ),
 
-        // 📑 Tab Content
-        Expanded(
-          child: Container(
-            color: const Color(0xFFE0F7FA),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                _buildProfileTab(lawyer),
-                _buildInfoTab(lawyer),
-                _buildWorkTab(lawyer),
-              ],
+          // 📅 Appointment Button
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: ElevatedButton(
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  builder: (ctx) => Container(
+                    height: 200,
+                    child: const Center(child: Text("Appointment Modal Placeholder")),
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.pink.shade100,
+                foregroundColor: Colors.black,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+              ),
+              child: const Text("Get Appointment"),
             ),
           ),
-        ),
-      ],
-    );
-  }
 
-  Widget _buildProfileTab(Lawyer lawyer) {
-    return _detailCard([
-      _infoText("Name", lawyer.fullName),
-      _infoText("Speciality", lawyer.specialization),
-      _infoText("Bar Reg Number", lawyer.barRegNumber),
-      _infoText("Address", "${lawyer.address}, ${lawyer.city}, ${lawyer.state}"),
-      _infoText("Contact", lawyer.phone),
-      const SizedBox(height: 12),
-      _appointmentButton(),
-    ]);
-  }
-
-  Widget _buildInfoTab(Lawyer lawyer) {
-    return _detailCard([
-      _sectionCard("Description", lawyer.description),
-      _sectionCard("Special Case", lawyer.specialCase),
-      _sectionCard("Social Link", lawyer.socialLink),
-      const SizedBox(height: 12),
-      _appointmentButton(),
-    ]);
-  }
-
-  Widget _buildWorkTab(Lawyer lawyer) {
-    return _detailCard([
-      const Text("🎓 Education", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-      const SizedBox(height: 6),
-      ...lawyer.education.map((e) => Padding(
-        padding: const EdgeInsets.only(bottom: 6),
-        child: Text(
-          "🎓 ${e.degree ?? 'N/A'} - ${e.institute ?? 'N/A'}, ${e.year ?? 'N/A'} (${e.specialization ?? 'N/A'})",
-          style: const TextStyle(fontSize: 14),
-        ),
-      )),
-
-      const SizedBox(height: 12),
-      const Text("📁 Work Experience", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-      const SizedBox(height: 6),
-      ...lawyer.workExperience.map((w) => Padding(
-        padding: const EdgeInsets.only(bottom: 6),
-        child: Text(
-          "📁 ${w.court ?? 'N/A'} (${w.from ?? 'N/A'} to ${w.to ?? 'N/A'})",
-          style: const TextStyle(fontSize: 14),
-        ),
-      )),
-
-      const SizedBox(height: 12),
-      _appointmentButton(),
-    ]);
-  }
-
-  Widget _infoText(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "$label: ",
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-          ),
-          Expanded(
-            child: Text(value, style: const TextStyle(fontSize: 14)),
-          ),
+          // ⭐ Review Section
+          ReviewSection(rating: rating, reviews: lawyer.reviews),
+          const SizedBox(height: 16),
         ],
-      ),
-    );
-  }
-
-  Widget _sectionCard(String title, String? content) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-          const SizedBox(height: 6),
-          Text(content ?? 'Not Provided'),
-        ],
-      ),
-    );
-  }
-
-  Widget _detailCard(List<Widget> children) {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: children,
-      ),
-    );
-  }
-
-  Widget _appointmentButton() {
-    return Center(
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFFFAD4D4),
-          foregroundColor: Colors.black,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        ),
-        onPressed: _showAppointmentModal,
-        child: const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-          child: Text("Get Appointment"),
-        ),
       ),
     );
   }
