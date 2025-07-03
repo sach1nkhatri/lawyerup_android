@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lawyerup_android/features/bookings/presentation/pages/booking_tab_page.dart';
 
 import '../../features/ai_chat/presentation/pages/chat_page.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
@@ -17,9 +18,9 @@ import '../../features/onboarding/presentation/pages/welcome_page.dart';
 import '../../features/pdf_library/presentation/pages/pdf_library_page.dart';
 import '../../features/settings/presentation/pages/settings_page.dart';
 import '../../features/splash/presentation/pages/splash_page.dart';
-
 import '../service_locater/service_locator.dart';
 import '../../features/lawyer_up/presentation/bloc/lawyer_list_event.dart';
+
 
 
 
@@ -38,7 +39,8 @@ class AppRouter {
   static const String lawyer = '/lawyerup';
   static const String profile = '/profile';
   static const String settings = '/settings';
-  static const String lawyerPreview = '/preview'; // ✅ New route
+  static const String lawyerPreview = '/preview';
+  static const String bookingTabPage = '/bookings';
 
   static final Map<String, WidgetBuilder> routes = {
     splash: (context) => const SplashPage(),
@@ -53,6 +55,11 @@ class AppRouter {
     news: (context) => const NewsPage(),
     pdf: (context) => const PdfLibraryPage(),
     settings: (context) => const SettingsPage(),
+    bookingTabPage: (context) {
+      final role = ModalRoute.of(context)!.settings.arguments as String;
+      return BookingTabPage(role: role);
+    },
+
 
     // ✅ Lawyer List Page
     lawyer: (context) => BlocProvider(
