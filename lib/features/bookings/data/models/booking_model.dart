@@ -2,15 +2,12 @@ import 'user_model.dart';
 import 'lawyer_profile_model.dart';
 import 'message_model.dart';
 import '../../domain/entities/booking.dart';
-import '../../domain/entities/user.dart' as domain_user;
-import '../../domain/entities/lawyer_profile.dart' as domain_lawyer;
-import '../../domain/entities/message.dart' as domain_message;
 
 class BookingModel {
   final String id;
   final UserModel user;
   final UserModel lawyer;
-  final LawyerProfileModel lawyerList;
+  final LawyerProfileModel? lawyerList; // ✅ Make nullable
   final String date;
   final String time;
   final int duration;
@@ -46,7 +43,9 @@ class BookingModel {
       id: json['_id'],
       user: UserModel.fromJson(json['user']),
       lawyer: UserModel.fromJson(json['lawyer']),
-      lawyerList: LawyerProfileModel.fromJson(json['lawyerList']),
+      lawyerList: json['lawyerList'] != null
+          ? LawyerProfileModel.fromJson(json['lawyerList'])
+          : LawyerProfileModel.empty(), // ✅ fallback
       date: json['date'],
       time: json['time'],
       duration: json['duration'],
@@ -64,12 +63,13 @@ class BookingModel {
     );
   }
 
+
   Booking toEntity() {
     return Booking(
       id: id,
       user: user.toEntity(),
       lawyer: lawyer.toEntity(),
-      lawyerList: lawyerList.toEntity(),
+      lawyerList: lawyerList?.toEntity(), // ✅ nullable safe
       date: date,
       time: time,
       duration: duration,

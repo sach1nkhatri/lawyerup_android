@@ -6,7 +6,7 @@ class Booking {
   final String id;
   final User user;
   final User lawyer;
-  final LawyerProfile lawyerList;
+  final LawyerProfile? lawyerList; // ✅ Make nullable
   final String date;
   final String time;
   final int duration;
@@ -23,7 +23,7 @@ class Booking {
     required this.id,
     required this.user,
     required this.lawyer,
-    required this.lawyerList,
+    required this.lawyerList, // now nullable
     required this.date,
     required this.time,
     required this.duration,

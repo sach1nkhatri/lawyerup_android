@@ -31,6 +31,19 @@ class LawyerProfileModel {
     );
   }
 
+  factory LawyerProfileModel.empty() {
+    return LawyerProfileModel(
+      id: '',
+      specialization: '',
+      qualification: '',
+      profilePhoto: null,
+      contact: null,
+      phone: null,
+      schedule: {},
+    );
+  }
+
+
   domain.LawyerProfile toEntity() {
     return domain.LawyerProfile(
       id: id,
