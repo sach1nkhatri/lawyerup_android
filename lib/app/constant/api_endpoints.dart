@@ -3,10 +3,6 @@ class ApiEndpoints {
 
   /// Use 10.0.2.2 for Android Emulator
   static const String baseHost = "http://10.0.2.2:5000";
-  // static const String baseHost = "http://localhost:5000";
-
-  static const pdfList = 'pdfs'; // 👈 Just 'pdfs', not full path
-
   static const String baseUrl = "$baseHost/api/";
 
   // Auth
@@ -17,6 +13,9 @@ class ApiEndpoints {
 
   // Static
   static const String uploads = "$baseHost/uploads/";
+
+  // PDFs
+  static const pdfList = 'pdfs';
 
   // News
   static const String getAllNews = "${baseUrl}news";
@@ -29,12 +28,26 @@ class ApiEndpoints {
       "${baseUrl}news/$newsId/comment/$index";
 
   // Lawyer
-  static const String getAllLawyers = "${baseUrl}lawyers"; // for listing
-  static const String createLawyer = "${baseUrl}lawyers"; // For POST
-
+  static const String getAllLawyers = "${baseUrl}lawyers";
+  static const String createLawyer = "${baseUrl}lawyers";
   static String getLawyerById(String id) => "$baseUrl/lawyers/$id";
   static String updateLawyer(String id) => "$baseUrl/lawyers/$id";
   static String deleteLawyer(String id) => "$baseUrl/lawyers/$id";
-  static const String getLawyerByUser = "${baseUrl}lawyers/by-user"; // Optional
+  static const String getLawyerByUser = "${baseUrl}lawyers/by-user";
 
+  //  Bookings
+  static const String createBooking = "${baseUrl}bookings";
+  static String getUserBookings(String userId) => "${baseUrl}bookings/user/$userId";
+  static String getLawyerBookings(String lawyerId) => "${baseUrl}bookings/lawyer/$lawyerId";
+  static String getAvailableSlots(String lawyerId, String date, int duration) =>
+      "${baseUrl}bookings/slots?lawyerId=$lawyerId&date=$date&duration=$duration";
+  static String updateBookingStatus(String bookingId) =>
+      "${baseUrl}bookings/$bookingId/status";
+  static String updateMeetingLink(String bookingId) =>
+      "${baseUrl}bookings/$bookingId/meeting-link";
+  static String deleteBooking(String bookingId) => "${baseUrl}bookings/$bookingId";
+  static String getChatMessages(String bookingId) => "${baseUrl}bookings/$bookingId/chat";
+  static String sendMessage(String bookingId) => "${baseUrl}bookings/$bookingId/chat";
+  static String markMessagesRead(String bookingId) =>
+      "${baseUrl}bookings/$bookingId/chat/read";
 }

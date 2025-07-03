@@ -4,6 +4,20 @@ import 'package:http/http.dart' as http;
 import 'package:dio/dio.dart';
 
 //NEWS
+import '../../features/bookings/data/datasources/remote_datasource/booking_remote_data_source.dart';
+import '../../features/bookings/data/datasources/remote_datasource/booking_repository_impl.dart';
+import '../../features/bookings/domain/repositories/booking_repository.dart';
+import '../../features/bookings/domain/usecases/create_booking.dart';
+import '../../features/bookings/domain/usecases/delete_booking.dart';
+import '../../features/bookings/domain/usecases/get_available_slots.dart';
+import '../../features/bookings/domain/usecases/get_lawyer_bookings.dart';
+import '../../features/bookings/domain/usecases/get_messages.dart';
+import '../../features/bookings/domain/usecases/get_user_bookings.dart';
+import '../../features/bookings/domain/usecases/mark_messages_as_read.dart';
+import '../../features/bookings/domain/usecases/send_message.dart';
+import '../../features/bookings/domain/usecases/update_booking_status.dart';
+import '../../features/bookings/domain/usecases/update_meeting_link.dart';
+import '../../features/bookings/presentation/bloc/booking_bloc.dart';
 import '../../features/lawyer_up/data/datasources/remote/lawyer_remote_data_source.dart';
 import '../../features/lawyer_up/data/repositories/lawyer_repository_impl.dart';
 import '../../features/lawyer_up/domain/repositories/lawyer_repository.dart';
@@ -144,5 +158,33 @@ Future<void> initServiceLocator() async {
 
 // Bloc
   sl.registerFactory(() => PdfBloc(sl()));
+
+
+  // ==================== BOOKINGS ====================
+  // Data Source
+  sl.registerLazySingleton<BookingRemoteDataSource>(() => BookingRemoteDataSource(dio: sl()));
+
+  // Repository
+  sl.registerLazySingleton<BookingRepository>(() => BookingRepositoryImpl(remote: sl()));
+
+  // Use Cases
+  sl.registerLazySingleton(() => GetUserBookings(sl()));
+  sl.registerLazySingleton(() => GetLawyerBookings(sl()));
+  sl.registerLazySingleton(() => CreateBooking(sl()));
+  sl.registerLazySingleton(() => DeleteBooking(sl()));
+  sl.registerLazySingleton(() => UpdateBookingStatus(sl()));
+  sl.registerLazySingleton(() => UpdateMeetingLink(sl()));
+  sl.registerLazySingleton(() => GetAvailableSlots(sl()));
+  sl.registerLazySingleton(() => GetMessages(sl()));
+  sl.registerLazySingleton(() => SendMessage(sl()));
+  sl.registerLazySingleton(() => MarkMessagesAsRead(sl()));
+
+  // Bloc
+  sl.registerFactory(() => BookingBloc(
+    getUserBookings: sl(),
+    getLawyerBookings: sl(),
+    deleteBooking: sl(),
+    updateBookingStatus: sl(),
+  ));
 
 }

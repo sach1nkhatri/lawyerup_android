@@ -1,56 +1,58 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hive/hive.dart';
+
+import '../../../../app/constant/hive_constants.dart';
+import '../../../../app/service_locater/service_locator.dart';
+import '../../../auth/data/models/user_hive_model.dart';
+import '../bloc/booking_bloc.dart';
+import '../bloc/booking_event.dart';
+import '../bloc/booking_state.dart';
 import '../widgets/user_booking_card.dart';
 import '../widgets/lawyer_booking_card.dart';
 
-class BookingTabPage extends StatefulWidget {
+class BookingTabPage extends StatelessWidget {
   final String role; // 'user' or 'lawyer'
+
   const BookingTabPage({super.key, required this.role});
 
   @override
-  State<BookingTabPage> createState() => _BookingTabPageState();
+  Widget build(BuildContext context) {
+    // ✅ Access already-opened box (opened via HiveService in main.dart)
+    final box = Hive.box<UserHiveModel>(HiveConstants.userBox);
+    final user = box.get('user');
+    final userId = user?.uid ?? ''; // fallback to '' if null
+
+    return BlocProvider(
+      create: (_) => sl<BookingBloc>()..add(LoadBookings(role: role, userId: userId)),
+      child: _BookingTabView(role: role),
+    );
+  }
 }
 
-class _BookingTabPageState extends State<BookingTabPage> with TickerProviderStateMixin {
-  late TabController _tabController;
 
-  final List<String> _tabs = ['Pending', 'Accepted', 'History'];
+class _BookingTabView extends StatefulWidget {
+  final String role;
+  const _BookingTabView({required this.role});
+
+  @override
+  State<_BookingTabView> createState() => _BookingTabViewState();
+}
+
+class _BookingTabViewState extends State<_BookingTabView> with TickerProviderStateMixin {
+  late TabController _tabController;
+  final List<String> _tabs = ['pending', 'approved', 'history'];
 
   @override
   void initState() {
-    super.initState();
     _tabController = TabController(length: _tabs.length, vsync: this);
+    super.initState();
   }
 
   @override
   void dispose() {
     _tabController.dispose();
     super.dispose();
-  }
-
-  Widget _buildDummyCard(String status) {
-    if (widget.role == 'lawyer') {
-      return LawyerBookingCard(
-        name: 'John Doe',
-        email: 'john@example.com',
-        contact: '9800000000',
-        status: status,
-        date: '2025-07-04',
-        time: '10:30',
-        mode: 'online',
-        description: 'Discuss criminal case',
-      );
-    } else {
-      return UserBookingCard(
-        lawyerName: 'Aayush Khatri',
-        email: 'aayush@lawyer.com',
-        contact: '9812345678',
-        status: status,
-        date: '2025-07-04',
-        time: '14:00',
-        mode: 'live',
-        description: 'Consult family law issue',
-      );
-    }
   }
 
   @override
@@ -60,22 +62,59 @@ class _BookingTabPageState extends State<BookingTabPage> with TickerProviderStat
         title: const Text('My Bookings'),
         bottom: TabBar(
           controller: _tabController,
-          tabs: _tabs.map((t) => Tab(text: t)).toList(),
+          tabs: _tabs.map((tab) => Tab(text: tab.capitalize())).toList(),
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: _tabs.map((status) {
-          return ListView.builder(
-            padding: const EdgeInsets.all(12),
-            itemCount: 2, // Just show 2 dummy cards
-            itemBuilder: (_, i) => Padding(
-              padding: const EdgeInsets.only(bottom: 12.0),
-              child: _buildDummyCard(status.toLowerCase()),
-            ),
-          );
-        }).toList(),
+      body: BlocBuilder<BookingBloc, BookingState>(
+        builder: (context, state) {
+          if (state is BookingLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (state is BookingError) {
+            return Center(child: Text(state.message));
+          }
+
+          if (state is BookingLoaded) {
+            final bookings = state.bookings;
+            return TabBarView(
+              controller: _tabController,
+              children: _tabs.map((status) {
+                final filtered = bookings.where((b) {
+                  if (status == 'history') {
+                    return ['completed', 'cancelled'].contains(b.status.toLowerCase());
+                  }
+                  return b.status.toLowerCase() == status;
+                }).toList();
+
+                if (filtered.isEmpty) {
+                  return const Center(child: Text('No bookings found.'));
+                }
+
+                return ListView.builder(
+                  padding: const EdgeInsets.all(12),
+                  itemCount: filtered.length,
+                  itemBuilder: (_, i) {
+                    final booking = filtered[i];
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: widget.role == 'lawyer'
+                          ? LawyerBookingCard(booking: booking)
+                          : UserBookingCard(booking: booking),
+                    );
+                  },
+                );
+              }).toList(),
+            );
+          }
+
+          return const SizedBox.shrink();
+        },
       ),
     );
   }
+}
+
+extension on String {
+  String capitalize() => '${this[0].toUpperCase()}${substring(1)}';
 }
