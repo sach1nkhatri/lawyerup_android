@@ -18,15 +18,4 @@ class HiveService {
     await Hive.deleteBoxFromDisk('users');
     await Hive.deleteBoxFromDisk('settingsBox');
   }
-
-  Future<void> addDummyUser() async {
-    final box = Hive.box<UserHiveModel>('users');
-    if (box.isEmpty) {
-      await box.add(UserHiveModel(
-        uid: 'local-1',
-        email: 'test@lawyerup.com',
-        token: 'local-token',
-      ));
-    }
-  }
 }
