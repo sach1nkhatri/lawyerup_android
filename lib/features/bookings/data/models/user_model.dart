@@ -7,6 +7,10 @@ class UserModel {
   final String? contactNumber;
   final String? phone;
   final String? role;
+  final String? address;
+  final String? city;
+  final String? state;
+  final String? plan;
 
   UserModel({
     required this.id,
@@ -15,6 +19,10 @@ class UserModel {
     this.contactNumber,
     this.phone,
     this.role,
+    this.address,
+    this.city,
+    this.state,
+    this.plan,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -25,7 +33,26 @@ class UserModel {
       contactNumber: json['contactNumber'],
       phone: json['phone'],
       role: json['role'],
+      address: json['address'],
+      city: json['city'],
+      state: json['state'],
+      plan: json['plan'],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      '_id': id,
+      'fullName': fullName,
+      'email': email,
+      'contactNumber': contactNumber,
+      'phone': phone,
+      'role': role,
+      'address': address,
+      'city': city,
+      'state': state,
+      'plan': plan,
+    };
   }
 
   domain.User toEntity() {
@@ -36,6 +63,10 @@ class UserModel {
       contactNumber: contactNumber,
       phone: phone,
       role: role,
+      address: address,
+      city: city,
+      state: state,
+      plan: plan,
     );
   }
 }

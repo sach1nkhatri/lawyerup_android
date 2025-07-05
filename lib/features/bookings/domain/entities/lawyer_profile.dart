@@ -2,18 +2,31 @@ class LawyerProfile {
   final String id;
   final String specialization;
   final String qualification;
-  final String? profilePhoto;
   final String? contact;
   final String? phone;
-  final dynamic schedule;
+  final String? rate;
+  final String? profilePhoto;
+  final Map<String, dynamic>? schedule;
 
-  LawyerProfile({
+  const LawyerProfile({
     required this.id,
     required this.specialization,
     required this.qualification,
-    this.profilePhoto,
     this.contact,
     this.phone,
+    this.rate,
+    this.profilePhoto,
     this.schedule,
   });
+
+  static const fallback = LawyerProfile(
+    id: '',
+    specialization: 'N/A',
+    qualification: 'N/A',
+    contact: '',
+    phone: '',
+    rate: '',
+    profilePhoto: '',
+    schedule: {},
+  );
 }

@@ -12,22 +12,52 @@ class LoadBookings extends BookingEvent {
   final String userId;
 
   const LoadBookings({required this.role, required this.userId});
+
+  @override
+  List<Object?> get props => [role, userId];
 }
 
 class CancelBooking extends BookingEvent {
   final String bookingId;
+  final String role;
+  final String userId;
 
-  const CancelBooking(this.bookingId);
+  const CancelBooking({
+    required this.bookingId,
+    required this.role,
+    required this.userId,
+  });
+
+  @override
+  List<Object?> get props => [bookingId, role, userId];
 }
 
 class ApproveBooking extends BookingEvent {
   final String bookingId;
+  final String role;
+  final String userId;
 
-  const ApproveBooking(this.bookingId);
+  const ApproveBooking({
+    required this.bookingId,
+    required this.role,
+    required this.userId,
+  });
+
+  @override
+  List<Object?> get props => [bookingId, role, userId];
 }
 
 class CompleteBooking extends BookingEvent {
   final String bookingId;
+  final String role;
+  final String userId;
 
-  const CompleteBooking(this.bookingId);
+  const CompleteBooking({
+    required this.bookingId,
+    required this.role,
+    required this.userId,
+  });
+
+  @override
+  List<Object?> get props => [bookingId, role, userId];
 }

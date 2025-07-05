@@ -5,14 +5,13 @@ import 'package:dio/dio.dart';
 
 //NEWS
 import '../../features/bookings/data/datasources/remote_datasource/booking_remote_data_source.dart';
-import '../../features/bookings/data/datasources/remote_datasource/booking_repository_impl.dart';
+import '../../features/bookings/data/repositories/booking_repository_impl.dart';
 import '../../features/bookings/domain/repositories/booking_repository.dart';
 import '../../features/bookings/domain/usecases/create_booking.dart';
 import '../../features/bookings/domain/usecases/delete_booking.dart';
 import '../../features/bookings/domain/usecases/get_available_slots.dart';
-import '../../features/bookings/domain/usecases/get_lawyer_bookings.dart';
+import '../../features/bookings/domain/usecases/get_bookings.dart';
 import '../../features/bookings/domain/usecases/get_messages.dart';
-import '../../features/bookings/domain/usecases/get_user_bookings.dart';
 import '../../features/bookings/domain/usecases/mark_messages_as_read.dart';
 import '../../features/bookings/domain/usecases/send_message.dart';
 import '../../features/bookings/domain/usecases/update_booking_status.dart';
@@ -22,7 +21,6 @@ import '../../features/lawyer_up/data/datasources/remote/lawyer_remote_data_sour
 import '../../features/lawyer_up/data/repositories/lawyer_repository_impl.dart';
 import '../../features/lawyer_up/domain/repositories/lawyer_repository.dart';
 import '../../features/lawyer_up/domain/usecases/get_all_lawyers.dart';
-import '../../features/lawyer_up/domain/usecases/get_lawyer_detail.dart';
 import '../../features/lawyer_up/presentation/bloc/lawyer_list_bloc.dart';
 import '../../features/news/presentation/bloc/news_preview_bloc.dart';
 //DIO
@@ -167,9 +165,8 @@ Future<void> initServiceLocator() async {
   // Repository
   sl.registerLazySingleton<BookingRepository>(() => BookingRepositoryImpl(remote: sl()));
 
-  // Use Cases
-  sl.registerLazySingleton(() => GetUserBookings(sl()));
-  sl.registerLazySingleton(() => GetLawyerBookings(sl()));
+// Use Cases
+  sl.registerLazySingleton(() => GetBookings(sl())); // ✅ New unified use case
   sl.registerLazySingleton(() => CreateBooking(sl()));
   sl.registerLazySingleton(() => DeleteBooking(sl()));
   sl.registerLazySingleton(() => UpdateBookingStatus(sl()));
@@ -179,10 +176,9 @@ Future<void> initServiceLocator() async {
   sl.registerLazySingleton(() => SendMessage(sl()));
   sl.registerLazySingleton(() => MarkMessagesAsRead(sl()));
 
-  // Bloc
+// Bloc
   sl.registerFactory(() => BookingBloc(
-    getUserBookings: sl(),
-    getLawyerBookings: sl(),
+    getBookings: sl(), // ✅ Inject new use case
     deleteBooking: sl(),
     updateBookingStatus: sl(),
   ));

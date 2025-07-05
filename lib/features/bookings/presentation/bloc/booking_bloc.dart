@@ -1,21 +1,17 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../domain/usecases/get_bookings.dart';
 import '../../domain/usecases/delete_booking.dart';
-import '../../domain/usecases/get_lawyer_bookings.dart';
-import '../../domain/usecases/get_user_bookings.dart';
 import '../../domain/usecases/update_booking_status.dart';
 import 'booking_event.dart';
 import 'booking_state.dart';
 
-
 class BookingBloc extends Bloc<BookingEvent, BookingState> {
-  final GetUserBookings getUserBookings;
-  final GetLawyerBookings getLawyerBookings;
+  final GetBookings getBookings;
   final DeleteBooking deleteBooking;
   final UpdateBookingStatus updateBookingStatus;
 
   BookingBloc({
-    required this.getUserBookings,
-    required this.getLawyerBookings,
+    required this.getBookings,
     required this.deleteBooking,
     required this.updateBookingStatus,
   }) : super(BookingInitial()) {
@@ -28,9 +24,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
   Future<void> _onLoad(LoadBookings event, Emitter<BookingState> emit) async {
     emit(BookingLoading());
     try {
-      final bookings = event.role == 'lawyer'
-          ? await getLawyerBookings(event.userId)
-          : await getUserBookings(event.userId);
+      final bookings = await getBookings(userId: event.userId, role: event.role);
       emit(BookingLoaded(bookings));
     } catch (e) {
       emit(BookingError("Failed to load bookings"));
@@ -39,16 +33,16 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
 
   Future<void> _onCancel(CancelBooking event, Emitter<BookingState> emit) async {
     await deleteBooking(event.bookingId);
-    add(LoadBookings(role: 'user', userId: '')); // reload – you can optimize
+    add(LoadBookings(userId: event.userId, role: event.role)); // reload
   }
 
   Future<void> _onApprove(ApproveBooking event, Emitter<BookingState> emit) async {
-    await updateBookingStatus(event.bookingId, 'approved');
-    add(LoadBookings(role: 'lawyer', userId: ''));
+    await updateBookingStatus(event.bookingId, "approved");
+    add(LoadBookings(userId: event.userId, role: event.role));
   }
 
   Future<void> _onComplete(CompleteBooking event, Emitter<BookingState> emit) async {
-    await updateBookingStatus(event.bookingId, 'completed');
-    add(LoadBookings(role: 'lawyer', userId: ''));
+    await updateBookingStatus(event.bookingId, "completed");
+    add(LoadBookings(userId: event.userId, role: event.role));
   }
 }

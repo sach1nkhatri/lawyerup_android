@@ -1,12 +1,11 @@
 import 'user.dart';
 import 'lawyer_profile.dart';
-import 'message.dart';
 
 class Booking {
   final String id;
   final User user;
   final User lawyer;
-  final LawyerProfile? lawyerList;
+  final LawyerProfile lawyerList; // ✅ always required
   final String date;
   final String time;
   final int duration;
@@ -15,11 +14,10 @@ class Booking {
   final String meetingLink;
   final String status;
   final bool reviewed;
-  final List<Message> messages;
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  Booking({
+  const Booking({
     required this.id,
     required this.user,
     required this.lawyer,
@@ -32,7 +30,6 @@ class Booking {
     required this.meetingLink,
     required this.status,
     required this.reviewed,
-    required this.messages,
     required this.createdAt,
     required this.updatedAt,
   });

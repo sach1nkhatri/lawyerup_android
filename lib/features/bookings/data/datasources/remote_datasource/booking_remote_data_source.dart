@@ -7,14 +7,22 @@ class BookingRemoteDataSource {
 
   BookingRemoteDataSource({required this.dio});
 
-  Future<List<BookingModel>> getUserBookings(String userId) async {
-    final res = await dio.get('/bookings/user/$userId');
-    return (res.data as List).map((e) => BookingModel.fromJson(e)).toList();
-  }
+  /// ✅ Always use /bookings/user/:userId for both roles to get full booking data with lawyerList populated
+  Future<List<BookingModel>> getBookings({
+    required String userId,
+    required String role, // 'user' or 'lawyer'
+  }) async {
+    try {
+      final endpoint = '/bookings/user/$userId'; // ✅ Force consistent route with lawyerList
+      final res = await dio.get(endpoint);
 
-  Future<List<BookingModel>> getLawyerBookings(String lawyerId) async {
-    final res = await dio.get('/bookings/lawyer/$lawyerId');
-    return (res.data as List).map((e) => BookingModel.fromJson(e)).toList();
+      return (res.data as List)
+          .map((e) => BookingModel.fromJson(e))
+          .toList();
+    } catch (e) {
+      print("Booking fetch failed: $e");
+      rethrow;
+    }
   }
 
   Future<void> createBooking(Map<String, dynamic> data) async {
@@ -52,12 +60,15 @@ class BookingRemoteDataSource {
     return (res.data as List).map((e) => MessageModel.fromJson(e)).toList();
   }
 
-  Future<MessageModel> sendMessage(String bookingId, String senderId, String text) async {
+  Future<MessageModel> sendMessage(
+      String bookingId,
+      String senderId,
+      String text,
+      ) async {
     final res = await dio.post('/bookings/$bookingId/chat', data: {
-      'senderId': senderId,
+      'sender': senderId,
       'text': text,
     });
-
     return MessageModel.fromJson(res.data);
   }
 
