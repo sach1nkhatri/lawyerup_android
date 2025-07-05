@@ -46,7 +46,7 @@ class QuickLinks extends StatelessWidget {
       child: InkWell(
         onTap: () {
           if (title == "Bookings") {
-            Navigator.pushNamed(context, '/bookings', arguments: 'user'); // or 'lawyer'
+            Navigator.pushNamed(context, '/bookings'); // or 'lawyer'
 
           } else if (title == "News & Articles") {
             Navigator.pushNamed(context, '/news');

@@ -55,10 +55,12 @@ class AppRouter {
     news: (context) => const NewsPage(),
     pdf: (context) => const PdfLibraryPage(),
     settings: (context) => const SettingsPage(),
+
+    // Booking Page
     bookingTabPage: (context) {
-      final role = ModalRoute.of(context)!.settings.arguments as String;
-      return BookingTabPage(role: role);
+      return const BookingTabPage(); // no role passed, handled via Hive inside
     },
+
 
 
     // ✅ Lawyer List Page

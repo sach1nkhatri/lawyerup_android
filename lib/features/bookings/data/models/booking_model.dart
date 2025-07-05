@@ -1,86 +1,63 @@
+import '../../domain/entities/booking.dart';
+import '../../domain/entities/lawyer_profile.dart';
 import 'user_model.dart';
 import 'lawyer_profile_model.dart';
-import 'message_model.dart';
-import '../../domain/entities/booking.dart';
 
-class BookingModel {
-  final String id;
-  final UserModel user;
-  final UserModel lawyer;
-  final LawyerProfileModel? lawyerList; // ✅ Make nullable
-  final String date;
-  final String time;
-  final int duration;
-  final String mode;
-  final String description;
-  final String meetingLink;
-  final String status;
-  final bool reviewed;
-  final List<MessageModel> messages;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-
-  BookingModel({
-    required this.id,
-    required this.user,
-    required this.lawyer,
-    required this.lawyerList,
-    required this.date,
-    required this.time,
-    required this.duration,
-    required this.mode,
-    required this.description,
-    required this.meetingLink,
-    required this.status,
-    required this.reviewed,
-    required this.messages,
-    required this.createdAt,
-    required this.updatedAt,
+class BookingModel extends Booking {
+  const BookingModel({
+    required super.id,
+    required super.user,
+    required super.lawyer,
+    required super.lawyerList, // fallback will always provide a value
+    required super.date,
+    required super.time,
+    required super.duration,
+    required super.mode,
+    required super.description,
+    required super.meetingLink,
+    required super.status,
+    required super.reviewed,
+    required super.createdAt,
+    required super.updatedAt,
   });
 
   factory BookingModel.fromJson(Map<String, dynamic> json) {
     return BookingModel(
-      id: json['_id'],
-      user: UserModel.fromJson(json['user']),
-      lawyer: UserModel.fromJson(json['lawyer']),
+      id: json['_id'] ?? '',
+      user: UserModel.fromJson(json['user']).toEntity(),
+      lawyer: UserModel.fromJson(json['lawyer']).toEntity(),
       lawyerList: json['lawyerList'] != null
-          ? LawyerProfileModel.fromJson(json['lawyerList'])
-          : LawyerProfileModel.empty(), // fallback
-      date: json['date'],
-      time: json['time'],
-      duration: json['duration'],
-      mode: json['mode'],
+          ? LawyerProfileModel.fromJson(json['lawyerList']).toEntity()
+          : LawyerProfile.fallback, // ✅ fallback used here
+      date: json['date'] ?? '',
+      time: json['time'] ?? '',
+      duration: json['duration'] ?? 1,
+      mode: json['mode'] ?? 'online',
       description: json['description'] ?? '',
       meetingLink: json['meetingLink'] ?? '',
-      status: json['status'],
+      status: json['status'] ?? 'pending',
       reviewed: json['reviewed'] ?? false,
-      messages: (json['messages'] as List<dynamic>?)
-          ?.map((e) => MessageModel.fromJson(e))
-          .toList() ??
-          [],
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),
     );
   }
 
-
-  Booking toEntity() {
-    return Booking(
-      id: id,
-      user: user.toEntity(),
-      lawyer: lawyer.toEntity(),
-      lawyerList: lawyerList?.toEntity(),
-      date: date,
-      time: time,
-      duration: duration,
-      mode: mode,
-      description: description,
-      meetingLink: meetingLink,
-      status: status,
-      reviewed: reviewed,
-      messages: messages.map((m) => m.toEntity()).toList(),
-      createdAt: createdAt,
-      updatedAt: updatedAt,
-    );
+  Map<String, dynamic> toJson() {
+    return {
+      '_id': id,
+      'user': (user as UserModel).toJson(),
+      'lawyer': (lawyer as UserModel).toJson(),
+      'lawyerList': (lawyerList as LawyerProfileModel).toJson(),
+      'date': date,
+      'time': time,
+      'duration': duration,
+      'mode': mode,
+      'description': description,
+      'meetingLink': meetingLink,
+      'status': status,
+      'reviewed': reviewed,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
+    };
   }
 }

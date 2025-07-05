@@ -2,8 +2,7 @@ import 'package:lawyerup_android/features/bookings/domain/entities/booking.dart'
 import 'package:lawyerup_android/features/bookings/domain/entities/message.dart';
 import 'package:lawyerup_android/features/bookings/domain/repositories/booking_repository.dart';
 
-import 'booking_remote_data_source.dart';
-
+import '../datasources/remote_datasource/booking_remote_data_source.dart';
 
 
 
@@ -13,16 +12,14 @@ class BookingRepositoryImpl implements BookingRepository {
   BookingRepositoryImpl({required this.remote});
 
   @override
-  Future<List<Booking>> getUserBookings(String userId) async {
-    final result = await remote.getUserBookings(userId);
-    return result.map((e) => e.toEntity()).toList();
+  Future<List<Booking>> getBookings({
+    required String userId,
+    required String role,
+  }) async {
+    final result = await remote.getBookings(userId: userId, role: role);
+    return result; // ✅ No .toEntity()
   }
 
-  @override
-  Future<List<Booking>> getLawyerBookings(String lawyerId) async {
-    final result = await remote.getLawyerBookings(lawyerId);
-    return result.map((e) => e.toEntity()).toList();
-  }
 
   @override
   Future<void> createBooking(Map<String, dynamic> data) {
@@ -59,8 +56,8 @@ class BookingRepositoryImpl implements BookingRepository {
 
   @override
   Future<List<Message>> getMessages(String bookingId) async {
-    final result = await remote.getMessages(bookingId);
-    return result.map((e) => e.toEntity()).toList();
+    final models = await remote.getMessages(bookingId);
+    return models.map((m) => m.toEntity()).toList();
   }
 
   @override
@@ -68,6 +65,7 @@ class BookingRepositoryImpl implements BookingRepository {
     final model = await remote.sendMessage(bookingId, senderId, text);
     return model.toEntity();
   }
+
 
   @override
   Future<void> markMessagesAsRead(String bookingId) {

@@ -5,6 +5,10 @@ class User {
   final String? contactNumber;
   final String? phone;
   final String? role;
+  final String? address;
+  final String? city;
+  final String? state;
+  final String? plan;
 
   User({
     required this.id,
@@ -13,5 +17,9 @@ class User {
     this.contactNumber,
     this.phone,
     this.role,
+    this.address,
+    this.city,
+    this.state,
+    this.plan,
   });
 }
