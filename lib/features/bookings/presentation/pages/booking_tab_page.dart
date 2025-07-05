@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
-
 import '../../../../app/constant/hive_constants.dart';
 import '../../../../app/service_locater/service_locator.dart';
 import '../../../auth/data/models/user_hive_model.dart';
@@ -10,7 +9,6 @@ import '../bloc/booking_event.dart';
 import '../bloc/booking_state.dart';
 import '../widgets/user_booking_card.dart';
 import '../widgets/lawyer_booking_card.dart';
-import '../../domain/entities/booking.dart';
 
 class BookingTabPage extends StatelessWidget {
   const BookingTabPage({super.key});
@@ -69,10 +67,26 @@ class _BookingTabViewState extends State<_BookingTabView> with TickerProviderSta
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Bookings"), bottom: TabBar(
-        controller: _tabController,
-        tabs: _tabs.map((e) => Tab(text: e.toUpperCase())).toList(),
-      )),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF1C2D3D),
+        iconTheme: const IconThemeData(color: Colors.white),
+        title: const Text(
+          'My Bookings',
+          style: TextStyle(
+            fontFamily: 'Lora',
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+            color: Colors.white,
+          ),
+        ),
+        bottom: TabBar(
+          controller: _tabController,
+          labelColor: Colors.white,
+          unselectedLabelColor: Colors.white70,
+          indicatorColor: Colors.white,
+          tabs: _tabs.map((tab) => Tab(text: tab)).toList(),
+        ),
+      ),
       body: BlocBuilder<BookingBloc, BookingState>(
         builder: (context, state) {
           if (state is BookingLoading) {
