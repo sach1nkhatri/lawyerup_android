@@ -13,7 +13,11 @@ class BookingRemoteDataSource {
     required String role, // 'user' or 'lawyer'
   }) async {
     try {
-      final endpoint = '/bookings/user/$userId'; // ✅ Force consistent route with lawyerList
+      // 🔄 Dynamically choose endpoint
+      final endpoint = role == 'lawyer'
+          ? '/bookings/lawyer/$userId'
+          : '/bookings/user/$userId';
+
       final res = await dio.get(endpoint);
 
       return (res.data as List)

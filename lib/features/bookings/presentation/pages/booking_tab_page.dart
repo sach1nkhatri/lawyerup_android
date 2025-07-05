@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
+
 import '../../../../app/constant/hive_constants.dart';
 import '../../../../app/service_locater/service_locator.dart';
 import '../../../auth/data/models/user_hive_model.dart';
@@ -29,11 +30,10 @@ class BookingTabPage extends StatelessWidget {
 
     return BlocProvider(
       create: (_) => sl<BookingBloc>()..add(LoadBookings(role: role, userId: userId)),
-      child: _BookingTabView(role: role, userId: '',),
+      child: _BookingTabView(role: role, userId: userId), // ✅ FIXED
     );
   }
 }
-
 
 class _BookingTabView extends StatefulWidget {
   final String role;
@@ -92,21 +92,35 @@ class _BookingTabViewState extends State<_BookingTabView> with TickerProviderSta
           if (state is BookingLoading) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is BookingLoaded) {
-            final filtered = (String status) =>
-                state.bookings.where((b) => b.status == status).toList();
+            final filtered = (String status) {
+              final isHistory = status == 'history';
+              return state.bookings.where((b) {
+                final matchesStatus = isHistory
+                    ? b.status == 'completed'
+                    : b.status == status;
+
+                final isMine = widget.role == 'lawyer'
+                    ? b.lawyer.id == widget.userId
+                    : b.user.id == widget.userId;
+
+                return matchesStatus && isMine;
+              }).toList();
+            };
 
             return TabBarView(
               controller: _tabController,
               children: _tabs.map((status) {
-                final bookings = filtered(status == 'history' ? 'completed' : status);
-                if (bookings.isEmpty) return const Center(child: Text("No bookings"));
+                final bookings = filtered(status);
+                if (bookings.isEmpty) {
+                  return const Center(child: Text("No bookings"));
+                }
                 return ListView.builder(
                   itemCount: bookings.length,
                   itemBuilder: (context, index) {
                     final booking = bookings[index];
                     return widget.role == 'lawyer'
-                        ? UserBookingCard(booking: booking)
-                        : LawyerBookingCard(booking: booking);
+                        ? LawyerBookingCard(booking: booking)   // 🧑‍⚖️ lawyer sees lawyer card
+                        : UserBookingCard(booking: booking);    // 👤 user sees user card
                   },
                 );
               }).toList(),
