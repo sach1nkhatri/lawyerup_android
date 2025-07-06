@@ -57,8 +57,8 @@ class _DashboardViewState extends State<DashboardView> {
                 icon: const Icon(Icons.person_add_alt_1),
                 label: const Text("Join as a Lawyer"),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepPurple,
-                  foregroundColor: Colors.white,
+                  backgroundColor: Color(0xFF18EFCB),
+                  foregroundColor: Colors.black,
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   minimumSize: const Size(double.infinity, 60),
@@ -69,6 +69,7 @@ class _DashboardViewState extends State<DashboardView> {
             Text(
               "Featured News",
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontFamily: 'Lora',
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
               ),
