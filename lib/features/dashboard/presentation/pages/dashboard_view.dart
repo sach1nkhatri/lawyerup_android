@@ -27,14 +27,14 @@ class _DashboardViewState extends State<DashboardView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.white,
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(62),
+        preferredSize: const Size.fromHeight(80),
         child: Container(
           padding: const EdgeInsets.only(top: 60, bottom: 10, left: 10), // for status bar safe area
           color: Colors.white,
           child: const Center(
-            child: LogoHeader(), // 🔒 stays fixed
+            child: LogoHeader(),
           ),
         ),
       ),
