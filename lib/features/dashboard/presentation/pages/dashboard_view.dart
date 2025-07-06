@@ -23,11 +23,11 @@ class _DashboardViewState extends State<DashboardView> {
     print('Logged-in role: $role');
   }
 
-  @override
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.transparent,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(62),
         child: Container(
