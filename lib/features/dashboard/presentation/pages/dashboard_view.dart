@@ -3,9 +3,8 @@ import '../../../../app/shared/services/hive_service.dart';
 import '../../../join_as_a_lawyer/presentation/pages/join_as_lawyer_page.dart';
 import '../widgets/logo_header.dart';
 import '../widgets/quick_links.dart';
-// import '../widgets/bookings_card.dart';
 import '../widgets/featured_lawyers_widget.dart';
-import '../widgets/featured_news_widget.dart';
+import '../widgets/featured_news_widget.dart'; // ✅ use this only!
 
 class DashboardView extends StatefulWidget {
   const DashboardView({super.key});
@@ -47,7 +46,6 @@ class _DashboardViewState extends State<DashboardView> {
             const QuickLinks(),
             const SizedBox(height: 32),
 
-            // ✅ Only shows for role == 'lawyer'
             if (role == 'lawyer')
               ElevatedButton.icon(
                 onPressed: () {
@@ -69,16 +67,6 @@ class _DashboardViewState extends State<DashboardView> {
 
             const SizedBox(height: 32),
             Text(
-              "Featured Lawyers",
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
-            ),
-            const SizedBox(height: 16),
-            const FeaturedLawyersWidget(),
-            const SizedBox(height: 24),
-            Text(
               "Featured News",
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
@@ -86,7 +74,18 @@ class _DashboardViewState extends State<DashboardView> {
               ),
             ),
             const SizedBox(height: 16),
-            const FeaturedNewsWidget(),
+            const FeaturedNewsWidget(), // ✅ now comes first
+
+            const SizedBox(height: 24),
+            // Text(
+            //   "Featured Lawyers",
+            //   style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            //     fontWeight: FontWeight.bold,
+            //     fontSize: 18,
+            //   ),
+            // ),
+            // const SizedBox(height: 16),
+            // const FeaturedLawyersWidget(),
           ],
         ),
       ),

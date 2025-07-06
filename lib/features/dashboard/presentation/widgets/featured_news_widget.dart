@@ -1,89 +1,96 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:lawyerup_android/features/news/data/models/news_model.dart';
+import 'package:lawyerup_android/features/news/data/repositories/news_repository_impl.dart';
+import 'package:lawyerup_android/features/news/presentation/pages/news_page.dart';
+import 'package:lawyerup_android/features/news/presentation/widgets/news_article_card.dart';
 
-class FeaturedNewsWidget extends StatelessWidget {
+import '../../../news/data/datasources/remote/news_remote_data_source_impl.dart';
+
+class FeaturedNewsWidget extends StatefulWidget {
   const FeaturedNewsWidget({super.key});
 
   @override
+  State<FeaturedNewsWidget> createState() => _FeaturedNewsWidgetState();
+}
+
+class _FeaturedNewsWidgetState extends State<FeaturedNewsWidget> {
+  NewsModel? featuredNews;
+  bool loading = true;
+  String? error;
+
+  @override
+  void initState() {
+    super.initState();
+    loadFeaturedNews();
+  }
+
+  Future<void> loadFeaturedNews() async {
+    try {
+      final repo = NewsRepositoryImpl(NewsRemoteDataSourceImpl(Dio()));
+
+      final allNews = await repo.getAllNews() as List<NewsModel>;
+
+      final firstFeatured = allNews.firstWhere(
+            (news) => news.title.toLowerCase().contains('featured'),
+        orElse: () => allNews.isNotEmpty
+            ? allNews.first
+            : throw Exception('No news available'),
+      );
+
+      setState(() {
+        featuredNews = firstFeatured;
+        loading = false;
+      });
+    } catch (e) {
+      print("Error loading featured news: $e");
+      setState(() {
+        error = "Unable to load featured news.";
+        loading = false;
+      });
+    }
+  }
+
+
+
+  @override
   Widget build(BuildContext context) {
-    final List<Map<String, dynamic>> newsList = [
-      {
-        'title': 'सर्वोच्च अदालतको आदेश',
-        'summary': 'सर्वोच्च अदालतले दिएको एउटा आदेशमा अनलाइन कानुनी परामर्शलाई कानुनी मान्यता दिइएको छ। अदालतले भनेको छ कि...',
-        'author': 'सुनिता भण्डारी',
-        'date': '2025-06-14',
-        'likes': 1,
-        'dislikes': 0,
+    if (loading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (error != null) {
+      return Center(
+        child: Text(
+          error!,
+          style: const TextStyle(color: Colors.red),
+        ),
+      );
+    }
+
+    if (featuredNews == null) {
+      return const Text("No featured news found.");
+    }
+
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const NewsPage()),
+        );
       },
-      // Add more static news if needed
-    ];
-
-    return SizedBox(
-      height:300,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: newsList.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 16),
-        itemBuilder: (context, index) {
-          final news = newsList[index];
-
-          return Container(
-            width: 300,
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.shade300),
-              color: Colors.white,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Placeholder image
-                Container(
-                  height: 100,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Icon(Icons.image, size: 40),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  news['title'],
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  news['summary'],
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 12),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  news['author'],
-                  style: const TextStyle(fontSize: 11, color: Colors.grey),
-                ),
-                const Spacer(),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(news['date'], style: const TextStyle(fontSize: 10)),
-                    Row(
-                      children: [
-                        const Icon(Icons.thumb_up_alt_outlined, size: 14),
-                        Text(" ${news['likes']}  "),
-                        const Icon(Icons.thumb_down_alt_outlined, size: 14),
-                        Text(" ${news['dislikes']}"),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
+      child: NewsArticleCard(
+        title: featuredNews!.title,
+        summary: featuredNews!.summary,
+        image: featuredNews!.image,
+        likes: featuredNews!.likes,
+        dislikes: featuredNews!.dislikes,
+        author: featuredNews!.author,
+        date: DateTime.tryParse(featuredNews!.date) ?? DateTime.now(),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const NewsPage()),
           );
         },
       ),
