@@ -46,10 +46,10 @@ class BottomNav extends StatelessWidget {
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.easeOut,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  padding: const EdgeInsets.symmetric(vertical: 10),
                   decoration: BoxDecoration(
-                    color: isSelected ? Colors.black.withOpacity(0.05) : Colors.transparent,
-                    borderRadius: BorderRadius.circular(16),
+                    color: isSelected ? Colors.black.withOpacity(0.15) : Colors.transparent,
+                    borderRadius: BorderRadius.circular(50),
                   ),
                   child: Center(
                     child: Image.asset(
