@@ -10,7 +10,7 @@ class User {
   final String? state;
   final String? plan;
 
-  User({
+  const User({
     required this.id,
     required this.fullName,
     required this.email,
@@ -22,4 +22,17 @@ class User {
     this.state,
     this.plan,
   });
+
+  static const fallback = User(
+    id: '',
+    fullName: 'Unknown User',
+    email: '',
+    contactNumber: '',
+    phone: '',
+    role: 'user',
+    address: '',
+    city: '',
+    state: '',
+    plan: '',
+  );
 }

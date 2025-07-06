@@ -1,15 +1,35 @@
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive/hive.dart';
+import '../../../features/auth/data/models/user_hive_model.dart';
 import '../../constant/hive_constants.dart';
 
 class HiveService {
-  Future<void> init() async {
-    await Hive.initFlutter();
+  /// Get the full user object (UserHiveModel)
+  static UserHiveModel? getUser() {
+    final box = Hive.box<UserHiveModel>(HiveConstants.userBox);
+    return box.get(HiveConstants.userKey);
+  }
 
-    //  Open all required boxes before usage
-    await Hive.openBox(HiveConstants.userBox);
-    await Hive.openBox(HiveConstants.settingsBox);
+  /// Get the user's role as a string (e.g., 'user', 'lawyer', 'admin')
+  static String getRole() {
+    final user = getUser();
+    return user?.role ?? '';
+  }
 
-    // Optional: register adapters here if you use any
-    // Hive.registerAdapter(UserAdapter());
+  /// Check if the user is a lawyer
+  static bool isLawyer() => getRole() == 'lawyer';
+
+  /// Check if the user is an admin
+  static bool isAdmin() => getRole() == 'admin';
+
+  /// Save user (optional helper)
+  static Future<void> saveUser(UserHiveModel user) async {
+    final box = Hive.box<UserHiveModel>(HiveConstants.userBox);
+    await box.put(HiveConstants.userKey, user);
+  }
+
+  /// Clear user (e.g., on logout)
+  static Future<void> clearUser() async {
+    final box = Hive.box<UserHiveModel>(HiveConstants.userBox);
+    await box.delete(HiveConstants.userKey);
   }
 }

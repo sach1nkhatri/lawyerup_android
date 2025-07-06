@@ -18,14 +18,14 @@ class QuickLinks extends StatelessWidget {
             alignment: WrapAlignment.center,
             children: [
               _tile(
-                  context, "LawyerUP", "assets/images/qwhammer.png", tileWidth),
+                  context, "LawyerUP", "assets/images/hammerico.png", tileWidth),
 
-              _tile(context, "News & Articles", "assets/images/newspaper.png",
+              _tile(context, "News & Articles", "assets/images/newsico.png",
                   tileWidth),
 
-              _tile(context, "Law Pdf", "assets/images/law.png", tileWidth),
+              _tile(context, "Law Pdf", "assets/images/lawpdficon.png", tileWidth),
 
-              _tile(context, "Bookings", "assets/images/bookings.png", tileWidth),
+              _tile(context, "Bookings", "assets/images/bookingico.png", tileWidth),
             ],
           ),
         );
