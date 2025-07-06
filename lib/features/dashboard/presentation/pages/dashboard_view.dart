@@ -3,7 +3,7 @@ import '../../../../app/shared/services/hive_service.dart';
 import '../../../join_as_a_lawyer/presentation/pages/join_as_lawyer_page.dart';
 import '../widgets/logo_header.dart';
 import '../widgets/quick_links.dart';
-import '../widgets/featured_lawyers_widget.dart';
+// import '../widgets/featured_lawyers_widget.dart';
 import '../widgets/featured_news_widget.dart'; // ✅ use this only!
 
 class DashboardView extends StatefulWidget {
@@ -23,17 +23,19 @@ class _DashboardViewState extends State<DashboardView> {
     print('Logged-in role: $role');
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(0),
-        child: AppBar(
-          backgroundColor: const Color(0xFFFFFFFF),
-          elevation: 0,
-          centerTitle: true,
-          automaticallyImplyLeading: false,
+        preferredSize: const Size.fromHeight(80),
+        child: Container(
+          padding: const EdgeInsets.only(top: 60, bottom: 10, left: 10), // for status bar safe area
+          color: Colors.white,
+          child: const Center(
+            child: LogoHeader(),
+          ),
         ),
       ),
       body: SingleChildScrollView(
@@ -41,8 +43,6 @@ class _DashboardViewState extends State<DashboardView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Center(child: LogoHeader()),
-            const SizedBox(height: 24),
             const QuickLinks(),
             const SizedBox(height: 32),
 
@@ -57,8 +57,8 @@ class _DashboardViewState extends State<DashboardView> {
                 icon: const Icon(Icons.person_add_alt_1),
                 label: const Text("Join as a Lawyer"),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepPurple,
-                  foregroundColor: Colors.white,
+                  backgroundColor: Color(0xFF18EFCB),
+                  foregroundColor: Colors.black,
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   minimumSize: const Size(double.infinity, 60),
@@ -69,6 +69,7 @@ class _DashboardViewState extends State<DashboardView> {
             Text(
               "Featured News",
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontFamily: 'Lora',
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
               ),

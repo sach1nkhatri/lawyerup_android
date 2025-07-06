@@ -31,7 +31,7 @@ class NewsArticleCard extends StatelessWidget {
       onTap: onTap,
       child: Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        elevation: 4, color: Colors.blue.shade50,
+        elevation: 4, color: Colors.white,
         margin: const EdgeInsets.symmetric(vertical: 8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -54,10 +54,11 @@ class NewsArticleCard extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(12, 10, 12, 4),
               child: Text(
                 'by $author • ${_formatDate(date)}',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 12,
                   color: Colors.black,
                   fontStyle: FontStyle.italic,
+                  fontFamily: 'Playfair',
                 ),
               ),
             ),
@@ -68,10 +69,18 @@ class NewsArticleCard extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: Theme.of(context).textTheme.titleMedium,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontFamily: 'Lora',
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 8),
-                  Text(summary, maxLines: 2, overflow: TextOverflow.ellipsis),
+                  Text(
+                    summary,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontFamily: 'Playfair'),
+                  ),
                   const SizedBox(height: 12),
                   Row(
                     children: [
