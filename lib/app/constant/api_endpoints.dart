@@ -50,4 +50,10 @@ class ApiEndpoints {
   static String sendMessage(String bookingId) => "${baseUrl}bookings/$bookingId/chat";
   static String markMessagesRead(String bookingId) =>
       "${baseUrl}bookings/$bookingId/chat/read";
+
+  //JoinAsALawyer
+
+
+
+
 }

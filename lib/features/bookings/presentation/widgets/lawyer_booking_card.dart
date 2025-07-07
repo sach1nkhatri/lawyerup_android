@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../app/service_locater/service_locator.dart';
 import '../../data/datasources/remote_datasource/booking_remote_data_source.dart';
 import '../../domain/entities/booking.dart';
+import '../pages/chat_bottom_sheet.dart';
 
 class LawyerBookingCard extends StatefulWidget {
   final Booking booking;

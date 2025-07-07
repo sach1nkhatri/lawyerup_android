@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 
 import '../../domain/entities/booking.dart';
+import '../pages/chat_bottom_sheet.dart';
 
 
 class UserBookingCard extends StatelessWidget {
   final Booking booking;
+  final String currentUserId; // ✅ Add this
 
-  const UserBookingCard({super.key, required this.booking});
+  const UserBookingCard({
+    super.key,
+    required this.booking,
+    required this.currentUserId, // ✅ Receive it from parent
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +47,17 @@ class UserBookingCard extends StatelessWidget {
                   OutlinedButton(onPressed: () {}, child: const Text('Rate')),
                 if (booking.status == 'approved')
                   ElevatedButton.icon(
-                    onPressed: () {},
+                    onPressed: () {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        builder: (_) => ChatBottomSheet(
+                          bookingId: booking.id,
+                          currentUserId: currentUserId, // ✅ FIXED
+                        ),
+                      );
+                    },
                     icon: const Icon(Icons.chat_bubble_outline),
                     label: const Text('Chat'),
                   ),
@@ -66,3 +82,4 @@ class UserBookingCard extends StatelessWidget {
     }
   }
 }
+
