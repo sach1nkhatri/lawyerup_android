@@ -79,7 +79,7 @@ class LoginForm extends StatelessWidget {
                               Container(
                                 height: 50,
                                 width: 50,
-                                margin: const EdgeInsets.only(right: 4),
+                                margin: const EdgeInsets.only(right: 2),
                                 decoration: const BoxDecoration(
                                   color: accentTeal,
                                   shape: BoxShape.circle,
@@ -116,28 +116,28 @@ class LoginForm extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 30),
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          // Google login can be integrated here
-                        },
-                        icon: const Icon(Icons.g_mobiledata, size: 28),
-                        label: const Text('Log in with Google'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.black,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          textStyle: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
-                  ),
+                  // Padding(
+                  //   padding: const EdgeInsets.only(bottom: 30),
+                  //   child: SizedBox(
+                  //     width: double.infinity,
+                  //     child: ElevatedButton.icon(
+                  //       onPressed: () {
+                  //         // Google login can be integrated here
+                  //       },
+                  //       icon: const Icon(Icons.g_mobiledata, size: 28),
+                  //       label: const Text('Log in with Google'),
+                  //       style: ElevatedButton.styleFrom(
+                  //         backgroundColor: Colors.black,
+                  //         foregroundColor: Colors.white,
+                  //         padding: const EdgeInsets.symmetric(vertical: 14),
+                  //         shape: RoundedRectangleBorder(
+                  //           borderRadius: BorderRadius.circular(30),
+                  //         ),
+                  //         textStyle: const TextStyle(fontWeight: FontWeight.bold),
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
                 ],
               ),
             ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../app/service_locater/service_locator.dart';
+import '../../../../app/shared/widgets/global_snackbar.dart';
 import '../bloc/login_cubit.dart';
 import '../bloc/login_state.dart';
 import '../widgets/login_form.dart';
@@ -47,11 +48,34 @@ class _LoginBodyState extends State<_LoginBody> {
     return BlocConsumer<LoginCubit, LoginState>(
       listener: (context, state) {
         if (state is LoginSuccess) {
+          GlobalSnackBar.show(
+            context,
+            'Login successful! Welcome back.',
+            type: SnackType.success,
+          );
           Navigator.pushReplacementNamed(context, '/dashboard');
         } else if (state is LoginError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message)),
-          );
+          // Detect specific error types (optional)
+          final message = state.message.toLowerCase();
+          if (message.contains('user not found')) {
+            GlobalSnackBar.show(
+              context,
+              'No account exists with that email.',
+              type: SnackType.error,
+            );
+          } else if (message.contains('password')) {
+            GlobalSnackBar.show(
+              context,
+              'Incorrect password. Please try again.',
+              type: SnackType.error,
+            );
+          } else {
+            GlobalSnackBar.show(
+              context,
+              state.message,
+              type: SnackType.error,
+            );
+          }
         }
       },
       builder: (context, state) {
