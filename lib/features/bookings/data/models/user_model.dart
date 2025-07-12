@@ -12,7 +12,7 @@ class UserModel {
   final String? state;
   final String? plan;
 
-  UserModel({
+  const UserModel({
     required this.id,
     required this.fullName,
     required this.email,
@@ -25,9 +25,24 @@ class UserModel {
     this.plan,
   });
 
+  /// ✅ Fallback user for cases like missing sender info
+  static const fallback = UserModel(
+    id: '',
+    fullName: 'Unknown',
+    email: '',
+    contactNumber: '',
+    phone: '',
+    role: 'user',
+    address: '',
+    city: '',
+    state: '',
+    plan: '',
+  );
+
+  /// ✅ From backend JSON
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      id: json['_id'],
+      id: json['_id'] ?? '',
       fullName: json['fullName'] ?? '',
       email: json['email'] ?? '',
       contactNumber: json['contactNumber'],
@@ -40,6 +55,7 @@ class UserModel {
     );
   }
 
+  /// ✅ To backend JSON
   Map<String, dynamic> toJson() {
     return {
       '_id': id,
@@ -55,6 +71,7 @@ class UserModel {
     };
   }
 
+  /// ✅ Convert to domain entity
   domain.User toEntity() {
     return domain.User(
       id: id,
@@ -67,6 +84,31 @@ class UserModel {
       city: city,
       state: state,
       plan: plan,
+    );
+  }
+
+  /// ✅ Create from domain entity
+  factory UserModel.fromEntity(domain.User user) {
+    return UserModel(
+      id: user.id,
+      fullName: user.fullName,
+      email: user.email,
+      contactNumber: user.contactNumber,
+      phone: user.phone,
+      role: user.role,
+      address: user.address,
+      city: user.city,
+      state: user.state,
+      plan: user.plan,
+    );
+  }
+
+  /// ✅ (Optional) Create from ID-only map
+  factory UserModel.fromIdOnly(Map<String, dynamic> json) {
+    return UserModel(
+      id: json[r'$oid'] ?? '',
+      fullName: 'Unknown',
+      email: '',
     );
   }
 }

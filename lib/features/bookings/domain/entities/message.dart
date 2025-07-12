@@ -1,14 +1,12 @@
-import 'user.dart';
-
 class Message {
   final String text;
-  final User sender;
+  final String senderId;
   final DateTime timestamp;
   final String status;
 
   Message({
     required this.text,
-    required this.sender,
+    required this.senderId,
     required this.timestamp,
     required this.status,
   });

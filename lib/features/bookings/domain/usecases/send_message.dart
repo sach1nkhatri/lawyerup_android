@@ -1,12 +1,13 @@
 import '../entities/message.dart';
-import '../repositories/booking_repository.dart';
+import '../repositories/chat_repository.dart';
 
 class SendMessage {
-  final BookingRepository repository;
+  final ChatRepository repository;
 
   SendMessage(this.repository);
 
-  Future<Message> call(String bookingId, String senderId, String text) {
-    return repository.sendMessage(bookingId, senderId, text);
+  Future<void> call(String bookingId, Message message) async {
+    return await repository.sendMessage(bookingId, message);
   }
 }
+

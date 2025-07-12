@@ -1,49 +1,100 @@
 import 'package:flutter/material.dart';
-
 import '../../domain/entities/booking.dart';
-
+import '../pages/chat_bottom_sheet.dart';
 
 class UserBookingCard extends StatelessWidget {
   final Booking booking;
+  final String currentUserId;
 
-  const UserBookingCard({super.key, required this.booking});
+  const UserBookingCard({
+    super.key,
+    required this.booking,
+    required this.currentUserId,
+  });
 
   @override
   Widget build(BuildContext context) {
     final lawyer = booking.lawyer;
-    final profile = booking.lawyerList;
 
     return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 3,
+      margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      color: Color(0xFFFFFFFF),shadowColor: Colors.tealAccent,
       child: Padding(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(lawyer.fullName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            const Text(
+              '👨‍⚖️ Lawyer Info',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              lawyer.fullName,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
             const SizedBox(height: 4),
             Text('📧 ${lawyer.email}'),
             Text('📞 ${lawyer.contactNumber ?? lawyer.phone ?? "-"}'),
-            const Divider(height: 20),
+
+            const Divider(height: 24),
+
+            const Text(
+              '📅 Booking Details',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 6),
             Text('🗓 Date: ${booking.date}'),
             Text('⏰ Time: ${booking.time}'),
             Text('🧾 Mode: ${booking.mode}'),
-            Text('📄 Description: ${booking.description}'),
-            Text('📌 Status: ${booking.status}', style: TextStyle(fontWeight: FontWeight.bold, color: _statusColor())),
+            if (booking.description.isNotEmpty) Text('📝 ${booking.description}'),
+
             const SizedBox(height: 12),
+            Text(
+              '📌 Status: ${booking.status.toUpperCase()}',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: _statusColor(booking.status),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // 👇 Buttons
             Wrap(
-              spacing: 8,
+              spacing: 10,
+              runSpacing: 8,
               children: [
                 if (booking.status == 'pending')
-                  ElevatedButton(onPressed: () {}, child: const Text('Cancel')),
+                  ElevatedButton(
+                    onPressed: () {
+                      // TODO: Handle cancel
+                    },
+                    child: const Text('Cancel'),
+                  ),
                 if (booking.status == 'completed' && !booking.reviewed)
-                  OutlinedButton(onPressed: () {}, child: const Text('Rate')),
+                  OutlinedButton(
+                    onPressed: () {
+                      // TODO: Handle rating
+                    },
+                    child: const Text('Rate'),
+                  ),
                 if (booking.status == 'approved')
                   ElevatedButton.icon(
-                    onPressed: () {},
                     icon: const Icon(Icons.chat_bubble_outline),
                     label: const Text('Chat'),
+                    onPressed: () {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        builder: (_) => ChatBottomSheet(
+                          bookingId: booking.id,
+                          currentUserId: currentUserId,
+                        ),
+                      );
+                    },
                   ),
               ],
             ),
@@ -53,8 +104,8 @@ class UserBookingCard extends StatelessWidget {
     );
   }
 
-  Color _statusColor() {
-    switch (booking.status.toLowerCase()) {
+  Color _statusColor(String status) {
+    switch (status.toLowerCase()) {
       case 'approved':
         return Colors.green;
       case 'pending':
@@ -66,3 +117,4 @@ class UserBookingCard extends StatelessWidget {
     }
   }
 }
+

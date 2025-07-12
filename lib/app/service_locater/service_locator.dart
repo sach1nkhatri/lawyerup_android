@@ -6,7 +6,9 @@ import 'package:dio/dio.dart';
 //NEWS
 import '../../features/bookings/data/datasources/remote_datasource/booking_remote_data_source.dart';
 import '../../features/bookings/data/repositories/booking_repository_impl.dart';
+import '../../features/bookings/data/repositories/chat_repository_impl.dart';
 import '../../features/bookings/domain/repositories/booking_repository.dart';
+import '../../features/bookings/domain/repositories/chat_repository.dart';
 import '../../features/bookings/domain/usecases/create_booking.dart';
 import '../../features/bookings/domain/usecases/delete_booking.dart';
 import '../../features/bookings/domain/usecases/get_available_slots.dart';
@@ -17,6 +19,12 @@ import '../../features/bookings/domain/usecases/send_message.dart';
 import '../../features/bookings/domain/usecases/update_booking_status.dart';
 import '../../features/bookings/domain/usecases/update_meeting_link.dart';
 import '../../features/bookings/presentation/bloc/booking_bloc.dart';
+import '../../features/bookings/presentation/bloc/chat_bloc.dart';
+import '../../features/join_as_a_lawyer/data/datasources/join_lawyer_remote_data_source.dart';
+import '../../features/join_as_a_lawyer/data/datasources/join_lawyer_remote_data_source_impl.dart';
+import '../../features/join_as_a_lawyer/data/repository/join_lawyer_repository.dart';
+import '../../features/join_as_a_lawyer/data/repository/join_lawyer_repository_impl.dart';
+import '../../features/join_as_a_lawyer/presentation/bloc/join_lawyer_bloc.dart';
 import '../../features/lawyer_up/data/datasources/remote/lawyer_remote_data_source.dart';
 import '../../features/lawyer_up/data/repositories/lawyer_repository_impl.dart';
 import '../../features/lawyer_up/domain/repositories/lawyer_repository.dart';
@@ -159,28 +167,56 @@ Future<void> initServiceLocator() async {
 
 
   // ==================== BOOKINGS ====================
-  // Data Source
+
+// Data Source (only once)
   sl.registerLazySingleton<BookingRemoteDataSource>(() => BookingRemoteDataSource(dio: sl()));
 
-  // Repository
+// Booking Repository
   sl.registerLazySingleton<BookingRepository>(() => BookingRepositoryImpl(remote: sl()));
 
-// Use Cases
-  sl.registerLazySingleton(() => GetBookings(sl())); // ✅ New unified use case
+// Chat Repository
+  sl.registerLazySingleton<ChatRepository>(() => ChatRepositoryImpl(bookingRemoteDataSource: sl()));
+
+
+// ============ USE CASES ============
+
+  sl.registerLazySingleton(() => GetBookings(sl()));
   sl.registerLazySingleton(() => CreateBooking(sl()));
   sl.registerLazySingleton(() => DeleteBooking(sl()));
   sl.registerLazySingleton(() => UpdateBookingStatus(sl()));
   sl.registerLazySingleton(() => UpdateMeetingLink(sl()));
   sl.registerLazySingleton(() => GetAvailableSlots(sl()));
+
   sl.registerLazySingleton(() => GetMessages(sl()));
   sl.registerLazySingleton(() => SendMessage(sl()));
   sl.registerLazySingleton(() => MarkMessagesAsRead(sl()));
 
-// Bloc
+
+// ============ BLOCS ============
+
   sl.registerFactory(() => BookingBloc(
-    getBookings: sl(), // ✅ Inject new use case
+    getBookings: sl(),
     deleteBooking: sl(),
     updateBookingStatus: sl(),
   ));
+
+  sl.registerFactory(() => ChatBloc(
+    getMessages: sl(),
+    sendMessage: sl(),
+    markMessagesAsRead: sl(),
+  ));
+
+// ============ JOIN LAWYER ============
+
+  sl.registerLazySingleton<JoinLawyerRemoteDataSource>(
+        () => JoinLawyerRemoteDataSourceImpl(client: sl()),
+  );
+
+  sl.registerLazySingleton<JoinLawyerRepository>(
+        () => JoinLawyerRepositoryImpl(remoteDataSource: sl()),
+  );
+
+  sl.registerFactory(() => JoinLawyerBloc(repository: sl()));
+
 
 }

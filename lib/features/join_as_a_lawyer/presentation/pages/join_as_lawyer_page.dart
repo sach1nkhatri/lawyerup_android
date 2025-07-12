@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../wigets/schedule_builder.dart';
+import 'lawyer_status_page.dart';
 
 class JoinAsLawyerPage extends StatefulWidget {
   const JoinAsLawyerPage({Key? key}) : super(key: key);
@@ -34,6 +36,7 @@ class _JoinAsLawyerPageState extends State<JoinAsLawyerPage> {
 
   List<Map<String, String>> educationList = [];
   List<Map<String, String>> workList = [];
+  Map<String, List<Map<String, String>>> schedule = {};
 
   void addEducation() {
     setState(() {
@@ -112,7 +115,7 @@ class _JoinAsLawyerPageState extends State<JoinAsLawyerPage> {
             ),
           ),
           Text(
-            step == 1 ? "Personal Information" : "Education & Work",
+            step == 1 ? "Personal Information" : "Education, Work & Schedule",
             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 20),
@@ -185,14 +188,44 @@ class _JoinAsLawyerPageState extends State<JoinAsLawyerPage> {
             for (var e in educationList)
               ListTile(
                 leading: const Icon(Icons.school),
-                title: Text(
-                    "${e['degree']} - ${e['institute']} (${e['year']}) | ${e['specialization']}"),
+                title: Text("${e['degree']} - ${e['institute']} (${e['year']}) | ${e['specialization']}"),
               ),
+
+            const SizedBox(height: 20),
+            const Text("Weekly Schedule", style: TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 10),
+            ScheduleBuilder(
+              onScheduleChange: (data) => schedule = data,
+            ),
 
             const SizedBox(height: 30),
             ElevatedButton.icon(
               onPressed: () {
-                // submit logic
+                final lawyerData = {
+                  'fullName': form['fullName'],
+                  'specialization': form['specialization'],
+                  'email': form['email'],
+                  'phone': form['phone'],
+                  'address': form['address'],
+                  'city': form['city'],
+                  'state': form['state'],
+                  'expectedGraduation': form['expectedGraduation'],
+                  'description': form['description'],
+                  'specialCase': form['specialCase'],
+                  'socialLink': form['socialLink'],
+                  'education': educationList,
+                  'workExperience': workList,
+                  'schedule': schedule,
+                  'status': 'hold',
+                  'profilePhoto': null,
+                };
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => LawyerStatusPage(lawyer: lawyerData),
+                  ),
+                );
               },
               icon: const Icon(Icons.check_circle),
               label: const Text("Join Now"),

@@ -30,7 +30,7 @@ class BookingTabPage extends StatelessWidget {
 
     return BlocProvider(
       create: (_) => sl<BookingBloc>()..add(LoadBookings(role: role, userId: userId)),
-      child: _BookingTabView(role: role, userId: userId), // ✅ FIXED
+      child: _BookingTabView(role: role, userId: userId), //  FIXED
     );
   }
 }
@@ -120,7 +120,7 @@ class _BookingTabViewState extends State<_BookingTabView> with TickerProviderSta
                     final booking = bookings[index];
                     return widget.role == 'lawyer'
                         ? LawyerBookingCard(booking: booking)   // 🧑‍⚖️ lawyer sees lawyer card
-                        : UserBookingCard(booking: booking);    // 👤 user sees user card
+                        : UserBookingCard(booking: booking, currentUserId: '',);    // 👤 user sees user card
                   },
                 );
               }).toList(),
