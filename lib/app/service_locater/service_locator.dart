@@ -20,6 +20,11 @@ import '../../features/bookings/domain/usecases/update_booking_status.dart';
 import '../../features/bookings/domain/usecases/update_meeting_link.dart';
 import '../../features/bookings/presentation/bloc/booking_bloc.dart';
 import '../../features/bookings/presentation/bloc/chat_bloc.dart';
+import '../../features/join_as_a_lawyer/data/datasources/join_lawyer_remote_data_source.dart';
+import '../../features/join_as_a_lawyer/data/datasources/join_lawyer_remote_data_source_impl.dart';
+import '../../features/join_as_a_lawyer/data/repository/join_lawyer_repository.dart';
+import '../../features/join_as_a_lawyer/data/repository/join_lawyer_repository_impl.dart';
+import '../../features/join_as_a_lawyer/presentation/bloc/join_lawyer_bloc.dart';
 import '../../features/lawyer_up/data/datasources/remote/lawyer_remote_data_source.dart';
 import '../../features/lawyer_up/data/repositories/lawyer_repository_impl.dart';
 import '../../features/lawyer_up/domain/repositories/lawyer_repository.dart';
@@ -201,6 +206,17 @@ Future<void> initServiceLocator() async {
     markMessagesAsRead: sl(),
   ));
 
+// ============ JOIN LAWYER ============
+
+  sl.registerLazySingleton<JoinLawyerRemoteDataSource>(
+        () => JoinLawyerRemoteDataSourceImpl(client: sl()),
+  );
+
+  sl.registerLazySingleton<JoinLawyerRepository>(
+        () => JoinLawyerRepositoryImpl(remoteDataSource: sl()),
+  );
+
+  sl.registerFactory(() => JoinLawyerBloc(repository: sl()));
 
 
 }

@@ -20,6 +20,7 @@ class UserBookingCard extends StatelessWidget {
       elevation: 3,
       margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      color: Color(0xFFFFFFFF),shadowColor: Colors.tealAccent,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -116,3 +117,4 @@ class UserBookingCard extends StatelessWidget {
     }
   }
 }
+
