@@ -15,6 +15,7 @@ class AuthLocalDatasourceImpl implements AuthLocalDatasource {
       email: user.email,
       role: user.role,
       token: user.token,
+      contactNumner: user.contactNumber
     );
     await box.put('user', userHive);
   }

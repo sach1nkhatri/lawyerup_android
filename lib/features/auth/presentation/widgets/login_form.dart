@@ -54,8 +54,26 @@ class LoginForm extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 30),
-                        _buildRoundedField(emailController, 'Username or Email'),
+
+                        /// ✅ EMAIL FIELD WITH KEY
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          decoration: BoxDecoration(
+                            color: tealFieldColor,
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          child: TextField(
+                            key: const Key('emailField'),
+                            controller: emailController,
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              hintText: 'Username or Email',
+                            ),
+                          ),
+                        ),
                         const SizedBox(height: 16),
+
+                        /// ✅ PASSWORD FIELD WITH KEY
                         Container(
                           decoration: BoxDecoration(
                             color: tealFieldColor,
@@ -67,6 +85,7 @@ class LoginForm extends StatelessWidget {
                                 child: Padding(
                                   padding: const EdgeInsets.symmetric(horizontal: 16),
                                   child: TextField(
+                                    key: const Key('passwordField'),
                                     controller: passwordController,
                                     obscureText: true,
                                     decoration: const InputDecoration(
@@ -76,6 +95,8 @@ class LoginForm extends StatelessWidget {
                                   ),
                                 ),
                               ),
+
+                              /// ✅ LOGIN BUTTON
                               Container(
                                 height: 50,
                                 width: 50,
@@ -85,6 +106,7 @@ class LoginForm extends StatelessWidget {
                                   shape: BoxShape.circle,
                                 ),
                                 child: InkWell(
+                                  key: const Key('loginButton'), // 👈 for test tap
                                   onTap: isLoading ? null : onLogin,
                                   child: isLoading
                                       ? const Padding(
@@ -100,6 +122,7 @@ class LoginForm extends StatelessWidget {
                             ],
                           ),
                         ),
+
                         const SizedBox(height: 20),
                         const Text("Don't have an account", style: TextStyle(color: Colors.black54)),
                         TextButton(
@@ -116,50 +139,11 @@ class LoginForm extends StatelessWidget {
                       ],
                     ),
                   ),
-                  // Padding(
-                  //   padding: const EdgeInsets.only(bottom: 30),
-                  //   child: SizedBox(
-                  //     width: double.infinity,
-                  //     child: ElevatedButton.icon(
-                  //       onPressed: () {
-                  //         // Google login can be integrated here
-                  //       },
-                  //       icon: const Icon(Icons.g_mobiledata, size: 28),
-                  //       label: const Text('Log in with Google'),
-                  //       style: ElevatedButton.styleFrom(
-                  //         backgroundColor: Colors.black,
-                  //         foregroundColor: Colors.white,
-                  //         padding: const EdgeInsets.symmetric(vertical: 14),
-                  //         shape: RoundedRectangleBorder(
-                  //           borderRadius: BorderRadius.circular(30),
-                  //         ),
-                  //         textStyle: const TextStyle(fontWeight: FontWeight.bold),
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
                 ],
               ),
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildRoundedField(TextEditingController controller, String hint) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: const Color(0xFFB5F7ED),
-        borderRadius: BorderRadius.circular(30),
-      ),
-      child: TextField(
-        controller: controller,
-        decoration: InputDecoration(
-          border: InputBorder.none,
-          hintText: hint,
-        ),
       ),
     );
   }

@@ -7,6 +7,7 @@ class UserModel extends UserEntity {
     required super.email,
     required super.role,
     required super.token,
+    required super.contactNumber,
   });
 
 
@@ -17,6 +18,7 @@ class UserModel extends UserEntity {
       email: entity.email,
       role: entity.role,
       token: entity.token,
+      contactNumber: entity.contactNumber,
     );
   }
 
@@ -27,6 +29,7 @@ class UserModel extends UserEntity {
       email: json['email'] ?? '',
       role: json['role'] ?? '',
       token: token,
+      contactNumber: json['contactNumber']??'',
     );
   }
 

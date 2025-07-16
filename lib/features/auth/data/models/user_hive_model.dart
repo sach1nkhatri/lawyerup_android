@@ -20,12 +20,16 @@ class UserHiveModel extends HiveObject {
   @HiveField(4)
   final String token;
 
+  @HiveField(5)
+  final String contactNumner;
+
   UserHiveModel({
     required this.uid,
     required this.fullName,
     required this.email,
     required this.role,
     required this.token,
+    required this.contactNumner,
   });
 
   UserEntity toEntity() {
@@ -35,6 +39,7 @@ class UserHiveModel extends HiveObject {
       email: email,
       role: role,
       token: token,
+      contactNumber: contactNumner,
     );
   }
 }
