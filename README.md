@@ -21,6 +21,7 @@ LawyerUp Android is the official mobile application for **LawyerUp**, a modern l
 - 👤 **Lawyer Dashboard** – View bookings, chat with users, manage availability
 - 🗂️ **Profile Management** – Show qualifications, experience, contact, and services
 
+
 ---
 
 ## 🧱 Architecture
@@ -194,3 +195,8 @@ THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR I
 For support or business inquiries:  
 📧 Email: support@lawyerupnepal.com  
 🌐 Website: [lawyerupnepal.com](https://lawyerupnepal.com)
+=======
+For help getting started with Flutter development, view the
+[online documentation](https://docs.flutter.dev/), which offers tutorials,
+samples, guidance on mobile development, and a full API reference..
+
