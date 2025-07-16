@@ -144,15 +144,6 @@ class ApiEndpoints {
   // Add more as needed
 }
 ```
-
----
-
-## 📸 Screenshots (Optional)
-
-| Home Page | Lawyer Detail | Booking Screen |
-|-----------|---------------|----------------|
-| *(Add screenshots here if needed)* |
-
 ---
 
 ## 🤝 Contributing
