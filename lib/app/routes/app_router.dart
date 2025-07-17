@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lawyerup_android/features/bookings/presentation/pages/booking_tab_page.dart';
 
-import '../../features/ai_chat/presentation/pages/chat_page.dart';
+import '../../features/law_ai_chat/presentation/pages/chat_page.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/signup_page.dart';
 import '../../features/dashboard/presentation/pages/dashboard_page.dart';
