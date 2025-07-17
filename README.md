@@ -145,8 +145,6 @@ class ApiEndpoints {
 }
 ```
 
----
-
 
 ## 🤝 Contributing
 
