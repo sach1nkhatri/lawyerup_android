@@ -18,7 +18,8 @@ class _ChatBubbleAreaState extends State<ChatBubbleArea> {
   Widget build(BuildContext context) {
     return BlocBuilder<LawAiChatBloc, LawAiChatState>(
       builder: (context, state) {
-        final messages = state.messages;
+        final messages = state.chatSessions[state.currentChatId] ?? [];
+
 
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (_scrollController.hasClients) {

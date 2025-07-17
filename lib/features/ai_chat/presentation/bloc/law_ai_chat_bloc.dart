@@ -9,8 +9,8 @@ class LawAiChatBloc extends Bloc<LawAiChatEvent, LawAiChatState> {
   LawAiChatBloc()
       : super(LawAiChatState(chatSessions: {'chat_1': []}, currentChatId: 'chat_1')) {
     on<SendMessage>(_onSendMessage);
-    on<StartNewChat>(_onStartNewChat);
-    on<LoadChat>(_onLoadChat);
+    on<StartNewChatEvent>(_onStartNewChat);
+    on<LoadChatByIdEvent>(_onLoadChat);
   }
 
   Future<void> _onSendMessage(SendMessage event, Emitter<LawAiChatState> emit) async {
@@ -89,14 +89,14 @@ class LawAiChatBloc extends Bloc<LawAiChatEvent, LawAiChatState> {
     }
   }
 
-  void _onStartNewChat(StartNewChat event, Emitter<LawAiChatState> emit) {
+  void _onStartNewChat(StartNewChatEvent event, Emitter<LawAiChatState> emit) {
     final newId = 'chat_${DateTime.now().millisecondsSinceEpoch}';
     final updatedSessions = Map<String, List<Map<String, dynamic>>>.from(state.chatSessions);
     updatedSessions[newId] = [];
     emit(state.copyWith(chatSessions: updatedSessions, currentChatId: newId));
   }
 
-  void _onLoadChat(LoadChat event, Emitter<LawAiChatState> emit) {
+  void _onLoadChat(LoadChatByIdEvent event, Emitter<LawAiChatState> emit) {
     emit(state.copyWith(currentChatId: event.chatId));
   }
 }
