@@ -8,7 +8,7 @@ import '../bloc/law_ai_chat_bloc.dart';
 import '../bloc/law_ai_chat_event.dart';
 
 class ChatDrawer extends StatefulWidget {
-  final Function(String chatId) onChatSelected; // callback to parent
+  final Function(String chatId) onChatSelected;
 
   const ChatDrawer({super.key, required this.onChatSelected});
 
@@ -43,6 +43,64 @@ class _ChatDrawerState extends State<ChatDrawer> {
     }
   }
 
+  Future<void> _deleteChat(String chatId) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        backgroundColor: const Color(0xFF1E2B3A),
+        title: Row(
+          children: const [
+            Icon(Icons.warning_amber_rounded, color: Colors.redAccent),
+            SizedBox(width: 10),
+            Text("Delete Chat", style: TextStyle(color: Colors.white)),
+          ],
+        ),
+        content: const Text(
+          "Are you sure you want to delete this chat? This cannot be undone.",
+          style: TextStyle(color: Colors.white70),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton.icon(
+            icon: const Icon(Icons.delete_outline, size: 18),
+            label: const Text("Delete"),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            onPressed: () => Navigator.pop(context, true),
+          ),
+        ],
+      ),
+    );
+
+
+    if (confirm != true) return;
+
+    try {
+      final chatSource = ChatRemoteDataSourceImpl(dio: sl<Dio>());
+      await chatSource.deleteChat(chatId);
+
+      setState(() {
+        chats.removeWhere((c) => c.id == chatId);
+      });
+
+      final bloc = context.read<LawAiChatBloc>();
+      if (bloc.state.currentChatId == chatId) {
+        bloc.add(StartNewChatEvent());
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to delete chat: $e")),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final currentChatId = context.read<LawAiChatBloc>().state.currentChatId;
@@ -53,7 +111,6 @@ class _ChatDrawerState extends State<ChatDrawer> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header
             const Padding(
               padding: EdgeInsets.fromLTRB(20, 24, 20, 12),
               child: Text(
@@ -66,7 +123,6 @@ class _ChatDrawerState extends State<ChatDrawer> {
               ),
             ),
 
-            // Loading spinner
             if (loading)
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 40),
@@ -81,7 +137,6 @@ class _ChatDrawerState extends State<ChatDrawer> {
                 ),
               )
             else
-            // Chat list
               Expanded(
                 child: ListView.separated(
                   itemCount: chats.length,
@@ -101,32 +156,26 @@ class _ChatDrawerState extends State<ChatDrawer> {
                         overflow: TextOverflow.ellipsis,
                       ),
                       tileColor: isSelected ? Colors.white10 : Colors.transparent,
-                        onTap: () {
-                          final bloc = context.read<LawAiChatBloc>();
-
-                          // Store this chat's messages into BLoC
-                          bloc.add(SetAllChatsFromDrawerEvent({
-                            chat.id: chat.messages,
-                          }));
-
-                          // Set the selected chat ID
-                          bloc.add(LoadChatByIdEvent(chat.id));
-
-                          // Let parent widget know (optional)
-                          widget.onChatSelected(chat.id);
-
-                          Navigator.pop(context);
-                        }
-
+                      onTap: () {
+                        final bloc = context.read<LawAiChatBloc>();
+                        bloc.add(SetAllChatsFromDrawerEvent({
+                          chat.id: chat.messages,
+                        }));
+                        bloc.add(LoadChatByIdEvent(chat.id));
+                        widget.onChatSelected(chat.id);
+                        Navigator.pop(context);
+                      },
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+                        onPressed: () => _deleteChat(chat.id),
+                      ),
                     );
                   },
                 ),
               ),
 
-            // Divider
             const Divider(color: Colors.white24),
 
-            // New Chat button
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: ElevatedButton.icon(
@@ -139,7 +188,7 @@ class _ChatDrawerState extends State<ChatDrawer> {
                 label: const Text("Start New Chat", style: TextStyle(color: Colors.white)),
                 onPressed: () {
                   setState(() => selectedId = null);
-                  widget.onChatSelected(''); // empty string means new chat
+                  widget.onChatSelected('');
                   Navigator.pop(context);
                 },
               ),

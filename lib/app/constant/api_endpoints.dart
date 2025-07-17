@@ -53,6 +53,9 @@ class ApiEndpoints {
 
   //JoinAsALawyer
 
+// AI Chat
+  static const String getChats = "${baseUrl}ai/chats";
+  static String deleteChat(String chatId) => "${baseUrl}ai/chats/$chatId";
 
 
 
