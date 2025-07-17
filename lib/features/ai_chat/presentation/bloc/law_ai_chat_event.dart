@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 
+import '../../data/models/chat_model.dart';
+
 abstract class LawAiChatEvent extends Equatable {
   @override
   List<Object?> get props => [];
@@ -28,3 +30,22 @@ class LoadChatByIdEvent extends LawAiChatEvent {
 
 /// 💡 Load default prompt recommendations (optional)
 class LoadInitialRecommendationsEvent extends LawAiChatEvent {}
+
+
+class SetActiveChatEvent extends LawAiChatEvent {
+  final ChatModel chat;
+
+  SetActiveChatEvent(this.chat);
+
+  @override
+  List<Object?> get props => [chat];
+}
+
+class SetAllChatsFromDrawerEvent extends LawAiChatEvent {
+  final Map<String, List<Map<String, dynamic>>> chatSessions;
+
+  SetAllChatsFromDrawerEvent(this.chatSessions);
+
+  @override
+  List<Object?> get props => [chatSessions];
+}

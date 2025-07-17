@@ -5,6 +5,7 @@ import '../../../../app/service_locater/service_locator.dart';
 import '../../data/datasources/remote/chat_remote_data_source.dart';
 import '../../data/models/chat_model.dart';
 import '../bloc/law_ai_chat_bloc.dart';
+import '../bloc/law_ai_chat_event.dart';
 
 class ChatDrawer extends StatefulWidget {
   final Function(String chatId) onChatSelected; // callback to parent
@@ -100,10 +101,23 @@ class _ChatDrawerState extends State<ChatDrawer> {
                         overflow: TextOverflow.ellipsis,
                       ),
                       tileColor: isSelected ? Colors.white10 : Colors.transparent,
-                      onTap: () {
-                        widget.onChatSelected(chat.id); // 🔁 trigger chat load
-                        Navigator.pop(context); // close drawer
-                      },
+                        onTap: () {
+                          final bloc = context.read<LawAiChatBloc>();
+
+                          // Store this chat's messages into BLoC
+                          bloc.add(SetAllChatsFromDrawerEvent({
+                            chat.id: chat.messages,
+                          }));
+
+                          // Set the selected chat ID
+                          bloc.add(LoadChatByIdEvent(chat.id));
+
+                          // Let parent widget know (optional)
+                          widget.onChatSelected(chat.id);
+
+                          Navigator.pop(context);
+                        }
+
                     );
                   },
                 ),

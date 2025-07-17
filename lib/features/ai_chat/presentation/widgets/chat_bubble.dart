@@ -18,9 +18,9 @@ class _ChatBubbleAreaState extends State<ChatBubbleArea> {
   Widget build(BuildContext context) {
     return BlocBuilder<LawAiChatBloc, LawAiChatState>(
       builder: (context, state) {
-        final messages = state.chatSessions[state.currentChatId] ?? [];
+        final messages = state.messages; // ✅ clean getter from state
 
-
+        // Auto-scroll to bottom
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (_scrollController.hasClients) {
             _scrollController.animateTo(
@@ -41,12 +41,14 @@ class _ChatBubbleAreaState extends State<ChatBubbleArea> {
           itemCount: messages.length,
           itemBuilder: (context, index) {
             final msg = messages[index];
+            final isUser = msg['isUser'] == true;
+            final text = msg['text'] ?? '';
+
             return Align(
-              alignment:
-              msg['isUser'] ? Alignment.centerRight : Alignment.centerLeft,
+              alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
               child: ChatBubble(
-                text: msg['text'],
-                isUser: msg['isUser'],
+                text: text,
+                isUser: isUser,
               ),
             );
           },

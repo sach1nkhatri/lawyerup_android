@@ -7,13 +7,20 @@ import 'law_ai_chat_state.dart';
 
 class LawAiChatBloc extends Bloc<LawAiChatEvent, LawAiChatState> {
   LawAiChatBloc()
-      : super(LawAiChatState(chatSessions: {'chat_1': []}, currentChatId: 'chat_1')) {
+      : super(LawAiChatState(
+    chatSessions: {'chat_1': []},
+    currentChatId: 'chat_1',
+  )) {
     on<SendMessage>(_onSendMessage);
     on<StartNewChatEvent>(_onStartNewChat);
     on<LoadChatByIdEvent>(_onLoadChat);
+    on<SetAllChatsFromDrawerEvent>(_onSetAllChatsFromDrawer);
   }
 
-  Future<void> _onSendMessage(SendMessage event, Emitter<LawAiChatState> emit) async {
+  Future<void> _onSendMessage(
+      SendMessage event,
+      Emitter<LawAiChatState> emit,
+      ) async {
     final session = [...state.messages];
     session.add({'text': event.message, 'isUser': true});
     emit(state.copyWith(
@@ -56,6 +63,7 @@ class LawAiChatBloc extends Bloc<LawAiChatEvent, LawAiChatState> {
               emit(state.copyWith(isStreaming: false));
               break;
             }
+
             final data = jsonDecode(jsonLine);
             final delta = data['choices'][0]['delta'];
             final newText = delta['content'];
@@ -64,7 +72,7 @@ class LawAiChatBloc extends Bloc<LawAiChatEvent, LawAiChatState> {
               final updatedSession = [...session];
               updatedSession[updatedSession.length - 1] = {
                 'text': buffer.toString(),
-                'isUser': false
+                'isUser': false,
               };
               emit(state.copyWith(
                 chatSessions: {
@@ -89,14 +97,32 @@ class LawAiChatBloc extends Bloc<LawAiChatEvent, LawAiChatState> {
     }
   }
 
-  void _onStartNewChat(StartNewChatEvent event, Emitter<LawAiChatState> emit) {
+  void _onStartNewChat(
+      StartNewChatEvent event,
+      Emitter<LawAiChatState> emit,
+      ) {
     final newId = 'chat_${DateTime.now().millisecondsSinceEpoch}';
-    final updatedSessions = Map<String, List<Map<String, dynamic>>>.from(state.chatSessions);
+    final updatedSessions =
+    Map<String, List<Map<String, dynamic>>>.from(state.chatSessions);
     updatedSessions[newId] = [];
     emit(state.copyWith(chatSessions: updatedSessions, currentChatId: newId));
   }
 
-  void _onLoadChat(LoadChatByIdEvent event, Emitter<LawAiChatState> emit) {
+  void _onLoadChat(
+      LoadChatByIdEvent event,
+      Emitter<LawAiChatState> emit,
+      ) {
     emit(state.copyWith(currentChatId: event.chatId));
+  }
+
+  void _onSetAllChatsFromDrawer(
+      SetAllChatsFromDrawerEvent event,
+      Emitter<LawAiChatState> emit,
+      ) {
+    final merged = {
+      ...state.chatSessions,
+      ...event.chatSessions,
+    };
+    emit(state.copyWith(chatSessions: merged));
   }
 }

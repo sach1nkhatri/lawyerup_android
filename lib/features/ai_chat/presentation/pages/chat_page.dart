@@ -13,7 +13,7 @@ class ChatPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => LawAiChatBloc(), // ✅ FIXED: Removed invalid event
+      create: (_) => LawAiChatBloc(),
       child: const ChatView(),
     );
   }
@@ -37,9 +37,9 @@ class ChatView extends StatelessWidget {
         ),
         title: BlocBuilder<LawAiChatBloc, LawAiChatState>(
           builder: (context, state) {
-            final currentSession = state.chatSessions[state.currentChatId] ?? [];
-            final title = currentSession.isNotEmpty
-                ? currentSession.firstWhere((m) => m['isUser'], orElse: () => {'text': 'Get Plus+'})['text']
+            final messages = state.messages;
+            final title = messages.isNotEmpty
+                ? messages.firstWhere((m) => m['isUser'], orElse: () => {'text': 'Get Plus+'})['text']
                 : 'New Chat';
 
             return Text(
@@ -53,6 +53,7 @@ class ChatView extends StatelessWidget {
       drawer: ChatDrawer(
         onChatSelected: (chatId) {
           final bloc = context.read<LawAiChatBloc>();
+
           if (chatId.isEmpty) {
             bloc.add(StartNewChatEvent());
           } else {
