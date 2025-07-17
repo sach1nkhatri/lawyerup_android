@@ -36,6 +36,7 @@ class _ChatBubbleAreaState extends State<ChatBubbleArea> {
         }
 
         return ListView.builder(
+          key: ValueKey(state.currentChatId), // 🔥 Forces refresh on prompt tap or chat change
           controller: _scrollController,
           padding: const EdgeInsets.all(16),
           itemCount: messages.length,
@@ -95,53 +96,58 @@ class RecommendedPrompts extends StatelessWidget {
       "Explain the types of contracts.",
     ];
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 32, 20, 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            "Try asking",
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF1E2B3A),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Wrap(
-            spacing: 10,
-            runSpacing: 12,
-            children: prompts.map((text) {
-              return InkWell(
-                onTap: () {
-                  context.read<LawAiChatBloc>().add(SendMessage(text));
-                },
-                borderRadius: BorderRadius.circular(24),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF3F6FA),
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: const Color(0xFFE0E0E0)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.03),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      )
-                    ],
-                  ),
-                  child: Text(
-                    text,
-                    style: const TextStyle(fontSize: 14, color: Colors.black87),
-                  ),
+    return Builder(
+      builder: (innerContext) {
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(20, 32, 20, 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Try asking",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF1E2B3A),
                 ),
-              );
-            }).toList(),
+              ),
+              const SizedBox(height: 16),
+              Wrap(
+                spacing: 10,
+                runSpacing: 12,
+                children: prompts.map((text) {
+                  return InkWell(
+                    onTap: () {
+                      // ✅ Trigger message and refresh chat bubble immediately
+                      innerContext.read<LawAiChatBloc>().add(SendMessage(text));
+                    },
+                    borderRadius: BorderRadius.circular(24),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF3F6FA),
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(color: const Color(0xFFE0E0E0)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.03),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          )
+                        ],
+                      ),
+                      child: Text(
+                        text,
+                        style: const TextStyle(fontSize: 14, color: Colors.black87),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
