@@ -7,12 +7,14 @@ import '../../../../app/constant/hive_constants.dart';
 import '../../../../features/auth/data/models/user_hive_model.dart';
 
 class AppointmentModal extends StatefulWidget {
-  final String lawyerId;
+  final String lawyerId;     // this is lawyer's USER ID (lawyer)
+  final String lawyerListId; // this is lawyer's LISTING ID (lawyerList)
   final Function onClose;
 
   const AppointmentModal({
     super.key,
     required this.lawyerId,
+    required this.lawyerListId,
     required this.onClose,
   });
 
@@ -60,7 +62,7 @@ class _AppointmentModalState extends State<AppointmentModal> {
       selectedTime = '';
     });
 
-    final url = ApiEndpoints.getAvailableSlots(widget.lawyerId, selectedDate, duration);
+    final url = ApiEndpoints.getAvailableSlots(widget.lawyerListId, selectedDate, duration);
     try {
       final res = await http.get(Uri.parse(url));
       if (res.statusCode == 200) {
@@ -93,8 +95,8 @@ class _AppointmentModalState extends State<AppointmentModal> {
 
     final booking = {
       "user": userId,
-      "lawyer": widget.lawyerId,
-      "lawyerList": widget.lawyerId,
+      "lawyer": widget.lawyerId,         // ✅ actual user ID of the lawyer
+      "lawyerList": widget.lawyerListId, // ✅ lawyer listing _id
       "date": selectedDate,
       "time": selectedTime,
       "duration": duration,
