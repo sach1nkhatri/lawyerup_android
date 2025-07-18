@@ -8,15 +8,18 @@ class ChatRepositoryImpl implements ChatRepository {
 
   ChatRepositoryImpl({required this.bookingRemoteDataSource});
 
+
   @override
-  Future<void> sendMessage(String bookingId, Message message) {
-    // Extract senderId and text from the domain entity (after adjusting entity structure)
-    return bookingRemoteDataSource.sendMessage(
+  Future<Message> sendMessage(String bookingId, Message message) async {
+    final res = await bookingRemoteDataSource.sendMessage(
       bookingId,
       message.senderId,
       message.text,
     );
+    return res.toEntity(); // return backend-confirmed message
   }
+
+
 
   @override
   Future<List<Message>> getMessages(String bookingId) async {

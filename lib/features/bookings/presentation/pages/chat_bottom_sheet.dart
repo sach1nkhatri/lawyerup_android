@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hive/hive.dart';
+
+import '../../../../app/constant/hive_constants.dart';
 import '../../../../app/service_locater/service_locator.dart';
-import '../../../bookings/presentation/widgets/chat_bubble.dart';
+import '../../../../app/shared/services/socket_service.dart';
+import '../../../auth/data/models/user_hive_model.dart';
 import '../../domain/entities/message.dart';
 import '../bloc/chat_bloc.dart';
 import '../bloc/chat_event.dart';
 import '../bloc/chat_state.dart';
 import '../widgets/chat_input_box.dart';
-
+import '../../../bookings/presentation/widgets/chat_bubble.dart';
 
 class ChatBottomSheet extends StatefulWidget {
   final String bookingId;
   final String currentUserId;
-
 
   const ChatBottomSheet({
     super.key,
@@ -26,6 +29,25 @@ class ChatBottomSheet extends StatefulWidget {
 
 class _ChatBottomSheetState extends State<ChatBottomSheet> {
   final ScrollController _scrollController = ScrollController();
+  late final SocketService socket;
+  late final String fullName;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final box = Hive.box<UserHiveModel>(HiveConstants.userBox);
+    final user = box.get('user');
+    fullName = user?.fullName ?? "fullName"; // <- Assign safely here
+
+    socket = sl<SocketService>();
+    socket.connectAndJoin(widget.bookingId);
+
+    socket.onMessageReceived((data) {
+      context.read<ChatBloc>().add(LoadMessages(widget.bookingId));
+    });
+  }
+
 
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -33,6 +55,12 @@ class _ChatBottomSheetState extends State<ChatBottomSheet> {
         _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
       }
     });
+  }
+
+  @override
+  void dispose() {
+    socket.disconnect();
+    super.dispose();
   }
 
   @override
@@ -78,6 +106,7 @@ class _ChatBottomSheetState extends State<ChatBottomSheet> {
                             return ChatBubble(
                               text: message.text,
                               isMe: isMe,
+                              senderName: isMe ? "You" : (message.senderName ?? "Client"),
                             );
                           },
                         );
@@ -92,14 +121,23 @@ class _ChatBottomSheetState extends State<ChatBottomSheet> {
                     final message = Message(
                       text: text,
                       senderId: widget.currentUserId,
+                      senderName: fullName,
                       timestamp: DateTime.now(),
                       status: 'sent',
                     );
+
                     context.read<ChatBloc>().add(
                       SendMessageEvent(
                         bookingId: widget.bookingId,
                         message: message,
                       ),
+                    );
+
+                    socket.sendMessage(
+                      bookingId: widget.bookingId,
+                      senderId: widget.currentUserId,
+                      text: text,
+                      senderName: fullName,
                     );
                   },
                 ),

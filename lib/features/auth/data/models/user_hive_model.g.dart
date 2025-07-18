@@ -22,7 +22,7 @@ class UserHiveModelAdapter extends TypeAdapter<UserHiveModel> {
       email: fields[2] as String,
       role: fields[3] as String,
       token: fields[4] as String,
-      contactNumner: fields[5] as String,
+      contactNumber: fields[5] as String,
     );
   }
 
@@ -41,7 +41,7 @@ class UserHiveModelAdapter extends TypeAdapter<UserHiveModel> {
       ..writeByte(4)
       ..write(obj.token)
       ..writeByte(5)
-      ..write(obj.contactNumner);
+      ..write(obj.contactNumber);
   }
 
   @override

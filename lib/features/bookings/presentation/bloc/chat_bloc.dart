@@ -1,6 +1,4 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../../domain/entities/message.dart';
 import '../../domain/usecases/get_messages.dart';
 import '../../domain/usecases/send_message.dart';
 import '../../domain/usecases/mark_messages_as_read.dart';
@@ -28,19 +26,21 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       emit(ChatLoaded(messages));
       await markMessagesAsRead(event.bookingId);
     } catch (e) {
-      emit(ChatError(e.toString()));
+      emit(ChatError("Failed to load messages: ${e.toString()}"));
     }
   }
 
   Future<void> _onSendMessage(SendMessageEvent event, Emitter<ChatState> emit) async {
     if (state is ChatLoaded) {
       try {
-        await sendMessage(event.bookingId, event.message);
-        final updatedMessages = List<Message>.from((state as ChatLoaded).messages)
-          ..add(event.message);
+        final sentMessage = await sendMessage(event.bookingId, event.message);
+
+        final currentMessages = (state as ChatLoaded).messages;
+        final updatedMessages = [...currentMessages, sentMessage];
+
         emit(ChatLoaded(updatedMessages));
       } catch (e) {
-        emit(ChatError("Failed to send message"));
+        emit(ChatError("Failed to send message: ${e.toString()}"));
       }
     }
   }
