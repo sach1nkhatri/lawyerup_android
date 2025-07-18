@@ -120,7 +120,11 @@ class _BookingTabViewState extends State<_BookingTabView> with TickerProviderSta
                     final booking = bookings[index];
 
                     return widget.role == 'lawyer'
-                        ? LawyerBookingCard(booking: booking) // 🧑‍⚖️ lawyer sees lawyer card
+                        ? LawyerBookingCard(
+                      booking: booking,
+                      userId: widget.userId,
+                      role: widget.role,
+                    )
                         : UserBookingCard(
                       booking: booking,
                       currentUserId: widget.userId,
@@ -129,7 +133,7 @@ class _BookingTabViewState extends State<_BookingTabView> with TickerProviderSta
                           LoadBookings(userId: widget.userId, role: widget.role),
                         );
                       },
-                    ); // 👤 user sees user card
+                    );
                   },
                 );
               }).toList(),
