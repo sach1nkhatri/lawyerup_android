@@ -32,7 +32,7 @@ class _DashboardPageState extends State<DashboardPage> {
       body: _pages[_currentIndex],
       bottomNavigationBar: BottomNav(
         currentIndex: _currentIndex,
-        onTap: _onTabTapped, // ✅ Properly passed callback
+        onTap: _onTabTapped,
       ),
     );
   }

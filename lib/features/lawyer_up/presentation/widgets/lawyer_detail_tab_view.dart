@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../app/constant/api_endpoints.dart';
 import '../../domain/entities/lawyer.dart';
 import '../widgets/review_section.dart';
+import 'appointment_modal.dart';
 
 class LawyerDetailTabView extends StatelessWidget {
   final Lawyer lawyer;
@@ -172,9 +173,13 @@ class LawyerDetailTabView extends StatelessWidget {
               onPressed: () {
                 showModalBottomSheet(
                   context: context,
-                  builder: (ctx) => Container(
-                    height: 200,
-                    child: const Center(child: Text("Appointment Modal Placeholder")),
+                  isScrollControlled: true,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                  ),
+                  builder: (ctx) => AppointmentModal(
+                    lawyerId: lawyer.id, // <-- make sure `lawyer` is available in this scope
+                    onClose: () => print("Appointment modal closed"),
                   ),
                 );
               },
@@ -190,9 +195,10 @@ class LawyerDetailTabView extends StatelessWidget {
             ),
           ),
 
+
           // ⭐ Review Section
           ReviewSection(rating: rating, reviews: lawyer.reviews),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
         ],
       ),
     );
