@@ -4,11 +4,12 @@ import 'package:http/http.dart' as http;
 import 'package:hive/hive.dart';
 import '../../../../app/constant/api_endpoints.dart';
 import '../../../../app/constant/hive_constants.dart';
+import '../../../../app/shared/widgets/global_snackbar.dart';
 import '../../../../features/auth/data/models/user_hive_model.dart';
 
 class AppointmentModal extends StatefulWidget {
-  final String lawyerId;     // this is lawyer's USER ID (lawyer)
-  final String lawyerListId; // this is lawyer's LISTING ID (lawyerList)
+  final String lawyerId;     // Lawyer's user ID
+  final String lawyerListId; // Lawyer's listing ID
   final Function onClose;
 
   const AppointmentModal({
@@ -72,10 +73,10 @@ class _AppointmentModalState extends State<AppointmentModal> {
           selectedTime = timeSlots.isNotEmpty ? timeSlots.first : '';
         });
       } else {
-        _showToast("Failed to load slots");
+        GlobalSnackBar.show(context, "Failed to load slots", type: SnackType.error);
       }
     } catch (e) {
-      _showToast("Slot fetch error");
+      GlobalSnackBar.show(context, "Slot fetch error", type: SnackType.error);
     } finally {
       setState(() => isLoadingSlots = false);
     }
@@ -83,20 +84,16 @@ class _AppointmentModalState extends State<AppointmentModal> {
 
   String _twoDigits(int n) => n.toString().padLeft(2, '0');
 
-  void _showToast(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
-  }
-
   Future<void> _confirmBooking() async {
     if (selectedTime.isEmpty || userId == null) {
-      _showToast("Please select date, time and ensure you're logged in.");
+      GlobalSnackBar.show(context, "Please select date, time and ensure you're logged in.", type: SnackType.warning);
       return;
     }
 
     final booking = {
       "user": userId,
-      "lawyer": widget.lawyerId,         // ✅ actual user ID of the lawyer
-      "lawyerList": widget.lawyerListId, // ✅ lawyer listing _id
+      "lawyer": widget.lawyerId,
+      "lawyerList": widget.lawyerListId,
       "date": selectedDate,
       "time": selectedTime,
       "duration": duration,
@@ -114,14 +111,15 @@ class _AppointmentModalState extends State<AppointmentModal> {
         body: jsonEncode(booking),
       );
       if (res.statusCode == 200 || res.statusCode == 201) {
-        _showToast("✅ Appointment booked!");
+        GlobalSnackBar.show(context, "Appointment booked!", type: SnackType.success);
+        GlobalSnackBar.show(context, "Appointment booked!", type: SnackType.success);
         widget.onClose();
         Navigator.of(context).pop();
       } else {
-        _showToast("❌ Failed to book: ${res.body}");
+        GlobalSnackBar.show(context, "Failed to book: ${res.body}", type: SnackType.error);
       }
     } catch (e) {
-      _showToast("Booking error");
+      GlobalSnackBar.show(context, "Booking error", type: SnackType.error);
     } finally {
       setState(() => isBooking = false);
     }
@@ -156,43 +154,101 @@ class _AppointmentModalState extends State<AppointmentModal> {
             children: [
               Center(
                 child: Text(
-                  '🎯 Book Appointment',
+                  'Book Appointment',
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: Colors.pink.shade400,
+                    color: Colors.green.shade400,
                   ),
                 ),
               ),
               const SizedBox(height: 16),
 
-              _buildLabel("📅 Select Date"),
-              _styledDropdown(
-                value: selectedDate,
-                items: availableDates,
-                onChanged: (val) {
-                  selectedDate = val!;
-                  _loadSlots();
+              _buildLabel("Select Date"),
+              InkWell(
+                onTap: () async {
+                  final now = DateTime.now();
+                  final picked = await showDatePicker(
+                    context: context,
+                    initialDate: now,
+                    firstDate: now,
+                    lastDate: now.add(const Duration(days: 14)),
+                    builder: (context, child) {
+                      return Theme(
+                        data: Theme.of(context).copyWith(
+                          colorScheme: ColorScheme.light(
+                            primary: Colors.green.shade400,
+                            onPrimary: Colors.white,
+                            onSurface: Colors.black,
+                          ),
+                          textButtonTheme: TextButtonThemeData(
+                            style: TextButton.styleFrom(foregroundColor: Colors.green.shade400),
+                          ),
+                        ),
+                        child: child!,
+                      );
+                    },
+                  );
+
+                  if (picked != null) {
+                    setState(() {
+                      selectedDate = "${picked.year}-${_twoDigits(picked.month)}-${_twoDigits(picked.day)}";
+                    });
+                    _loadSlots();
+                  }
                 },
+                child: Container(
+                  width: double.infinity,
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 14),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey.shade300),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        selectedDate.isNotEmpty ? selectedDate : 'Select a date',
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                      const Icon(Icons.calendar_today, size: 20, color: Colors.grey),
+                    ],
+                  ),
+                ),
               ),
 
-              _buildLabel("⏰ Time Slot"),
-              isLoadingSlots
-                  ? const Center(child: CircularProgressIndicator())
-                  : _styledDropdown(
-                value: selectedTime,
-                items: timeSlots,
-                onChanged: (val) => setState(() => selectedTime = val!),
-              ),
 
-              _buildLabel("⏳ Duration (hours)"),
+              _buildLabel("Time Slot"),
+              if (isLoadingSlots)
+                const Center(child: CircularProgressIndicator())
+              else if (timeSlots.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 12),
+                  child: Text(
+                    "🚫 No slots available for the selected date.",
+                    style: TextStyle(fontSize: 15, color: Colors.redAccent),
+                    textAlign: TextAlign.center,
+                  ),
+                )
+              else
+                timeSlotSelector(
+                  selectedValue: selectedTime,
+                  items: timeSlots,
+                  onSelected: (val) => setState(() => selectedTime = val),
+                ),
+
+
+
+              _buildLabel("Duration (hours)"),
               _styledTextInput(
                 initialValue: duration.toString(),
                 keyboardType: TextInputType.number,
                 onChanged: (val) => duration = int.tryParse(val) ?? 1,
               ),
 
-              _buildLabel("💻 Appointment Type"),
+              _buildLabel("Appointment Type"),
               Row(
                 children: ['online', 'live'].map((type) {
                   final selected = appointmentType == type;
@@ -227,7 +283,11 @@ class _AppointmentModalState extends State<AppointmentModal> {
                 child: ElevatedButton.icon(
                   onPressed: isBooking ? null : _confirmBooking,
                   icon: isBooking
-                      ? const CircularProgressIndicator(strokeWidth: 2, color: Colors.white)
+                      ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                  )
                       : const Icon(Icons.done),
                   label: Text(
                     isBooking ? "Booking..." : "Confirm Booking",
@@ -263,30 +323,43 @@ class _AppointmentModalState extends State<AppointmentModal> {
     ),
   );
 
-  Widget _styledDropdown({
-    required String value,
+  Widget timeSlotSelector({
+    required String selectedValue,
     required List<String> items,
-    required void Function(String?) onChanged,
+    required void Function(String) onSelected,
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade300),
-      ),
-      child: DropdownButton<String>(
-        value: value,
-        isExpanded: true,
-        underline: const SizedBox(),
-        items: items
-            .map((item) => DropdownMenuItem(value: item, child: Text(item)))
-            .toList(),
-        onChanged: onChanged,
+      padding: const EdgeInsets.all(4),
+      child: Wrap(
+        spacing: 10,
+        runSpacing: 10,
+        children: items.map((slot) {
+          final isSelected = slot == selectedValue;
+          return ChoiceChip(
+            label: Text(
+              slot,
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: isSelected ? Colors.white : Colors.black87,
+              ),
+            ),
+            selected: isSelected,
+            selectedColor: Colors.pink.shade400,
+            backgroundColor: Colors.grey.shade100,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: BorderSide(
+                color: isSelected ? Colors.pink.shade400 : Colors.grey.shade300,
+              ),
+            ),
+            onSelected: (_) => onSelected(slot),
+          );
+        }).toList(),
       ),
     );
   }
+
 
   Widget _styledTextInput({
     String initialValue = '',
@@ -295,10 +368,11 @@ class _AppointmentModalState extends State<AppointmentModal> {
     TextInputType keyboardType = TextInputType.text,
     required void Function(String) onChanged,
   }) {
+    final controller = TextEditingController(text: initialValue);
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       child: TextField(
-        controller: TextEditingController(text: initialValue),
+        controller: controller,
         keyboardType: keyboardType,
         maxLines: maxLines,
         onChanged: onChanged,
