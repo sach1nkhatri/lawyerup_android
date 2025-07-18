@@ -1,6 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import '../../../../app/constant/api_endpoints.dart';
+import '../../../../app/constant/hive_constants.dart';
+import '../../../../features/auth/data/models/user_hive_model.dart';
 import '../../domain/entities/lawyer.dart';
 import '../widgets/review_section.dart';
 import 'appointment_modal.dart';
@@ -84,6 +87,18 @@ class LawyerDetailTabView extends StatelessWidget {
 
     final imageUrl = "${ApiEndpoints.baseHost}${lawyer.profilePhoto}";
 
+    // ✅ Fetch current user from Hive
+    final userBox = Hive.box<UserHiveModel>(HiveConstants.userBox);
+    final currentUser = userBox.get(HiveConstants.userKey);
+
+    // ✅ Logic to prevent lawyers from booking other lawyers or themselves
+    final isLawyer = currentUser?.role == 'lawyer';
+    final currentUserId = currentUser?.uid;
+    final viewedLawyerCreatorId = lawyer.id;
+
+    final isSelf = currentUserId == viewedLawyerCreatorId;
+    final disableBooking = isLawyer || isSelf;
+
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -98,16 +113,13 @@ class LawyerDetailTabView extends StatelessWidget {
                   shape: BoxShape.circle,
                   color: Colors.grey[200],
                   image: DecorationImage(
-                    image: CachedNetworkImageProvider(
-                      "${ApiEndpoints.baseHost}${lawyer.profilePhoto}",
-                    ),
+                    image: CachedNetworkImageProvider(imageUrl),
                     fit: BoxFit.cover,
                   ),
                 ),
               ),
             ),
           ),
-
 
           // 🧾 Tabs + Detail Cards
           DefaultTabController(
@@ -170,7 +182,9 @@ class LawyerDetailTabView extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 12),
             child: ElevatedButton(
-              onPressed: () {
+              onPressed: disableBooking
+                  ? null
+                  : () {
                 showModalBottomSheet(
                   context: context,
                   isScrollControlled: true,
@@ -178,23 +192,27 @@ class LawyerDetailTabView extends StatelessWidget {
                     borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
                   ),
                   builder: (ctx) => AppointmentModal(
-                    lawyerId: lawyer.id, // <-- make sure `lawyer` is available in this scope
-                    onClose: () => print("Appointment modal closed"),
+                    lawyerId: lawyer.id,
+                    onClose: () => print("Closed"),
                   ),
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.pink.shade100,
+                backgroundColor:
+                disableBooking ? Colors.grey.shade300 : Colors.pink.shade100,
                 foregroundColor: Colors.black,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(24),
                 ),
                 padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
               ),
-              child: const Text("Get Appointment"),
+              child: Text(
+                disableBooking
+                    ? "Not Available for Lawyers"
+                    : "Get Appointment",
+              ),
             ),
           ),
-
 
           // ⭐ Review Section
           ReviewSection(rating: rating, reviews: lawyer.reviews),
