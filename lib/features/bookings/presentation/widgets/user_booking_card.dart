@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lawyerup_android/features/bookings/presentation/widgets/user_review_modal.dart';
 import '../../domain/entities/booking.dart';
 import '../pages/chat_bottom_sheet.dart';
 
@@ -76,10 +77,27 @@ class UserBookingCard extends StatelessWidget {
                 if (booking.status == 'completed' && !booking.reviewed)
                   OutlinedButton(
                     onPressed: () {
-                      // TODO: Handle rating
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                        ),
+                        builder: (_) => UserReviewModal(
+                          bookingId: booking.id, // ✅ Replace with actual booking ID
+                          onSuccess: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("✅ Review submitted!")),
+                            );
+                            Navigator.of(context).pop(); // Close modal if needed
+                          },
+                        ),
+                      );
                     },
                     child: const Text('Rate'),
                   ),
+
+
                 if (booking.status == 'approved')
                   ElevatedButton.icon(
                     icon: const Icon(Icons.chat_bubble_outline),

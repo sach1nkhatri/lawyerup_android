@@ -51,12 +51,14 @@ class ApiEndpoints {
   static String markMessagesRead(String bookingId) =>
       "${baseUrl}bookings/$bookingId/chat/read";
 
-  //JoinAsALawyer
+
 
 // AI Chat
   static const String getChats = "${baseUrl}ai/chats";
   static String deleteChat(String chatId) => "${baseUrl}ai/chats/$chatId";
 
+// Reviews
+  static String submitReview(String bookingId) => "${baseUrl}reviews/$bookingId";
 
 
 }
