@@ -118,9 +118,18 @@ class _BookingTabViewState extends State<_BookingTabView> with TickerProviderSta
                   itemCount: bookings.length,
                   itemBuilder: (context, index) {
                     final booking = bookings[index];
+
                     return widget.role == 'lawyer'
-                        ? LawyerBookingCard(booking: booking)   // 🧑‍⚖️ lawyer sees lawyer card
-                        : UserBookingCard(booking: booking, currentUserId: '',);    // 👤 user sees user card
+                        ? LawyerBookingCard(booking: booking) // 🧑‍⚖️ lawyer sees lawyer card
+                        : UserBookingCard(
+                      booking: booking,
+                      currentUserId: widget.userId,
+                      onCancelSuccess: () {
+                        context.read<BookingBloc>().add(
+                          LoadBookings(userId: widget.userId, role: widget.role),
+                        );
+                      },
+                    ); // 👤 user sees user card
                   },
                 );
               }).toList(),

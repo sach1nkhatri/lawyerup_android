@@ -4,6 +4,7 @@ import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import '../../../../app/constant/api_endpoints.dart';
 import '../../../../app/constant/hive_constants.dart';
+import '../../../../app/shared/widgets/global_snackbar.dart';
 import '../../../../features/auth/data/models/user_hive_model.dart';
 
 class UserReviewModal extends StatefulWidget {
@@ -30,8 +31,10 @@ class _UserReviewModalState extends State<UserReviewModal> {
     final user = userBox.get(HiveConstants.userKey);
 
     if (user == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("⚠️ Login required.")),
+      GlobalSnackBar.show(
+        context,
+        "⚠️ Login required.",
+        type: SnackType.warning,
       );
       return;
     }
@@ -57,15 +60,24 @@ class _UserReviewModalState extends State<UserReviewModal> {
       if (res.statusCode == 200) {
         Navigator.pop(context);
         widget.onSuccess();
+        GlobalSnackBar.show(
+          context,
+          "Review submitted successfully!",
+          type: SnackType.success,
+        );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("❌ Failed: ${res.body}")),
+        GlobalSnackBar.show(
+          context,
+          "Failed to submit review: ${res.body}",
+          type: SnackType.error,
         );
       }
     } catch (e) {
       setState(() => isSubmitting = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("⚠️ Error submitting review.")),
+      GlobalSnackBar.show(
+        context,
+        "Error submitting review.",
+        type: SnackType.error,
       );
     }
   }
@@ -76,15 +88,18 @@ class _UserReviewModalState extends State<UserReviewModal> {
       padding: MediaQuery.of(context).viewInsets,
       child: Container(
         padding: const EdgeInsets.all(20),
-        decoration: const BoxDecoration(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        decoration: BoxDecoration(
+          color: Colors.black12,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text("📝 Leave a Review", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            const Text("Leave a Review",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
             const SizedBox(height: 16),
 
+            // Rating Stars
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(5, (i) {
@@ -99,6 +114,7 @@ class _UserReviewModalState extends State<UserReviewModal> {
               }),
             ),
 
+            // Comment Input
             TextField(
               decoration: InputDecoration(
                 hintText: "Share your experience...",
@@ -114,20 +130,23 @@ class _UserReviewModalState extends State<UserReviewModal> {
 
             const SizedBox(height: 20),
 
+            // Submit Button
             ElevatedButton.icon(
               onPressed: isSubmitting ? null : _submitReview,
               icon: isSubmitting
                   ? const SizedBox(
                 width: 18,
                 height: 18,
-                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                child: CircularProgressIndicator(
+                    strokeWidth: 2, color: Colors.white),
               )
                   : const Icon(Icons.send),
               label: Text(isSubmitting ? "Submitting..." : "Submit Review"),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.pink.shade400,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+                padding:
+                const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),

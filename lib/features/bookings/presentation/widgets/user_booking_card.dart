@@ -1,16 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/adapters.dart';
+import 'package:http/http.dart' as http;
 import 'package:lawyerup_android/features/bookings/presentation/widgets/user_review_modal.dart';
+import '../../../../app/constant/api_endpoints.dart';
+import '../../../../app/constant/hive_constants.dart';
+import '../../../../app/shared/widgets/global_snackbar.dart';
+import '../../../auth/data/models/user_hive_model.dart';
 import '../../domain/entities/booking.dart';
 import '../pages/chat_bottom_sheet.dart';
 
 class UserBookingCard extends StatelessWidget {
   final Booking booking;
   final String currentUserId;
+  final VoidCallback onCancelSuccess;
 
   const UserBookingCard({
     super.key,
     required this.booking,
     required this.currentUserId,
+    required this.onCancelSuccess,
   });
 
   @override
@@ -21,7 +29,8 @@ class UserBookingCard extends StatelessWidget {
       elevation: 3,
       margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      color: Color(0xFFFFFFFF),shadowColor: Colors.tealAccent,
+      color: const Color(0xFFFFFFFF),
+      shadowColor: Colors.tealAccent,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -50,7 +59,8 @@ class UserBookingCard extends StatelessWidget {
             Text('🗓 Date: ${booking.date}'),
             Text('⏰ Time: ${booking.time}'),
             Text('🧾 Mode: ${booking.mode}'),
-            if (booking.description.isNotEmpty) Text('📝 ${booking.description}'),
+            if (booking.description.isNotEmpty)
+              Text('📝 ${booking.description}'),
 
             const SizedBox(height: 12),
             Text(
@@ -62,18 +72,92 @@ class UserBookingCard extends StatelessWidget {
             ),
             const SizedBox(height: 16),
 
-            // 👇 Buttons
             Wrap(
               spacing: 10,
               runSpacing: 8,
               children: [
                 if (booking.status == 'pending')
                   ElevatedButton(
-                    onPressed: () {
-                      // TODO: Handle cancel
+                    onPressed: () async {
+                      final userBox = Hive.box<UserHiveModel>(HiveConstants.userBox);
+                      final user = userBox.get(HiveConstants.userKey);
+
+                      if (user == null) {
+                        GlobalSnackBar.show(
+                          context,
+                          "⚠️ Login required.",
+                          type: SnackType.warning,
+                        );
+                        return;
+                      }
+
+                      final confirm = await showDialog<bool>(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                          backgroundColor: Colors.white,
+                          title: Row(
+                            children: const [
+                              Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 28),
+                              SizedBox(width: 10),
+                              Text(
+                                "Cancel Booking",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                              ),
+                            ],
+                          ),
+                          content: const Text(
+                            "Are you sure you want to cancel this booking?\nThis action cannot be undone.",
+                            style: TextStyle(fontSize: 15, height: 1.4),
+                          ),
+                          actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                          actionsAlignment: MainAxisAlignment.spaceBetween,
+                          actions: [
+                            TextButton.icon(
+                              onPressed: () => Navigator.pop(ctx, false),
+                              icon: const Icon(Icons.close, color: Colors.grey),
+                              label: const Text("No", style: TextStyle(color: Colors.grey)),
+                            ),
+                            ElevatedButton.icon(
+                              onPressed: () => Navigator.pop(ctx, true),
+                              icon: const Icon(Icons.check_circle_outline),
+                              label: const Text("Yes, Cancel"),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.redAccent,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+
+                      if (confirm != true) return;
+
+                      try {
+                        final res = await http.delete(
+                          Uri.parse(ApiEndpoints.deleteBooking(booking.id)),
+                          headers: {
+                            'Authorization': 'Bearer ${user.token}',
+                          },
+                        );
+
+                        if (res.statusCode == 200) {
+                          GlobalSnackBar.show(context, "Booking cancelled.", type: SnackType.success);
+                          onCancelSuccess(); // Refresh booking list
+                        } else {
+                          GlobalSnackBar.show(context, "Failed to cancel: ${res.body}", type: SnackType.error);
+                        }
+                      } catch (e) {
+                        GlobalSnackBar.show(context, "Error cancelling booking.", type: SnackType.error);
+                      }
                     },
                     child: const Text('Cancel'),
                   ),
+
                 if (booking.status == 'completed' && !booking.reviewed)
                   OutlinedButton(
                     onPressed: () {
@@ -84,19 +168,20 @@ class UserBookingCard extends StatelessWidget {
                           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
                         ),
                         builder: (_) => UserReviewModal(
-                          bookingId: booking.id, // ✅ Replace with actual booking ID
+                          bookingId: booking.id,
                           onSuccess: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text("✅ Review submitted!")),
+                            GlobalSnackBar.show(
+                              context,
+                              "✅ Review submitted!",
+                              type: SnackType.success,
                             );
-                            Navigator.of(context).pop(); // Close modal if needed
+                            Navigator.of(context).pop(); // Close the modal
                           },
                         ),
                       );
                     },
                     child: const Text('Rate'),
                   ),
-
 
                 if (booking.status == 'approved')
                   ElevatedButton.icon(
@@ -135,4 +220,3 @@ class UserBookingCard extends StatelessWidget {
     }
   }
 }
-
