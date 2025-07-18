@@ -63,6 +63,7 @@ import '../../features/pdf_library/presentation/bloc/pdf_bloc.dart';
 import '../../features/splash/data/datasources/local/splash_local_data_source.dart';
 import '../../features/splash/data/datasources/local/splash_local_data_source_impl.dart';
 import '../constant/hive_constants.dart';
+import '../shared/services/socket_service.dart';
 
 
 final sl = GetIt.instance;
@@ -217,6 +218,7 @@ Future<void> initServiceLocator() async {
   );
 
   sl.registerFactory(() => JoinLawyerBloc(repository: sl()));
-
+// Register the singleton
+  sl.registerLazySingleton<SocketService>(() => SocketService());
 
 }

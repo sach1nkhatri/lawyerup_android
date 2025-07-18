@@ -2,6 +2,7 @@ import '../../data/models/lawyer_model.dart';
 
 class Lawyer {
   final String id;
+  final String user;
   final String fullName;
   final String specialization; // From latest education
   final String barRegNumber; // From root-level specialization
@@ -22,6 +23,7 @@ class Lawyer {
 
   Lawyer({
     required this.id,
+    required this.user,
     required this.fullName,
     required this.specialization,
     required this.barRegNumber,
@@ -40,5 +42,4 @@ class Lawyer {
     required this.schedule,
     required this.reviews,
   });
-
 }

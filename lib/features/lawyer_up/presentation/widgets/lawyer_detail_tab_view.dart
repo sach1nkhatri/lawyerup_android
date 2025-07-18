@@ -1,8 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import '../../../../app/constant/api_endpoints.dart';
+import '../../../../app/constant/hive_constants.dart';
+import '../../../../features/auth/data/models/user_hive_model.dart';
 import '../../domain/entities/lawyer.dart';
 import '../widgets/review_section.dart';
+import 'appointment_modal.dart';
 
 class LawyerDetailTabView extends StatelessWidget {
   final Lawyer lawyer;
@@ -83,6 +87,18 @@ class LawyerDetailTabView extends StatelessWidget {
 
     final imageUrl = "${ApiEndpoints.baseHost}${lawyer.profilePhoto}";
 
+    // ✅ Fetch current user from Hive
+    final userBox = Hive.box<UserHiveModel>(HiveConstants.userBox);
+    final currentUser = userBox.get(HiveConstants.userKey);
+
+    // ✅ Logic to prevent lawyers from booking other lawyers or themselves
+    final isLawyer = currentUser?.role == 'lawyer';
+    final currentUserId = currentUser?.uid;
+    final viewedLawyerCreatorId = lawyer.id;
+
+    final isSelf = currentUserId == viewedLawyerCreatorId;
+    final disableBooking = isLawyer || isSelf;
+
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -91,16 +107,29 @@ class LawyerDetailTabView extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 24.0),
             child: Center(
               child: Container(
-                width: 120,
-                height: 120,
+                width: 130,
+                height: 130,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.grey[200],
-                  image: DecorationImage(
-                    image: CachedNetworkImageProvider(
-                      "${ApiEndpoints.baseHost}${lawyer.profilePhoto}",
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 8,
+                      offset: Offset(0, 4),
                     ),
+                  ],
+                  border: Border.all(
+                    color: Colors.blueAccent.withOpacity(0.3),
+                    width: 3,
+                  ),
+                  color: Colors.white,
+                ),
+                child: ClipOval(
+                  child: CachedNetworkImage(
+                    imageUrl: imageUrl,
                     fit: BoxFit.cover,
+                    placeholder: (ctx, url) => const Center(child: CircularProgressIndicator()),
+                    errorWidget: (ctx, url, error) => const Icon(Icons.person, size: 40),
                   ),
                 ),
               ),
@@ -140,23 +169,96 @@ class LawyerDetailTabView extends StatelessWidget {
 
                         // 🔹 Info Tab
                         _tabCard([
-                          _infoRow("Name", lawyer.fullName),
-                          _infoRow("Speciality", lawyer.specialization),
-                          _infoRow("Bar Reg Number", lawyer.barRegNumber),
-                          _infoRow("Address", lawyer.address),
-                          _infoRow("Contact", lawyer.phone),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black12,
+                                  blurRadius: 4,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _infoRow("👤 Name", lawyer.fullName),
+                                const SizedBox(height: 8),
+                                _infoRow("🎯 Speciality", lawyer.specialization),
+                                const SizedBox(height: 8),
+                                _infoRow("🆔 Bar Reg Number", lawyer.barRegNumber),
+                                const SizedBox(height: 8),
+                                _infoRow("📍 Address", lawyer.address),
+                                const SizedBox(height: 8),
+                                _infoRow("📞 Contact", lawyer.phone),
+                              ],
+                            ),
+                          ),
                         ]),
 
                         // 🔹 Work Tab
                         _tabCard([
-                          const Text("Education", style: TextStyle(fontWeight: FontWeight.bold)),
-                          const SizedBox(height: 6),
-                          ...lawyer.education.map((e) => Text("🎓 ${e.degree}, ${e.institute} (${e.year}) - ${e.specialization}")),
-                          const SizedBox(height: 16),
-                          const Text("Work Experience", style: TextStyle(fontWeight: FontWeight.bold)),
-                          const SizedBox(height: 6),
-                          ...lawyer.workExperience.map((w) => Text("📁 ${w.court} (${w.from} to ${w.to})")),
-                        ]),
+                          // 🎓 Education Section
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(16),
+                            margin: const EdgeInsets.only(bottom: 16),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black12,
+                                  blurRadius: 4,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text("Education", style: TextStyle(fontWeight: FontWeight.bold)),
+                                const SizedBox(height: 8),
+                                ...lawyer.education.map((e) => Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 4),
+                                  child: Text("🎓 ${e.degree} - ${e.institute}, ${e.year} (${e.specialization})"),
+                                )),
+                              ],
+                            ),
+                          ),
+
+                          // 🧳 Work Experience Section
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black12,
+                                  blurRadius: 4,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text("Work Experience", style: TextStyle(fontWeight: FontWeight.bold)),
+                                const SizedBox(height: 8),
+                                ...lawyer.workExperience.map((w) => Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 4),
+                                  child: Text("📁 ${w.court} (${w.from} to ${w.to})"),
+                                )),
+                              ],
+                            ),
+                          ),
+                        ])
                       ],
                     ),
                   ),
@@ -169,30 +271,44 @@ class LawyerDetailTabView extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 12),
             child: ElevatedButton(
-              onPressed: () {
+              onPressed: disableBooking
+                  ? null
+                  : () {
+                print("👤 lawyer.user (userId): ${lawyer.user}");
+                print("📋 lawyer.id (listingId): ${lawyer.id}");
+
                 showModalBottomSheet(
                   context: context,
-                  builder: (ctx) => Container(
-                    height: 200,
-                    child: const Center(child: Text("Appointment Modal Placeholder")),
+                  isScrollControlled: true,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                  ),
+                  builder: (ctx) => AppointmentModal(
+                    lawyerId: lawyer.user,       // ✅ user ID from Lawyer model
+                    lawyerListId: lawyer.id,     // ✅ actual listing ID
+                    onClose: () => print("Closed"),
                   ),
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.pink.shade100,
+                backgroundColor: disableBooking
+                    ? Colors.grey.shade300
+                    : Colors.pink.shade100,
                 foregroundColor: Colors.black,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(24),
                 ),
                 padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
               ),
-              child: const Text("Get Appointment"),
+              child: Text(
+                disableBooking ? "Not Available for Lawyers" : "Get Appointment",
+              ),
             ),
           ),
 
           // ⭐ Review Section
           ReviewSection(rating: rating, reviews: lawyer.reviews),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
         ],
       ),
     );

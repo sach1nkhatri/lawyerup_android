@@ -1,16 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../../../../app/constant/hive_constants.dart';
 import '../../../../app/service_locater/service_locator.dart';
+import '../../../../app/shared/widgets/global_snackbar.dart';
 import '../../../auth/data/models/user_hive_model.dart';
 import '../../data/datasources/remote_datasource/booking_remote_data_source.dart';
 import '../../domain/entities/booking.dart';
+import '../bloc/booking_bloc.dart';
+import '../bloc/booking_event.dart';
 import '../pages/chat_bottom_sheet.dart';
 
 class LawyerBookingCard extends StatefulWidget {
   final Booking booking;
+  final String userId;
+  final String role;
 
-  const LawyerBookingCard({super.key, required this.booking});
+  const LawyerBookingCard({
+    super.key,
+    required this.booking,
+    required this.userId,
+    required this.role,
+  });
 
   @override
   State<LawyerBookingCard> createState() => _LawyerBookingCardState();
@@ -76,13 +87,11 @@ class _LawyerBookingCardState extends State<LawyerBookingCard> {
               runSpacing: 10,
               children: [
                 if (status == 'pending')
-                  _actionButton(' Approve', () => _confirmStatusUpdate(context, 'approved'), Colors.orange),
-
+                  _actionButton('Approve', () => _confirmStatusUpdate(context, 'approved'), Colors.orange),
                 if (status == 'approved') ...[
                   _actionButton('Complete', () => _confirmStatusUpdate(context, 'completed'), Colors.green),
                   _actionButton('💬 Chat', () => _openChat(context), Colors.blue),
                 ],
-
                 _actionButton('🔗 Set Link', () => _promptMeetingLink(context), Colors.indigo),
               ],
             ),
@@ -123,29 +132,70 @@ class _LawyerBookingCardState extends State<LawyerBookingCard> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Set Meeting Link'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        backgroundColor: Colors.white,
+        title: Row(
+          children: const [
+            Icon(Icons.video_call_rounded, color: Colors.indigo, size: 26),
+            SizedBox(width: 10),
+            Text(
+              'Set Meeting Link',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+          ],
+        ),
         content: TextField(
           controller: controller,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             hintText: 'Paste Google Meet / Zoom link...',
-            border: OutlineInputBorder(),
+            filled: true,
+            fillColor: Colors.grey.shade100,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey.shade300),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey.shade300),
+            ),
           ),
         ),
+        actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        actionsAlignment: MainAxisAlignment.spaceBetween,
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-          ElevatedButton(
+          TextButton.icon(
+            onPressed: () => Navigator.pop(context),
+            icon: const Icon(Icons.close, color: Colors.grey),
+            label: const Text("Cancel", style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton.icon(
             onPressed: () async {
               final newLink = controller.text.trim();
               Navigator.pop(context);
               try {
                 await bookingRemote.updateMeetingLink(widget.booking.id, newLink);
                 setState(() => meetingLink = newLink);
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Meeting link updated')));
+                GlobalSnackBar.show(
+                  context,
+                  "Meeting link updated.",
+                  type: SnackType.success,
+                );
               } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+                GlobalSnackBar.show(
+                  context,
+                  "Error: $e",
+                  type: SnackType.error,
+                );
               }
             },
-            child: const Text('Save'),
+            icon: const Icon(Icons.save_alt),
+            label: const Text("Save"),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.indigo,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
           ),
         ],
       ),
@@ -156,22 +206,65 @@ class _LawyerBookingCardState extends State<LawyerBookingCard> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Update Booking Status'),
-        content: Text('Mark this booking as "$newStatus"?'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        backgroundColor: Colors.white,
+        title: Row(
+          children: [
+            Icon(
+              Icons.info_outline,
+              color: newStatus == 'approved' ? Colors.orange : Colors.green,
+              size: 26,
+            ),
+            const SizedBox(width: 10),
+            const Text(
+              'Update Status',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+          ],
+        ),
+        content: Text(
+          'Are you sure you want to mark this booking as "${newStatus.toUpperCase()}"?',
+          style: const TextStyle(fontSize: 15),
+        ),
+        actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        actionsAlignment: MainAxisAlignment.spaceBetween,
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-          ElevatedButton(
+          TextButton.icon(
+            onPressed: () => Navigator.pop(context),
+            icon: const Icon(Icons.close, color: Colors.grey),
+            label: const Text("Cancel", style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton.icon(
             onPressed: () async {
               Navigator.pop(context);
               try {
                 await bookingRemote.updateBookingStatus(widget.booking.id, newStatus);
-                setState(() => status = newStatus);
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Marked as $newStatus')));
+
+                // ✅ Reload booking list from BLoC
+                context.read<BookingBloc>().add(
+                  LoadBookings(userId: widget.userId, role: widget.role),
+                );
+
+                GlobalSnackBar.show(
+                  context,
+                  "Marked as $newStatus",
+                  type: SnackType.success,
+                );
               } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+                GlobalSnackBar.show(
+                  context,
+                  "Error: $e",
+                  type: SnackType.error,
+                );
               }
             },
-            child: const Text('Confirm'),
+            icon: const Icon(Icons.check_circle_outline),
+            label: const Text("Confirm"),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: newStatus == 'approved' ? Colors.orange : Colors.green,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
           ),
         ],
       ),
@@ -180,13 +273,11 @@ class _LawyerBookingCardState extends State<LawyerBookingCard> {
 
   void _openChat(BuildContext context) {
     final box = Hive.box<UserHiveModel>(HiveConstants.userBox);
-    final user = box.get('user');
+    final user = box.get(HiveConstants.userKey);
     final currentUserId = user?.uid ?? '';
 
     if (currentUserId.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("User ID not found")),
-      );
+      GlobalSnackBar.show(context, "User ID not found", type: SnackType.warning);
       return;
     }
 
