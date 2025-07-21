@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class ChatInputBox extends StatefulWidget {
   final Function(String) onSend;
-  final VoidCallback? onTyping; // ✅ optional typing callback
+  final VoidCallback? onTyping;
 
   const ChatInputBox({
     super.key,

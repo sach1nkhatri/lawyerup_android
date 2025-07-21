@@ -60,6 +60,13 @@ import '../../features/pdf_library/data/datasources/remote/pdf_repository_impl.d
 import '../../features/pdf_library/domain/repositories/pdf_repository.dart';
 import '../../features/pdf_library/domain/usecases/get_all_pdfs_usecase.dart';
 import '../../features/pdf_library/presentation/bloc/pdf_bloc.dart';
+import '../../features/settings/data/datasources/remote/settings_user_remote_data_source.dart';
+import '../../features/settings/data/datasources/remote/settings_user_remote_data_source_impl.dart';
+import '../../features/settings/data/repositories/settings_user_repository_impl.dart';
+import '../../features/settings/domain/repositories/settings_user_repository.dart';
+import '../../features/settings/domain/usecases/get_current_user_usecase.dart';
+import '../../features/settings/domain/usecases/update_user_profile_usecase.dart';
+import '../../features/settings/presentation/bloc/settings_bloc.dart';
 import '../../features/splash/data/datasources/local/splash_local_data_source.dart';
 import '../../features/splash/data/datasources/local/splash_local_data_source_impl.dart';
 import '../constant/hive_constants.dart';
@@ -220,5 +227,24 @@ Future<void> initServiceLocator() async {
   sl.registerFactory(() => JoinLawyerBloc(repository: sl()));
 // Register the singleton
   sl.registerLazySingleton<SocketService>(() => SocketService());
+
+
+// ============ SETTINGS ============
+
+  sl.registerLazySingleton<SettingsUserRemoteDataSource>(
+        () => SettingsUserRemoteDataSourceImpl(dio: sl()),
+  );
+
+  sl.registerLazySingleton<SettingsUserRepository>(
+        () => SettingsUserRepositoryImpl(sl()),
+  );
+
+  sl.registerLazySingleton(() => GetCurrentUserUseCase(sl()));
+  sl.registerLazySingleton(() => UpdateUserProfileUseCase(sl()));
+
+  sl.registerFactory(() => SettingsBloc(
+    getCurrentUser: sl(),
+    updateUser: sl(),
+  ));
 
 }

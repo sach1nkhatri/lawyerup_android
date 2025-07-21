@@ -6,8 +6,6 @@ class BookingRemoteDataSource {
   final Dio dio;
 
   BookingRemoteDataSource({required this.dio});
-
-  /// ✅ Always use /bookings/user/:userId for both roles to get full booking data with lawyerList populated
   Future<List<BookingModel>> getBookings({
     required String userId,
     required String role, // 'user' or 'lawyer'

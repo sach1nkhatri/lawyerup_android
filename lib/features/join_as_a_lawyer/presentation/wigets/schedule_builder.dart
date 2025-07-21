@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 
 class ScheduleBuilder extends StatefulWidget {
+  final Map<String, List<Map<String, String>>>? initialSchedule;
   final Function(Map<String, List<Map<String, String>>>) onScheduleChange;
 
-  const ScheduleBuilder({super.key, required this.onScheduleChange});
+  const ScheduleBuilder({
+    super.key,
+    required this.onScheduleChange,
+    this.initialSchedule,
+  });
 
   @override
   State<ScheduleBuilder> createState() => _ScheduleBuilderState();
@@ -19,6 +24,14 @@ class _ScheduleBuilderState extends State<ScheduleBuilder> {
   TimeOfDay? endTime;
 
   Map<String, List<Map<String, String>>> schedule = {};
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialSchedule != null) {
+      schedule = Map<String, List<Map<String, String>>>.from(widget.initialSchedule!);
+    }
+  }
 
   Future<void> _pickTime(bool isStart) async {
     final picked = await showTimePicker(
@@ -67,7 +80,6 @@ class _ScheduleBuilderState extends State<ScheduleBuilder> {
 
     widget.onScheduleChange(schedule);
   }
-
 
   @override
   Widget build(BuildContext context) {
