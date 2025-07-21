@@ -173,22 +173,71 @@ class _SettingsViewState extends State<_SettingsView> {
     );
   }
 
-  void confirmToggle(String label, VoidCallback onConfirm) async {
+  void confirmToggle(String label, bool isTurningOn, VoidCallback onConfirm) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Are you sure?', style: TextStyle(fontFamily: 'Lora')),
-        content: Text('Do you want to toggle $label?', style: const TextStyle(fontFamily: 'PlayfairDisplay')),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel', style: TextStyle(fontFamily: 'PlayfairDisplay')),
+      builder: (_) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 32),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 20, 24, 12),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.info_outline,
+                color: isTurningOn ? Colors.green : Colors.red,
+                size: 36,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Update $label',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Lora',
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Are you sure you want to turn ${isTurningOn ? "on" : "off"} $label?',
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 15, fontFamily: 'PlayfairDisplay'),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextButton.icon(
+                      onPressed: () => Navigator.pop(context, false),
+                      icon: const Icon(Icons.close, color: Colors.grey),
+                      label: const Text('Cancel'),
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.grey,
+                        textStyle: const TextStyle(fontFamily: 'PlayfairDisplay'),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () => Navigator.pop(context, true),
+                      icon: Icon(isTurningOn ? Icons.check_circle_outline : Icons.cancel_outlined),
+                      label: Text(isTurningOn ? 'Enable' : 'Disable'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: isTurningOn ? Colors.green : Colors.redAccent,
+                        foregroundColor: Colors.white,
+                        textStyle: const TextStyle(fontWeight: FontWeight.bold),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Confirm', style: TextStyle(fontFamily: 'PlayfairDisplay')),
-          ),
-        ],
+        ),
       ),
     );
 
@@ -196,7 +245,7 @@ class _SettingsViewState extends State<_SettingsView> {
       onConfirm();
       GlobalSnackBar.show(
         context,
-        '$label updated',
+        '$label ${isTurningOn ? "enabled" : "disabled"}',
         type: SnackType.success,
       );
     }
@@ -296,16 +345,15 @@ class _SettingsViewState extends State<_SettingsView> {
                 SettingsSection(
                   title: "Preferences",
                   items: ["Notifications", "Automated Updates"],
-                  switches: [notificationsEnabled, updatesEnabled],
-                  onSwitchToggle: (index, value) {
-                    final label = index == 0 ? 'Notifications' : 'Automated Updates';
-                    confirmToggle(label, () {
-                      setState(() {
-                        if (index == 0) notificationsEnabled = value;
-                        if (index == 1) updatesEnabled = value;
-                      });
+                  switches: [notificationsEnabled, updatesEnabled],onSwitchToggle: (index, value) {
+                  final label = index == 0 ? 'Notifications' : 'Automated Updates';
+                  confirmToggle(label, value, () {
+                    setState(() {
+                      if (index == 0) notificationsEnabled = value;
+                      if (index == 1) updatesEnabled = value;
                     });
-                  },
+                  });
+                },
                 ),
                 const SizedBox(height: 24),
                 const Text(
