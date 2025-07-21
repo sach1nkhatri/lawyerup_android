@@ -62,6 +62,6 @@ class ApiEndpoints {
 
 // Reviews
   static String submitReview(String bookingId) => "${baseUrl}reviews/$bookingId";
-
-
+  // FAQs
+  static const String getFaqs = "${baseUrl}faqs";
 }

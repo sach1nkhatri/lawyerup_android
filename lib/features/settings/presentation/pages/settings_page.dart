@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
+import 'package:lawyerup_android/features/settings/presentation/widgets/FaqPopupWidget.dart';
 import '../../../../app/routes/app_router.dart';
 import '../../../../app/service_locater/service_locator.dart';
 import '../../../../app/shared/widgets/global_snackbar.dart';
@@ -8,6 +9,7 @@ import '../../../auth/domain/repositories/auth_repository.dart';
 import '../bloc/settings_bloc.dart';
 import '../bloc/settings_bloc_event.dart';
 import '../bloc/settings_bloc_state.dart';
+import '../widgets/PrivacyPopup.dart';
 import '../widgets/settings_section.dart';
 
 class SettingsPage extends StatelessWidget {
@@ -52,44 +54,123 @@ class _SettingsViewState extends State<_SettingsView> {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Edit Profile"),
-        content: Form(
-          key: formKey,
+      builder: (context) => Dialog(
+        elevation: 8,
+        backgroundColor: Colors.white.withOpacity(0.95),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
           child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextFormField(controller: nameController, decoration: const InputDecoration(labelText: 'Name'), enabled: false),
-                TextFormField(controller: emailController, decoration: const InputDecoration(labelText: 'Email'), enabled: false),
-                TextFormField(controller: phoneController, decoration: const InputDecoration(labelText: 'Phone')),
-                TextFormField(controller: stateController, decoration: const InputDecoration(labelText: 'State')),
-                TextFormField(controller: cityController, decoration: const InputDecoration(labelText: 'City')),
-                TextFormField(controller: addressController, decoration: const InputDecoration(labelText: 'Address')),
-              ],
+            child: Form(
+              key: formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Center(
+                    child: Column(
+                      children: const [
+                        Icon(Icons.person, size: 36, color: Colors.deepPurple),
+                        SizedBox(height: 8),
+                        Text(
+                          "Edit Profile",
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  buildReadOnlyField("Name", nameController),
+                  buildReadOnlyField("Email", emailController),
+
+                  buildEditableField("Phone", phoneController),
+                  buildEditableField("State", stateController),
+                  buildEditableField("City", cityController),
+                  buildEditableField("Address", addressController),
+
+                  const SizedBox(height: 30),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      TextButton.icon(
+                        onPressed: () => Navigator.pop(context),
+                        icon: const Icon(Icons.close, color: Colors.redAccent),
+                        label: const Text(
+                          "Cancel",
+                          style: TextStyle(color: Colors.redAccent),
+                        ),
+                      ),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          if (formKey.currentState!.validate()) {
+                            context.read<SettingsBloc>().add(SaveSettingsUserProfile(
+                              contactNumber: phoneController.text,
+                              state: stateController.text,
+                              city: cityController.text,
+                              address: addressController.text,
+                            ));
+                            Navigator.pop(context);
+                          }
+                        },
+                        icon: const Icon(Icons.save),
+                        label: const Text("Save Changes"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.deepPurple,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
-          ElevatedButton(
-            onPressed: () {
-              if (formKey.currentState!.validate()) {
-                context.read<SettingsBloc>().add(SaveSettingsUserProfile(
-                  contactNumber: phoneController.text,
-                  state: stateController.text,
-                  city: cityController.text,
-                  address: addressController.text,
-                ));
-                Navigator.pop(context);
-              }
-            },
-            child: const Text("Save"),
-          )
-        ],
       ),
     );
   }
+
+  Widget buildEditableField(String label, TextEditingController controller) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: TextFormField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          filled: true,
+          fillColor: Colors.grey.shade100,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        ),
+        validator: (val) => val == null || val.isEmpty ? "Required" : null,
+      ),
+    );
+  }
+
+  Widget buildReadOnlyField(String label, TextEditingController controller) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: TextFormField(
+        controller: controller,
+        enabled: false,
+        decoration: InputDecoration(
+          labelText: label,
+          filled: true,
+          fillColor: Colors.grey.shade200,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        ),
+      ),
+    );
+  }
+
 
   void confirmToggle(String label, VoidCallback onConfirm) async {
     final confirmed = await showDialog<bool>(
@@ -209,9 +290,12 @@ class _SettingsViewState extends State<_SettingsView> {
                       showEditProfileDialog(state);
                     } else if (index == 1) {
                       showDialog(context: context, builder: (_) => const PrivacyPopup());
+                    } else if (index == 2) {
+                      showDialog(context: context, builder: (_) => const FaqPopupWidget());
                     }
                   },
                 ),
+
 
                 const SizedBox(height: 24),
 
@@ -318,22 +402,3 @@ class _SettingsViewState extends State<_SettingsView> {
   }
 }
 
-class PrivacyPopup extends StatelessWidget {
-  const PrivacyPopup({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text("Privacy Policy"),
-      content: const SingleChildScrollView(
-        child: Text("This is where your privacy policy content will go."),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text("Close"),
-        ),
-      ],
-    );
-  }
-}
