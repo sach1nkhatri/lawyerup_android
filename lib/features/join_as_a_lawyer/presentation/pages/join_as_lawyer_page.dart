@@ -1,4 +1,14 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:hive/hive.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+import '../../../../app/constant/hive_constants.dart';
+import '../../../../app/constant/api_endpoints.dart';
+import '../../../auth/data/models/user_hive_model.dart';
 import '../wigets/schedule_builder.dart';
 import 'lawyer_status_page.dart';
 
@@ -12,31 +22,50 @@ class JoinAsLawyerPage extends StatefulWidget {
 class _JoinAsLawyerPageState extends State<JoinAsLawyerPage> {
   int step = 1;
   bool isJunior = false;
+  File? profileImage;
+  File? licenseFile;
 
-  final form = {
-    'fullName': '',
-    'specialization': '',
-    'email': '',
-    'phone': '',
-    'state': '',
-    'city': '',
-    'address': '',
-    'expectedGraduation': '',
-    'description': '',
-    'specialCase': '',
-    'socialLink': '',
-    'eduDegree': '',
-    'eduInstitute': '',
-    'eduYear': '',
-    'eduSpecialization': '',
-    'workCourt': '',
-    'workFrom': '',
-    'workTo': '',
+  final form = <String, String>{
+    'fullName': '', 'specialization': '', 'email': '', 'phone': '',
+    'state': '', 'city': '', 'address': '', 'expectedGraduation': '',
+    'description': '', 'specialCase': '', 'socialLink': '',
+    'eduDegree': '', 'eduInstitute': '', 'eduYear': '', 'eduSpecialization': '',
+    'workCourt': '', 'workFrom': '', 'workTo': '',
   };
 
   List<Map<String, String>> educationList = [];
   List<Map<String, String>> workList = [];
   Map<String, List<Map<String, String>>> schedule = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _checkIfAlreadyLawyer();
+  }
+
+  Future<void> _checkIfAlreadyLawyer() async {
+    final box = Hive.box<UserHiveModel>(HiveConstants.userBox);
+    final user = box.get(HiveConstants.userKey);
+    final token = user?.token;
+
+    if (token == null) return;
+
+    final res = await http.get(
+      Uri.parse(ApiEndpoints.getLawyerByUser), // MUST point to /lawyers/me
+      headers: { 'Authorization': 'Bearer $token' },
+    );
+
+    if (res.statusCode == 200) {
+      final data = jsonDecode(res.body);
+      if (data['status'] != null) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => LawyerStatusPage(lawyer: data)),
+        );
+      }
+    }
+  }
+
 
   void addEducation() {
     setState(() {
@@ -76,11 +105,106 @@ class _JoinAsLawyerPageState extends State<JoinAsLawyerPage> {
           filled: true,
           fillColor: Colors.white,
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         ),
         onChanged: (val) => form[key] = val,
       ),
     );
+  }
+
+  Widget fileUploadSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text("Profile Photo & License", style: TextStyle(fontWeight: FontWeight.bold)),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            CircleAvatar(
+              radius: 32,
+              backgroundColor: Colors.grey.shade300,
+              backgroundImage: profileImage != null ? FileImage(profileImage!) : null,
+              child: profileImage == null
+                  ? const Icon(Icons.person, size: 30, color: Colors.black54)
+                  : null,
+            ),
+            const SizedBox(width: 12),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.image),
+              label: const Text("Choose Image"),
+              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF1C2D3D)),
+              onPressed: () async {
+                final picked = await ImagePicker().pickImage(source: ImageSource.gallery);
+                if (picked != null) setState(() => profileImage = File(picked.path));
+              },
+            ),
+          ],
+        ),
+        if (profileImage != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text("Selected: ${profileImage!.path.split('/').last}",
+                style: const TextStyle(fontSize: 12)),
+          ),
+        const SizedBox(height: 20),
+        ElevatedButton.icon(
+          icon: const Icon(Icons.picture_as_pdf),
+          label: const Text("Upload License PDF"),
+          style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF1C2D3D)),
+          onPressed: () async {
+            final result = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['pdf']);
+            if (result != null) {
+              setState(() => licenseFile = File(result.files.single.path!));
+            }
+          },
+        ),
+        if (licenseFile != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text("Selected: ${licenseFile!.path.split('/').last}",
+                style: const TextStyle(fontSize: 12)),
+          ),
+      ],
+    );
+  }
+
+  Future<void> submitForm() async {
+    final user = Hive.box<UserHiveModel>(HiveConstants.userBox).get(HiveConstants.userKey);
+    final token = user?.token;
+    final uid = user?.uid;
+    if (token == null || uid == null) return;
+
+    final uri = Uri.parse(ApiEndpoints.createLawyer);
+    final request = http.MultipartRequest('POST', uri);
+    request.headers['Authorization'] = 'Bearer $token';
+
+    request.fields['user'] = uid;
+    request.fields['role'] = isJunior ? 'junior' : 'senior';
+    form.forEach((key, value) => request.fields[key] = value);
+    request.fields['education'] = jsonEncode(educationList);
+    request.fields['workExperience'] = jsonEncode(workList);
+    request.fields['schedule'] = jsonEncode(schedule);
+
+    if (profileImage != null) {
+      request.files.add(await http.MultipartFile.fromPath('profilePhoto', profileImage!.path));
+    }
+    if (licenseFile != null) {
+      request.files.add(await http.MultipartFile.fromPath('licenseFile', licenseFile!.path));
+    }
+
+    final response = await request.send();
+    final res = await http.Response.fromStream(response);
+    if (res.statusCode == 201) {
+      final data = jsonDecode(res.body);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => LawyerStatusPage(lawyer: data)),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Submission failed"))
+      );
+    }
   }
 
   @override
@@ -89,35 +213,13 @@ class _JoinAsLawyerPageState extends State<JoinAsLawyerPage> {
       backgroundColor: Colors.blue.shade50,
       appBar: AppBar(
         backgroundColor: const Color(0xFF1C2D3D),
-        iconTheme: const IconThemeData(color: Colors.white),
-        title: const Text(
-          "Join as a Lawyer",
-          style: TextStyle(
-            fontFamily: 'Lora',
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-        elevation: 4,
+        title: const Text("Join as a Lawyer", style: TextStyle(color: Colors.white)),
       ),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton(
-              onPressed: () => setState(() => isJunior = !isJunior),
-              child: Text(
-                isJunior ? 'Switch to Senior Lawyer Form' : 'Join as Junior Lawyer',
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
-          Text(
-            step == 1 ? "Personal Information" : "Education, Work & Schedule",
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
+          Text(step == 1 ? "Personal Info" : "Education & Schedule",
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
           const SizedBox(height: 20),
           if (step == 1) ...[
             input('fullName', 'Full Name'),
@@ -127,116 +229,53 @@ class _JoinAsLawyerPageState extends State<JoinAsLawyerPage> {
             input('state', 'State'),
             input('city', 'City'),
             input('address', 'Address'),
+            const SizedBox(height: 10),
+            fileUploadSection(),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () => setState(() => step = 2),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF1C2D3D),
-                foregroundColor: Colors.white,
-                minimumSize: const Size.fromHeight(50),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              ),
+              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF1C2D3D)),
               child: const Text("Next"),
             ),
           ] else ...[
             if (isJunior) input('expectedGraduation', 'Expected Graduation Year'),
-            input('description', 'Short Description (max 200 chars)'),
-            input('specialCase', 'Special Case or Interest'),
-            input('socialLink', 'Social Link (optional)'),
-
-            if (!isJunior) ...[
-              const SizedBox(height: 20),
-              const Text("Work Experience", style: TextStyle(fontWeight: FontWeight.bold)),
-              const SizedBox(height: 10),
-              input('workCourt', 'Court'),
-              input('workFrom', 'From'),
-              input('workTo', 'To'),
-              ElevatedButton(
-                onPressed: addWork,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey.shade700,
-                  foregroundColor: Colors.white,
-                  minimumSize: const Size.fromHeight(45),
-                ),
-                child: const Text("Add Work"),
-              ),
-              const SizedBox(height: 10),
-              for (var w in workList)
-                ListTile(
-                  leading: const Icon(Icons.work),
-                  title: Text("${w['court']} (${w['from']} - ${w['to']})"),
-                ),
-            ],
-
-            const SizedBox(height: 20),
-            const Text("Academic Details", style: TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 10),
+            input('description', 'Description'),
+            input('specialCase', 'Special Case'),
+            input('socialLink', 'Social Link'),
+            const Divider(height: 30),
             input('eduDegree', 'Degree'),
             input('eduInstitute', 'Institute'),
             input('eduYear', 'Year'),
             input('eduSpecialization', 'Specialization'),
-            ElevatedButton(
-              onPressed: addEducation,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey.shade700,
-                foregroundColor: Colors.white,
-                minimumSize: const Size.fromHeight(45),
-              ),
-              child: const Text("Add Education"),
-            ),
+            ElevatedButton(onPressed: addEducation, child: const Text("Add Education")),
+            ...educationList.map((e) => ListTile(
+              leading: const Icon(Icons.school),
+              title: Text("${e['degree']} at ${e['institute']} (${e['year']})"),
+            )),
+            if (!isJunior) ...[
+              input('workCourt', 'Court'),
+              input('workFrom', 'From'),
+              input('workTo', 'To'),
+              ElevatedButton(onPressed: addWork, child: const Text("Add Work")),
+              ...workList.map((w) => ListTile(
+                leading: const Icon(Icons.work),
+                title: Text("${w['court']} (${w['from']} - ${w['to']})"),
+              )),
+            ],
             const SizedBox(height: 10),
-            for (var e in educationList)
-              ListTile(
-                leading: const Icon(Icons.school),
-                title: Text("${e['degree']} - ${e['institute']} (${e['year']}) | ${e['specialization']}"),
-              ),
-
-            const SizedBox(height: 20),
-            const Text("Weekly Schedule", style: TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 10),
-            ScheduleBuilder(
-              onScheduleChange: (data) => schedule = data,
-            ),
-
+            ScheduleBuilder(onScheduleChange: (data) => schedule = data),
             const SizedBox(height: 30),
             ElevatedButton.icon(
-              onPressed: () {
-                final lawyerData = {
-                  'fullName': form['fullName'],
-                  'specialization': form['specialization'],
-                  'email': form['email'],
-                  'phone': form['phone'],
-                  'address': form['address'],
-                  'city': form['city'],
-                  'state': form['state'],
-                  'expectedGraduation': form['expectedGraduation'],
-                  'description': form['description'],
-                  'specialCase': form['specialCase'],
-                  'socialLink': form['socialLink'],
-                  'education': educationList,
-                  'workExperience': workList,
-                  'schedule': schedule,
-                  'status': 'hold',
-                  'profilePhoto': null,
-                };
-
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => LawyerStatusPage(lawyer: lawyerData),
-                  ),
-                );
-              },
               icon: const Icon(Icons.check_circle),
-              label: const Text("Join Now"),
+              onPressed: submitForm,
+              label: const Text("Submit Application"),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF1C2D3D),
                 foregroundColor: Colors.white,
-                minimumSize: const Size.fromHeight(55),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                minimumSize: const Size.fromHeight(50),
               ),
             ),
-          ]
+          ],
         ],
       ),
     );

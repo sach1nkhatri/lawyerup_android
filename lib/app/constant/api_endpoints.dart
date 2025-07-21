@@ -34,6 +34,9 @@ class ApiEndpoints {
   static String updateLawyer(String id) => "$baseUrl/lawyers/$id";
   static String deleteLawyer(String id) => "$baseUrl/lawyers/$id";
   static const String getLawyerByUser = "${baseUrl}lawyers/by-user";
+  static const String getLawyerByMe = "${baseUrl}lawyers/me";
+
+
 
   //  Bookings
   static const String createBooking = "${baseUrl}bookings";

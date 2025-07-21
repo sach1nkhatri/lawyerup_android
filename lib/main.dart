@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lawyerup_android/app/app.dart';
-import 'core/network/hive_service.dart'; // teacher-style
+import 'core/network/hive_network_service.dart'; // teacher-style
 import 'app/service_locater/service_locator.dart';
 
 void main() async {
