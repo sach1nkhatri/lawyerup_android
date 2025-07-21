@@ -195,7 +195,7 @@ class _SettingsViewState extends State<_SettingsView> {
       onConfirm();
       GlobalSnackBar.show(
         context,
-        '$label updated (for visual only)',
+        '$label updated',
         type: SnackType.success,
       );
     }
@@ -301,10 +301,10 @@ class _SettingsViewState extends State<_SettingsView> {
 
                 SettingsSection(
                   title: "Preferences",
-                  items: ["Notifications", "Updates"],
+                  items: ["Notifications", "Automated Updates"],
                   switches: [notificationsEnabled, updatesEnabled],
                   onSwitchToggle: (index, value) {
-                    final label = index == 0 ? 'Notifications' : 'Updates';
+                    final label = index == 0 ? 'Notifications' : 'Automated Updates';
                     confirmToggle(label, () {
                       setState(() {
                         if (index == 0) notificationsEnabled = value;
