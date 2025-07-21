@@ -78,21 +78,19 @@ class _SettingsViewState extends State<_SettingsView> {
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
                             letterSpacing: 0.5,
+                            fontFamily: 'Lora',
                           ),
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 24),
-
                   buildReadOnlyField("Name", nameController),
                   buildReadOnlyField("Email", emailController),
-
                   buildEditableField("Phone", phoneController),
                   buildEditableField("State", stateController),
                   buildEditableField("City", cityController),
                   buildEditableField("Address", addressController),
-
                   const SizedBox(height: 30),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -102,7 +100,7 @@ class _SettingsViewState extends State<_SettingsView> {
                         icon: const Icon(Icons.close, color: Colors.redAccent),
                         label: const Text(
                           "Cancel",
-                          style: TextStyle(color: Colors.redAccent),
+                          style: TextStyle(color: Colors.redAccent, fontFamily: 'PlayfairDisplay'),
                         ),
                       ),
                       ElevatedButton.icon(
@@ -118,7 +116,7 @@ class _SettingsViewState extends State<_SettingsView> {
                           }
                         },
                         icon: const Icon(Icons.save),
-                        label: const Text("Save Changes"),
+                        label: const Text("Save Changes", style: TextStyle(fontFamily: 'PlayfairDisplay')),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.deepPurple,
                           foregroundColor: Colors.white,
@@ -144,12 +142,14 @@ class _SettingsViewState extends State<_SettingsView> {
         controller: controller,
         decoration: InputDecoration(
           labelText: label,
+          labelStyle: const TextStyle(fontFamily: 'PlayfairDisplay'),
           filled: true,
           fillColor: Colors.grey.shade100,
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         ),
         validator: (val) => val == null || val.isEmpty ? "Required" : null,
+        style: const TextStyle(fontFamily: 'PlayfairDisplay'),
       ),
     );
   }
@@ -162,30 +162,31 @@ class _SettingsViewState extends State<_SettingsView> {
         enabled: false,
         decoration: InputDecoration(
           labelText: label,
+          labelStyle: const TextStyle(fontFamily: 'PlayfairDisplay'),
           filled: true,
           fillColor: Colors.grey.shade200,
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         ),
+        style: const TextStyle(fontFamily: 'PlayfairDisplay'),
       ),
     );
   }
-
 
   void confirmToggle(String label, VoidCallback onConfirm) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Are you sure?'),
-        content: Text('Do you want to toggle $label?'),
+        title: const Text('Are you sure?', style: TextStyle(fontFamily: 'Lora')),
+        content: Text('Do you want to toggle $label?', style: const TextStyle(fontFamily: 'PlayfairDisplay')),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: const Text('Cancel', style: TextStyle(fontFamily: 'PlayfairDisplay')),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Confirm'),
+            child: const Text('Confirm', style: TextStyle(fontFamily: 'PlayfairDisplay')),
           ),
         ],
       ),
@@ -208,7 +209,7 @@ class _SettingsViewState extends State<_SettingsView> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF1E2B3A),
         elevation: 0,
-        title: const Text("Settings", style: TextStyle(color: Colors.white)),
+        title: const Text("Settings", style: TextStyle(color: Colors.white, fontFamily: 'Lora')),
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
@@ -233,11 +234,11 @@ class _SettingsViewState extends State<_SettingsView> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(user.fullName, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    Text(user.fullName, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'Lora')),
                     const SizedBox(height: 4),
-                    Text(user.city),
-                    Text("Since ${user.createdAt.year}"),
-                    Text("${user.plan} Plan"),
+                    Text(user.city, style: const TextStyle(fontFamily: 'PlayfairDisplay')),
+                    Text("Since ${user.createdAt.year}", style: const TextStyle(fontFamily: 'PlayfairDisplay')),
+                    Text("${user.plan} Plan", style: const TextStyle(fontFamily: 'PlayfairDisplay')),
                     const SizedBox(height: 12),
                     GestureDetector(
                       onTap: () {
@@ -255,15 +256,13 @@ class _SettingsViewState extends State<_SettingsView> {
                         ),
                         child: Text(
                           user.plan == 'Free Trial' ? 'Get Plus ➕' : 'Upgrade ➕',
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontFamily: 'Lora'),
                         ),
                       ),
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 24),
-
                 if (user.city.isEmpty || user.state.isEmpty || user.address.isEmpty)
                   Container(
                     padding: const EdgeInsets.all(12),
@@ -275,13 +274,11 @@ class _SettingsViewState extends State<_SettingsView> {
                       children: const [
                         Icon(Icons.warning_amber_rounded, color: Colors.orange),
                         SizedBox(width: 8),
-                        Expanded(child: Text("Complete your profile to get personalized recommendations.")),
+                        Expanded(child: Text("Complete your profile to get personalized recommendations.", style: TextStyle(fontFamily: 'PlayfairDisplay'))),
                       ],
                     ),
                   ),
-
                 const SizedBox(height: 24),
-
                 SettingsSection(
                   title: "Account",
                   items: ["Edit Profile", "Privacy", "Help & FAQ"],
@@ -295,10 +292,7 @@ class _SettingsViewState extends State<_SettingsView> {
                     }
                   },
                 ),
-
-
                 const SizedBox(height: 24),
-
                 SettingsSection(
                   title: "Preferences",
                   items: ["Notifications", "Automated Updates"],
@@ -313,15 +307,12 @@ class _SettingsViewState extends State<_SettingsView> {
                     });
                   },
                 ),
-
                 const SizedBox(height: 24),
-
                 const Text(
                   'Danger Zone',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.red),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.red, fontFamily: 'Lora'),
                 ),
                 const SizedBox(height: 12),
-
                 Column(
                   children: [
                     buildDangerRow(context, 'Clear Booking & Chat History'),
@@ -331,18 +322,15 @@ class _SettingsViewState extends State<_SettingsView> {
                     buildDangerRow(context, 'Delete Account'),
                   ],
                 ),
-
                 const SizedBox(height: 12),
                 Row(
                   children: const [
                     Icon(Icons.warning_amber_rounded, color: Colors.red, size: 16),
                     SizedBox(width: 6),
-                    Text('This action cannot be undone.', style: TextStyle(color: Colors.red, fontSize: 13)),
+                    Text('This action cannot be undone.', style: TextStyle(color: Colors.red, fontSize: 13, fontFamily: 'PlayfairDisplay')),
                   ],
                 ),
-
                 const SizedBox(height: 32),
-
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: SizedBox(
@@ -355,7 +343,7 @@ class _SettingsViewState extends State<_SettingsView> {
                         Navigator.pushNamedAndRemoveUntil(context, AppRouter.login, (route) => false);
                       },
                       icon: const Icon(Icons.logout),
-                      label: const Text('Logout'),
+                      label: const Text('Logout', style: TextStyle(fontFamily: 'PlayfairDisplay')),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.redAccent,
                         foregroundColor: Colors.white,
@@ -366,12 +354,11 @@ class _SettingsViewState extends State<_SettingsView> {
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 32),
               ],
             );
           } else if (state is SettingsError) {
-            return Center(child: Text(state.message));
+            return Center(child: Text(state.message, style: const TextStyle(fontFamily: 'PlayfairDisplay')));
           } else {
             return const SizedBox.shrink();
           }
@@ -384,7 +371,7 @@ class _SettingsViewState extends State<_SettingsView> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Expanded(child: Text(label)),
+        Expanded(child: Text(label, style: const TextStyle(fontFamily: 'PlayfairDisplay'))),
         ElevatedButton(
           onPressed: () {
             GlobalSnackBar.show(context, '$label not implemented yet.', type: SnackType.warning);
@@ -395,10 +382,9 @@ class _SettingsViewState extends State<_SettingsView> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
           ),
-          child: const Text('Delete'),
+          child: const Text('Delete', style: TextStyle(fontFamily: 'PlayfairDisplay')),
         ),
       ],
     );
   }
 }
-
