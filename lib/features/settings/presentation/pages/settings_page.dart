@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
+import 'package:lawyerup_android/features/settings/presentation/pages/pricing_page.dart';
 import 'package:lawyerup_android/features/settings/presentation/widgets/FaqPopupWidget.dart';
 import '../../../../app/constant/api_endpoints.dart';
 import '../../../../app/routes/app_router.dart';
@@ -354,27 +355,24 @@ class _SettingsViewState extends State<_SettingsView> {
                     const SizedBox(height: 12),
                     GestureDetector(
                       onTap: () {
-                        GlobalSnackBar.show(
+                        Navigator.push(
                           context,
-                          'Checkout is currently unavailable. Coming soon!',
-                          type: SnackType.error,
+                          MaterialPageRoute(builder: (_) => const PricingPage()),
                         );
                       },
                       child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 12, horizontal: 24),
+                        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                              colors: [Colors.purple, Colors.deepPurple]),
+                          gradient: const LinearGradient(colors: [Colors.purple, Colors.deepPurple]),
                           borderRadius: BorderRadius.circular(30),
                         ),
                         child: Text(
-                          user.plan == 'Free Trial'
-                              ? 'Get Plus ➕'
-                              : 'Upgrade ➕',
-                          style: const TextStyle(color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'Lora'),
+                          user.plan == 'Free Trial' ? 'Get Plus ➕' : 'Upgrade ➕',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Lora',
+                          ),
                         ),
                       ),
                     ),

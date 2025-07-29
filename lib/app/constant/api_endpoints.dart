@@ -69,5 +69,6 @@ class ApiEndpoints {
   static const String clearUserBookingChat = "${baseUrl}bookings/clear-user-history";
   static const String clearAiChat = "${baseUrl}ai/chats/all";
   static const String deleteAccount = "${baseUrl}delete/account";
+  static const String manualPayment = "${baseUrl}manual-payment";
 
 }
