@@ -2,7 +2,7 @@ class ApiEndpoints {
   ApiEndpoints._();
 
   /// Use 10.0.2.2 for Android Emulator
-  static const String baseHost = "http://10.0.2.2:5000";
+  static const String baseHost = "http://192.168.1.67:5000";
   static const String baseUrl = "$baseHost/api/";
 
   // Auth
@@ -64,4 +64,10 @@ class ApiEndpoints {
   static String submitReview(String bookingId) => "${baseUrl}reviews/$bookingId";
   // FAQs
   static const String getFaqs = "${baseUrl}faqs";
+
+  // Settings / Danger Zone
+  static const String clearUserBookingChat = "${baseUrl}bookings/clear-user-history";
+  static const String clearAiChat = "${baseUrl}ai/chats/all";
+  static const String deleteAccount = "${baseUrl}delete/account";
+
 }
