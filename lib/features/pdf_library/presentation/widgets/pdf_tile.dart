@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import '../../../../core/network/dio_client.dart';
+import '../../../../app/shared/widgets/global_snackbar.dart'; // import it here
 import '../pages/pdf_viewer_page.dart';
 
 class PdfTile extends StatelessWidget {
   final String title;
-  final String fullUrl; // full absolute URL
-  final String rawUrl;  // only needed to extract filename
+  final String fullUrl;
+  final String rawUrl;
 
   const PdfTile({
     super.key,
@@ -62,7 +63,7 @@ class PdfTile extends StatelessWidget {
                         Expanded(
                           child: ElevatedButton.icon(
                             onPressed: () => Navigator.pop(context, 'download'),
-                            icon: const Icon(Icons.download),
+                            icon: const Icon(Icons.download, color: Colors.white),
                             label: const Text("Download", style: TextStyle(color: Colors.white)),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.teal,
@@ -127,22 +128,29 @@ class PdfTile extends StatelessWidget {
           final path = await DioClient().downloadPdfFile(
             filename: filename,
             saveAs: title,
+            context: context, // required for snackbar
             onProgress: (p) {
               progress = p;
-              (context as Element).markNeedsBuild(); // force dialog to refresh
+              (context as Element).markNeedsBuild();
             },
           );
 
-          Navigator.of(context, rootNavigator: true).pop(); // close progress dialog
+          Navigator.of(context, rootNavigator: true).pop(); // close progress
 
-          if (path != null && context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("Downloaded to $path")),
-            );
-          } else if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Download failed")),
-            );
+          if (context.mounted) {
+            if (path != null) {
+              GlobalSnackBar.show(
+                context,
+                "Download Successful",
+                type: SnackType.success,
+              );
+            } else {
+              GlobalSnackBar.show(
+                context,
+                "Download failed",
+                type: SnackType.error,
+              );
+            }
           }
         }
       },
