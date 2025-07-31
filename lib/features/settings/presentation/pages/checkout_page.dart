@@ -23,15 +23,15 @@ class CheckoutPage extends StatefulWidget {
 }
 
 class _CheckoutPageState extends State<CheckoutPage> {
-  String selectedMethod = 'esewa';
+  String selectedMethod = 'eSewa';
   File? screenshotFile;
   bool isSubmitting = false;
 
   final paymentMethods = {
-    'esewa': 'eSewa',
-    'khalti': 'Khalti',
-    'ime': 'IME Pay',
-    'bank': 'Bank Transfer',
+    'eSewa': 'eSewa',
+    'Khalti': 'Khalti',
+    'IME': 'IME Pay',
+    'Bank': 'Bank Transfer',
   };
 
   Future<void> pickScreenshot() async {
@@ -55,7 +55,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
       final user = HiveService.getUser();
       if (user == null) throw Exception("User not found");
 
-      // Calculate validUntil (e.g., now + duration)
+      // Extract numeric value from price string
+      final rawAmount = widget.planPrice.replaceAll(RegExp(r'[^0-9.]'), '');
+      final amount = double.tryParse(rawAmount);
+      if (amount == null) throw Exception("Invalid amount format");
+
       final now = DateTime.now();
       final duration = widget.planDuration.toLowerCase();
       late DateTime validUntil;
@@ -65,12 +69,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
       } else if (duration.contains("week")) {
         validUntil = now.add(const Duration(days: 7));
       } else {
-        validUntil = now.add(const Duration(days: 30)); // assume monthly
+        validUntil = now.add(const Duration(days: 30));
       }
 
       final formData = FormData.fromMap({
         'plan': widget.planName,
-        'amount': widget.planPrice,
+        'amount': amount,
         'method': selectedMethod,
         'duration': widget.planDuration,
         'validUntil': validUntil.toIso8601String(),
@@ -105,14 +109,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
     }
   }
 
-
-
   Widget buildQRImage() {
     String asset = {
-      'esewa': 'assets/payment_codes/esewa-code.JPG',
-      'khalti': 'assets/payment_codes/khalti-code.PNG',
-      'ime': 'assets/payment_codes/imepay-code.JPG',
-      'bank': 'assets/payment_codes/bank-code.PNG',
+      'eSewa': 'assets/payment_codes/esewa-code.JPG',
+      'Khalti': 'assets/payment_codes/khalti-code.PNG',
+      'IME': 'assets/payment_codes/imepay-code.JPG',
+      'Bank': 'assets/payment_codes/bank-code.PNG',
     }[selectedMethod]!;
 
     return GestureDetector(
@@ -139,7 +141,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
       ),
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
