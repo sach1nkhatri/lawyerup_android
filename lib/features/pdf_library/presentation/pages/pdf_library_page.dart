@@ -27,37 +27,31 @@ class PdfLibraryPage extends StatelessWidget {
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
           ),
           centerTitle: true,
-          actions: const [
-            Padding(
-              padding: EdgeInsets.only(right: 12),
-              child: Icon(Icons.toggle_on, color: Colors.white),
-            ),
-          ],
         ),
         body: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.all(16),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(24),
-                  boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4)],
-                ),
-                child: Row(
-                  children: const [
-                    Icon(Icons.search, color: Colors.grey),
-                    SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        "Search for law article",
-                        style: TextStyle(color: Colors.black54, fontSize: 14),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              padding: const EdgeInsets.all(5), //if ever used padding is 16
+              // child: Container(
+              //   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              //   decoration: BoxDecoration(
+              //     color: Colors.white,
+              //     borderRadius: BorderRadius.circular(24),
+              //     boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4)],
+              //   ),
+              //   child: Row(
+              //     children: const [
+              //       Icon(Icons.search, color: Colors.grey),
+              //       SizedBox(width: 8),
+              //       Expanded(
+              //         child: Text(
+              //           "Search for law article",
+              //           style: TextStyle(color: Colors.black54, fontSize: 14),
+              //         ),
+              //       ),
+              //     ],
+              //   ),
+              // ),
             ),
             Expanded(
               child: BlocBuilder<PdfBloc, PdfState>(

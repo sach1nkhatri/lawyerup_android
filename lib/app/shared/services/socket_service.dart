@@ -4,7 +4,7 @@ class SocketService {
   late IO.Socket _socket;
 
   void connectAndJoin(String bookingId) {
-    _socket = IO.io('http://10.0.2.2:5000', <String, dynamic>{
+    _socket = IO.io('http://192.168.1.67:5000', <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
     });
