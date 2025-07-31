@@ -77,8 +77,9 @@ class ApiEndpoints {
   static const String clearUserBookingChat = "${baseUrl}bookings/clear-user-history";
   static const String clearAiChat = "${baseUrl}ai/chats/all";
   static const String deleteAccount = "${baseUrl}delete/account";
+  //payment
   static const String manualPayment = "${baseUrl}manual-payment";
-//report
+  //report
   static const String report = "${baseUrl}report";
 
 
@@ -88,7 +89,6 @@ class ApiEndpoints {
   // LM Studio / Local AI
   static const String lmStudioBase = "http://192.168.1.85:1234";
   static const String chatCompletions = "$lmStudioBase/v1/chat/completions";
-
 
 
 

@@ -52,34 +52,60 @@ class _CheckoutPageState extends State<CheckoutPage> {
     try {
       setState(() => isSubmitting = true);
 
-      final token = HiveService.getUser()?.token;
-      final userId = HiveService.getUser()?.uid;
-      if (token == null || userId == null) throw Exception("Unauthorized");
+      final user = HiveService.getUser();
+      if (user == null) throw Exception("User not found");
+
+      // Calculate validUntil (e.g., now + duration)
+      final now = DateTime.now();
+      final duration = widget.planDuration.toLowerCase();
+      late DateTime validUntil;
+
+      if (duration.contains("day")) {
+        validUntil = now.add(const Duration(days: 1));
+      } else if (duration.contains("week")) {
+        validUntil = now.add(const Duration(days: 7));
+      } else {
+        validUntil = now.add(const Duration(days: 30)); // assume monthly
+      }
 
       final formData = FormData.fromMap({
-        'user': userId,
         'plan': widget.planName,
-        'price': widget.planPrice,
-        'duration': widget.planDuration,
+        'amount': widget.planPrice,
         'method': selectedMethod,
-        'screenshot': await MultipartFile.fromFile(screenshotFile!.path, filename: 'payment.jpg'),
+        'duration': widget.planDuration,
+        'validUntil': validUntil.toIso8601String(),
+        'screenshot': await MultipartFile.fromFile(
+          screenshotFile!.path,
+          filename: screenshotFile!.path.split('/').last,
+        ),
       });
 
-      await Dio().post(
+      final response = await Dio().post(
         ApiEndpoints.manualPayment,
         data: formData,
-        options: Options(headers: {'Authorization': 'Bearer $token'}),
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer ${user.token}',
+            'Content-Type': 'multipart/form-data',
+          },
+        ),
       );
 
-      GlobalSnackBar.show(context, "Payment submitted for review.", type: SnackType.success);
-      Navigator.pop(context);
-
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        GlobalSnackBar.show(context, "Payment submitted for review.", type: SnackType.success);
+        Navigator.pop(context);
+      } else {
+        GlobalSnackBar.show(context, "Server error: ${response.statusMessage}", type: SnackType.error);
+      }
     } catch (e) {
+      debugPrint("Payment Error: $e");
       GlobalSnackBar.show(context, "Failed to submit payment.", type: SnackType.error);
     } finally {
       setState(() => isSubmitting = false);
     }
   }
+
+
 
   Widget buildQRImage() {
     String asset = {

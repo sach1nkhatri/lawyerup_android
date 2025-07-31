@@ -23,17 +23,17 @@ class GlobalSnackBar {
       case SnackType.success:
         backgroundColor = Colors.green.shade600;
         icon = Icons.check_circle_outline;
-        soundAsset = '/sounds/success.mp3';
+        soundAsset = 'sounds/success.mp3';
         break;
       case SnackType.error:
         backgroundColor = Colors.red.shade600;
         icon = Icons.error_outline;
-        soundAsset = '/sounds/failed.mp3';
+        soundAsset = 'sounds/failed.mp3';
         break;
       case SnackType.warning:
         backgroundColor = Colors.orange.shade800;
         icon = Icons.warning_amber_outlined;
-        soundAsset = '/sounds/failed.mp3';
+        soundAsset = 'sounds/failed.mp3';
         break;
     }
 
