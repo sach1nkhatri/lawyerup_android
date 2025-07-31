@@ -13,7 +13,7 @@ class WelcomePage extends StatelessWidget {
       body: Stack(
         children: [
 // Inside Stack children:
-          MediaQuery.of(context).size.shortestSide >= 600
+          MediaQuery.of(context).size.shortestSide >= 500
               ? Positioned(
             top: 10,
             left: -7,
