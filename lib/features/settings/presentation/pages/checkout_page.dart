@@ -83,14 +83,37 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   Widget buildQRImage() {
     String asset = {
-      'esewa': 'assets/qr/esewa-qr.png',
-      'khalti': 'assets/qr/khalti-qr.png',
-      'ime': 'assets/qr/imepay-qr.png',
-      'bank': 'assets/qr/bank-qr.png',
+      'esewa': 'assets/payment_codes/esewa-code.JPG',
+      'khalti': 'assets/payment_codes/khalti-code.PNG',
+      'ime': 'assets/payment_codes/imepay-code.JPG',
+      'bank': 'assets/payment_codes/bank-code.PNG',
     }[selectedMethod]!;
 
-    return Image.asset(asset, height: 160);
+    return GestureDetector(
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (_) => Dialog(
+            backgroundColor: Colors.transparent,
+            child: GestureDetector(
+              onTap: () => Navigator.pop(context),
+              child: InteractiveViewer(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.asset(asset),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Image.asset(asset, height: 160),
+      ),
+    );
   }
+
 
   @override
   Widget build(BuildContext context) {
