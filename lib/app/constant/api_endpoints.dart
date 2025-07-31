@@ -1,8 +1,8 @@
 class ApiEndpoints {
   ApiEndpoints._();
 
-  /// Use 10.0.2.2 for Android Emulator
-  static const String baseHost = "http://192.168.1.67:5000";
+  /// Use 10.0.2.2 for Android Emulator http://192.168.1.67:5000 http://10.0.2.2:5000
+  static const String baseHost =  "http://192.168.1.85:5000";
   static const String baseUrl = "$baseHost/api/";
 
   // Auth
@@ -59,6 +59,9 @@ class ApiEndpoints {
 // AI Chat
   static const String getChats = "${baseUrl}ai/chats";
   static String deleteChat(String chatId) => "${baseUrl}ai/chats/$chatId";
+  static String sendAiMessage(String chatId) => "${baseUrl}ai/send";
+  static const String saveReply = "${baseUrl}ai/saveReply";
+
 
 // Reviews
   static String submitReview(String bookingId) => "${baseUrl}reviews/$bookingId";

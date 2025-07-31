@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
 
+import '../../../../app/constant/api_endpoints.dart';
 import '../../../auth/data/models/user_hive_model.dart';
 import 'law_ai_chat_event.dart';
 import 'law_ai_chat_state.dart';
@@ -39,10 +40,10 @@ class LawAiChatBloc extends Bloc<LawAiChatEvent, LawAiChatState> {
     String chatId = state.currentChatId;
     final allSessions = {...state.chatSessions};
 
-    // 🧠 Create chat if placeholder
+    // Create chat if placeholder
     if (!allSessions.containsKey(chatId) || chatId == 'chat_1') {
       final res = await dio.post(
-        'http://10.0.2.2:5000/api/ai/chats',
+        ApiEndpoints.getChats,
         options: Options(headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -57,7 +58,7 @@ class LawAiChatBloc extends Bloc<LawAiChatEvent, LawAiChatState> {
       ));
     }
 
-    // ➕ Add user message
+    // Add user message
     final updated = [...allSessions[chatId] ?? []]
       ..add({'text': event.message, 'isUser': true});
     allSessions[chatId] = updated.cast<Map<String, dynamic>>();
@@ -66,9 +67,9 @@ class LawAiChatBloc extends Bloc<LawAiChatEvent, LawAiChatState> {
       isStreaming: true,
     ));
 
-    // 🔒 Save to DB
+    // Save to DB
     await dio.post(
-      'http://10.0.2.2:5000/api/ai/send',
+      ApiEndpoints.sendAiMessage(chatId),
       data: {'chatId': chatId, 'message': event.message},
       options: Options(headers: {
         'Authorization': 'Bearer $token',
@@ -76,23 +77,51 @@ class LawAiChatBloc extends Bloc<LawAiChatEvent, LawAiChatState> {
       }),
     );
 
-    // ➕ Start bot response
+    // Start bot response
     final botSession = [...allSessions[chatId] ?? []]
       ..add({'text': '', 'isUser': false});
     allSessions[chatId] = botSession.cast<Map<String, dynamic>>();
     emit(state.copyWith(chatSessions: allSessions));
 
+    // Build full message history
+    final sessionHistory = allSessions[chatId] ?? [];
+
+    final List<Map<String, String>> messages = [
+      {
+        'role': 'system',
+        'content': '''
+You are LawyerUp AI – a professional, reliable Nepali legal assistant.
+
+You must only answer questions strictly related to:
+- Nepali law and legal procedures
+- Social, political, and geopolitical matters (if they relate to law)
+- Government regulations, legal rights, or constitutional topics
+
+Do NOT answer anything unrelated to legal, civic, or governmental matters.
+
+You may respond in simple English or Nepali based on the user’s tone. Be concise, helpful, and accurate. If a user asks something outside your domain, politely say that LawyerUp AI is focused only on legal topics.
+'''
+      },
+      for (final msg in sessionHistory)
+        {
+          'role': msg['isUser'] == true ? 'user' : 'assistant',
+          'content': msg['text'] ?? ''
+        },
+      {
+        'role': 'user',
+        'content': event.message,
+      },
+    ];
+
     final request = http.Request(
       'POST',
-      Uri.parse('http://10.0.2.2:1234/v1/chat/completions'),
+      Uri.parse('http://192.168.1.85:1234/v1/chat/completions'),
     )
       ..headers['Content-Type'] = 'application/json'
       ..body = jsonEncode({
         'model': 'llama3:8b-instruct',
         'stream': true,
-        'messages': [
-          {'role': 'user', 'content': event.message}
-        ],
+        'messages': messages,
       });
 
     final response = await request.send();
@@ -134,9 +163,9 @@ class LawAiChatBloc extends Bloc<LawAiChatEvent, LawAiChatState> {
       }
     }
 
-    // ✅ Save final reply
+    // Save final reply
     await dio.post(
-      'http://10.0.2.2:5000/api/ai/saveReply',
+      ApiEndpoints.saveReply,
       data: {'chatId': chatId, 'reply': buffer.toString()},
       options: Options(headers: {
         'Authorization': 'Bearer $token',
@@ -149,7 +178,7 @@ class LawAiChatBloc extends Bloc<LawAiChatEvent, LawAiChatState> {
       StartNewChatEvent event,
       Emitter<LawAiChatState> emit,
       ) {
-    final newId = 'chat_${DateTime.now().millisecondsSinceEpoch}';
+    final newId = 'chat_\${DateTime.now().millisecondsSinceEpoch}';
     final updatedSessions =
     Map<String, List<Map<String, dynamic>>>.from(state.chatSessions);
     updatedSessions[newId] = [];
