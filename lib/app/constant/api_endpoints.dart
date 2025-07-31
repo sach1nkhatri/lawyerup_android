@@ -4,6 +4,11 @@ class ApiEndpoints {
   /// Use 10.0.2.2 for Android Emulator http://192.168.1.67:5000 http://10.0.2.2:5000
   static const String baseHost =  "http://192.168.1.85:5000";
   static const String baseUrl = "$baseHost/api/";
+//pdf
+  static const String staticHost = "http://192.168.1.85:5000";
+  // Socket
+  static const String socketUrl = "http://192.168.1.85:5000";
+
 
   // Auth
   static const String login = "${baseUrl}auth/login";

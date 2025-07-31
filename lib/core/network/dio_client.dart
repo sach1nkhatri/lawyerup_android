@@ -19,7 +19,7 @@ class DioClient {
     ));
   }
 
-  // ✅ Download PDF with optional progress callback
+  //  Download PDF with optional progress callback
   Future<String?> downloadPdfFile({
     required String filename,
     required String saveAs,
@@ -47,7 +47,7 @@ class DioClient {
 
       return savePath;
     } catch (e) {
-      print('❌ PDF download error: $e');
+      print(' PDF download error: $e');
       return null;
     }
   }

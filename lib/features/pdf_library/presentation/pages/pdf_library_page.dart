@@ -67,7 +67,8 @@ class PdfLibraryPage extends StatelessWidget {
                       separatorBuilder: (_, __) => const SizedBox(height: 12),
                       itemBuilder: (context, index) {
                         final pdf = pdfList[index];
-                        return PdfTile(title: pdf.title, url: pdf.url);
+                        return PdfTile(title: pdf.title, fullUrl: pdf.fullUrl, rawUrl: pdf.url);
+
                       },
                     );
                   } else if (state is PdfError) {

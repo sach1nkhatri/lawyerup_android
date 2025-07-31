@@ -11,6 +11,13 @@ class PdfEntity {
     required this.url,
   });
 
-  /// Full URL for preview/download
-  String get fullUrl => '${ApiEndpoints.baseHost}$url';
+  /// Safely returns full URL for preview/download
+  String get fullUrl {
+    final base = ApiEndpoints.staticHost.endsWith('/')
+        ? ApiEndpoints.staticHost.substring(0, ApiEndpoints.staticHost.length - 1)
+        : ApiEndpoints.staticHost;
+
+    final path = url.startsWith('/') ? url : '/$url';
+    return '$base$path';
+  }
 }
