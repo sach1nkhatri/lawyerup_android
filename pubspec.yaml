@@ -49,7 +49,8 @@ dependencies:
   socket_io_client: ^2.0.0-beta.4
   file_picker: ^10.2.0
   audioplayers: ^6.5.0
-  syncfusion_flutter_pdfviewer: ^24.1.41
+  sensors_plus: ^3.0.3
+
 
 dev_dependencies:
   flutter_test:

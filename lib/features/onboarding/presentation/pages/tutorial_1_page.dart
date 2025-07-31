@@ -17,7 +17,7 @@ class Tutorial1Page extends StatelessWidget {
             left: -7,
             right: -7,
             bottom: -8,
-            child: MediaQuery.of(context).size.shortestSide >= 600 // Tablet or iPad check
+            child: MediaQuery.of(context).size.shortestSide >= 500 // Tablet or iPad check
                 ? Image.asset(
               'assets/images/tab_1.png',
               fit: BoxFit.fill,

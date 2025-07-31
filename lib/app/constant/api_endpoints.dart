@@ -70,5 +70,7 @@ class ApiEndpoints {
   static const String clearAiChat = "${baseUrl}ai/chats/all";
   static const String deleteAccount = "${baseUrl}delete/account";
   static const String manualPayment = "${baseUrl}manual-payment";
+//report
+  static const String report = "${baseUrl}report";
 
 }
