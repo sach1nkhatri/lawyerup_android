@@ -43,7 +43,7 @@ class _LawyerUpRootState extends State<LawyerUpRoot> {
   void _startShakeListener() {
     userAccelerometerEvents.listen((event) {
       final g = sqrt(event.x * event.x + event.y * event.y + event.z * event.z);
-      if (g > 10) {
+      if (g > 15) {
         _showReportBottomSheet();
       }
     });

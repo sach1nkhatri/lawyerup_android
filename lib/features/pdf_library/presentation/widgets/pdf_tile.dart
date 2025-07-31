@@ -1,26 +1,26 @@
 import 'package:flutter/material.dart';
 import '../../../../core/network/dio_client.dart';
-import '../../../../app/constant/api_endpoints.dart'; // for baseHost/uploads
+import '../../../../app/shared/widgets/global_snackbar.dart'; // import it here
 import '../pages/pdf_viewer_page.dart';
 
 class PdfTile extends StatelessWidget {
   final String title;
-  final String url;
+  final String fullUrl;
+  final String rawUrl;
 
   const PdfTile({
     super.key,
     required this.title,
-    required this.url,
+    required this.fullUrl,
+    required this.rawUrl,
   });
 
   @override
   Widget build(BuildContext context) {
-    final fullUrl = '${ApiEndpoints.uploads}$url';
+    final filename = rawUrl.split('/').last;
 
     return GestureDetector(
       onTap: () async {
-        final filename = url.split('/').last;
-
         final action = await showDialog<String>(
           context: context,
           barrierDismissible: true,
@@ -37,10 +37,7 @@ class PdfTile extends StatelessWidget {
                     Text(
                       title,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 12),
                     const Text(
@@ -54,36 +51,25 @@ class PdfTile extends StatelessWidget {
                         Expanded(
                           child: ElevatedButton.icon(
                             onPressed: () => Navigator.pop(context, 'preview'),
-                            icon: const Icon(Icons.visibility, color: Colors.white), // Optional: white icon
-                            label: const Text(
-                              "Preview",
-                              style: TextStyle(color: Colors.white), // 👈 custom text color here
-                            ),
+                            icon: const Icon(Icons.visibility, color: Colors.white),
+                            label: const Text("Preview", style: TextStyle(color: Colors.white)),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.deepPurpleAccent,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14),
-                              ),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                             ),
                           ),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
-                          child:ElevatedButton.icon(
-                              onPressed: () => Navigator.pop(context, 'download'),
-                              icon: const Icon(Icons.download),
-                              label: const Text(
-                                "Download",
-                                style: TextStyle(color: Colors.white), // 🔥 Set your desired color here
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.teal,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
+                          child: ElevatedButton.icon(
+                            onPressed: () => Navigator.pop(context, 'download'),
+                            icon: const Icon(Icons.download, color: Colors.white),
+                            label: const Text("Download", style: TextStyle(color: Colors.white)),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.teal,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             ),
-
+                          ),
                         ),
                       ],
                     ),
@@ -102,49 +88,69 @@ class PdfTile extends StatelessWidget {
         if (action == 'preview') {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (_) => PdfViewerPage(url: fullUrl),
-            ),
+            MaterialPageRoute(builder: (_) => PdfViewerPage(url: fullUrl)),
           );
         }
 
         if (action == 'download') {
+          double progress = 0;
+
           showDialog(
             context: context,
             barrierDismissible: false,
-            builder: (context) {
-              double progress = 0;
-              return StatefulBuilder(
-                builder: (context, setState) => AlertDialog(
-                  title: const Text("Downloading..."),
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      LinearProgressIndicator(value: progress),
-                      const SizedBox(height: 12),
-                      Text("${(progress * 100).toStringAsFixed(0)}%"),
-                    ],
-                  ),
+            builder: (context) => StatefulBuilder(
+              builder: (context, setState) => AlertDialog(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                titlePadding: const EdgeInsets.only(top: 16, left: 20, right: 8),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                title: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text("Downloading...", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    GestureDetector(
+                      onTap: () => Navigator.of(context).pop(),
+                      child: const Icon(Icons.close, color: Colors.grey),
+                    ),
+                  ],
                 ),
-              );
-            },
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    LinearProgressIndicator(value: progress),
+                    const SizedBox(height: 12),
+                    Text("${(progress * 100).toStringAsFixed(0)}%"),
+                  ],
+                ),
+              ),
+            ),
           );
 
           final path = await DioClient().downloadPdfFile(
             filename: filename,
             saveAs: title,
+            context: context, // required for snackbar
             onProgress: (p) {
-              Navigator.of(context, rootNavigator: true).pop();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("Downloaded to $p")),
-              );
+              progress = p;
+              (context as Element).markNeedsBuild();
             },
           );
 
-          if (path == null && context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Download failed")),
-            );
+          Navigator.of(context, rootNavigator: true).pop(); // close progress
+
+          if (context.mounted) {
+            if (path != null) {
+              GlobalSnackBar.show(
+                context,
+                "Download Successful",
+                type: SnackType.success,
+              );
+            } else {
+              GlobalSnackBar.show(
+                context,
+                "Download failed",
+                type: SnackType.error,
+              );
+            }
           }
         }
       },
@@ -161,10 +167,7 @@ class PdfTile extends StatelessWidget {
             Image.asset('assets/images/pdf.png', height: 40),
             const SizedBox(width: 16),
             Expanded(
-              child: Text(
-                title,
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-              ),
+              child: Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
             ),
             Image.asset('assets/images/download.png', height: 28),
           ],

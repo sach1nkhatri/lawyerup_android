@@ -26,35 +26,35 @@ class PrivacyPopup extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: const [
-                    Text("📌 Chatbot Usage", style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text(" Chatbot Usage", style: TextStyle(fontWeight: FontWeight.bold)),
                     SizedBox(height: 4),
                     Text(
                       "The AI chatbot provides information for legal education and general reference only. It is not a replacement for professional legal advice. Always consult with a qualified lawyer for any legal concerns.",
                     ),
 
                     SizedBox(height: 16),
-                    Text("📅 Booking Responsibility", style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text(" Booking Responsibility", style: TextStyle(fontWeight: FontWeight.bold)),
                     SizedBox(height: 4),
                     Text(
                       "Appointments are handled independently by users and lawyers. LawyerUp is not responsible for any missed, canceled, or fraudulent bookings.",
                     ),
 
                     SizedBox(height: 16),
-                    Text("👥 Respect & Community Guidelines", style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text(" Respect & Community Guidelines", style: TextStyle(fontWeight: FontWeight.bold)),
                     SizedBox(height: 4),
                     Text(
                       "All users are expected to behave respectfully. Any abusive, discriminatory, or unethical behavior may lead to account suspension.",
                     ),
 
                     SizedBox(height: 16),
-                    Text("📜 General Disclaimer", style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text(" General Disclaimer", style: TextStyle(fontWeight: FontWeight.bold)),
                     SizedBox(height: 4),
                     Text(
                       "We do not guarantee accuracy, reliability, or legal validity of any content generated or listed in the app. Use at your own discretion.",
                     ),
 
                     SizedBox(height: 16),
-                    Text("🔐 Data Privacy", style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text(" Data Privacy", style: TextStyle(fontWeight: FontWeight.bold)),
                     SizedBox(height: 4),
                     Text(
                       "Your data is stored securely and only used for essential app functionality. We do not sell your information. Always ensure your device is protected.",

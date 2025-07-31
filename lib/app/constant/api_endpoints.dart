@@ -1,9 +1,14 @@
 class ApiEndpoints {
   ApiEndpoints._();
 
-  /// Use 10.0.2.2 for Android Emulator
-  static const String baseHost = "http://192.168.1.67:5000";
+  /// Use 10.0.2.2 for Android Emulator http://192.168.1.67:5000 http://10.0.2.2:5000
+  static const String baseHost =  "http://192.168.1.85:5000";
   static const String baseUrl = "$baseHost/api/";
+//pdf
+  static const String staticHost = "http://192.168.1.85:5000";
+  // Socket
+  static const String socketUrl = "http://192.168.1.85:5000";
+
 
   // Auth
   static const String login = "${baseUrl}auth/login";
@@ -59,6 +64,9 @@ class ApiEndpoints {
 // AI Chat
   static const String getChats = "${baseUrl}ai/chats";
   static String deleteChat(String chatId) => "${baseUrl}ai/chats/$chatId";
+  static String sendAiMessage(String chatId) => "${baseUrl}ai/send";
+  static const String saveReply = "${baseUrl}ai/saveReply";
+
 
 // Reviews
   static String submitReview(String bookingId) => "${baseUrl}reviews/$bookingId";
@@ -69,8 +77,19 @@ class ApiEndpoints {
   static const String clearUserBookingChat = "${baseUrl}bookings/clear-user-history";
   static const String clearAiChat = "${baseUrl}ai/chats/all";
   static const String deleteAccount = "${baseUrl}delete/account";
+  //payment
   static const String manualPayment = "${baseUrl}manual-payment";
-//report
+  //report
   static const String report = "${baseUrl}report";
+
+
+//Third Party Api For Ai chat
+
+
+  // LM Studio / Local AI
+  static const String lmStudioBase = "http://192.168.1.85:1234";
+  static const String chatCompletions = "$lmStudioBase/v1/chat/completions";
+
+
 
 }

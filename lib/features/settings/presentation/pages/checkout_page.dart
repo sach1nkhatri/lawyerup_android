@@ -23,15 +23,15 @@ class CheckoutPage extends StatefulWidget {
 }
 
 class _CheckoutPageState extends State<CheckoutPage> {
-  String selectedMethod = 'esewa';
+  String selectedMethod = 'eSewa';
   File? screenshotFile;
   bool isSubmitting = false;
 
   final paymentMethods = {
-    'esewa': 'eSewa',
-    'khalti': 'Khalti',
-    'ime': 'IME Pay',
-    'bank': 'Bank Transfer',
+    'eSewa': 'eSewa',
+    'Khalti': 'Khalti',
+    'IME': 'IME Pay',
+    'Bank': 'Bank Transfer',
   };
 
   Future<void> pickScreenshot() async {
@@ -52,29 +52,57 @@ class _CheckoutPageState extends State<CheckoutPage> {
     try {
       setState(() => isSubmitting = true);
 
-      final token = HiveService.getUser()?.token;
-      final userId = HiveService.getUser()?.uid;
-      if (token == null || userId == null) throw Exception("Unauthorized");
+      final user = HiveService.getUser();
+      if (user == null) throw Exception("User not found");
+
+      // Extract numeric value from price string
+      final rawAmount = widget.planPrice.replaceAll(RegExp(r'[^0-9.]'), '');
+      final amount = double.tryParse(rawAmount);
+      if (amount == null) throw Exception("Invalid amount format");
+
+      final now = DateTime.now();
+      final duration = widget.planDuration.toLowerCase();
+      late DateTime validUntil;
+
+      if (duration.contains("day")) {
+        validUntil = now.add(const Duration(days: 1));
+      } else if (duration.contains("week")) {
+        validUntil = now.add(const Duration(days: 7));
+      } else {
+        validUntil = now.add(const Duration(days: 30));
+      }
 
       final formData = FormData.fromMap({
-        'user': userId,
         'plan': widget.planName,
-        'price': widget.planPrice,
-        'duration': widget.planDuration,
+        'amount': amount,
         'method': selectedMethod,
-        'screenshot': await MultipartFile.fromFile(screenshotFile!.path, filename: 'payment.jpg'),
+        'duration': widget.planDuration,
+        'validUntil': validUntil.toIso8601String(),
+        'screenshot': await MultipartFile.fromFile(
+          screenshotFile!.path,
+          filename: screenshotFile!.path.split('/').last,
+        ),
       });
 
-      await Dio().post(
+      final response = await Dio().post(
         ApiEndpoints.manualPayment,
         data: formData,
-        options: Options(headers: {'Authorization': 'Bearer $token'}),
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer ${user.token}',
+            'Content-Type': 'multipart/form-data',
+          },
+        ),
       );
 
-      GlobalSnackBar.show(context, "Payment submitted for review.", type: SnackType.success);
-      Navigator.pop(context);
-
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        GlobalSnackBar.show(context, "Payment submitted for review.", type: SnackType.success);
+        Navigator.pop(context);
+      } else {
+        GlobalSnackBar.show(context, "Server error: ${response.statusMessage}", type: SnackType.error);
+      }
     } catch (e) {
+      debugPrint("Payment Error: $e");
       GlobalSnackBar.show(context, "Failed to submit payment.", type: SnackType.error);
     } finally {
       setState(() => isSubmitting = false);
@@ -83,13 +111,35 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   Widget buildQRImage() {
     String asset = {
-      'esewa': 'assets/qr/esewa-qr.png',
-      'khalti': 'assets/qr/khalti-qr.png',
-      'ime': 'assets/qr/imepay-qr.png',
-      'bank': 'assets/qr/bank-qr.png',
+      'eSewa': 'assets/payment_codes/esewa-code.JPG',
+      'Khalti': 'assets/payment_codes/khalti-code.PNG',
+      'IME': 'assets/payment_codes/imepay-code.JPG',
+      'Bank': 'assets/payment_codes/bank-code.PNG',
     }[selectedMethod]!;
 
-    return Image.asset(asset, height: 160);
+    return GestureDetector(
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (_) => Dialog(
+            backgroundColor: Colors.transparent,
+            child: GestureDetector(
+              onTap: () => Navigator.pop(context),
+              child: InteractiveViewer(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.asset(asset),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Image.asset(asset, height: 160),
+      ),
+    );
   }
 
   @override
