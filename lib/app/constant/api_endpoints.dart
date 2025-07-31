@@ -76,4 +76,15 @@ class ApiEndpoints {
 //report
   static const String report = "${baseUrl}report";
 
+
+//Third Party Api For Ai chat
+
+
+  // LM Studio / Local AI
+  static const String lmStudioBase = "http://192.168.1.85:1234";
+  static const String chatCompletions = "$lmStudioBase/v1/chat/completions";
+
+
+
+
 }

@@ -115,7 +115,7 @@ You may respond in simple English or Nepali based on the user’s tone. Be conci
 
     final request = http.Request(
       'POST',
-      Uri.parse('http://192.168.1.85:1234/v1/chat/completions'),
+      Uri.parse(ApiEndpoints.chatCompletions),
     )
       ..headers['Content-Type'] = 'application/json'
       ..body = jsonEncode({
