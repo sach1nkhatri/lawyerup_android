@@ -46,7 +46,7 @@ class _DashboardViewState extends State<DashboardView> {
             children: [
               const QuickLinks(),
               const SizedBox(height: 32),
-              if (role == 'lawyer')
+              if (role == 'admin')
                 ElevatedButton.icon(
                   onPressed: () {
                     Navigator.push(
