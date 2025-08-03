@@ -34,6 +34,8 @@ class LawyerUpRoot extends StatefulWidget {
 }
 
 class _LawyerUpRootState extends State<LawyerUpRoot> {
+  bool _isModalOpen = false;
+
   @override
   void initState() {
     super.initState();
@@ -43,7 +45,7 @@ class _LawyerUpRootState extends State<LawyerUpRoot> {
   void _startShakeListener() {
     userAccelerometerEvents.listen((event) {
       final g = sqrt(event.x * event.x + event.y * event.y + event.z * event.z);
-      if (g > 15) {
+      if (g > 35) {
         _showReportBottomSheet();
       }
     });
@@ -51,17 +53,25 @@ class _LawyerUpRootState extends State<LawyerUpRoot> {
 
   void _showReportBottomSheet() {
     final context = navigatorKey.currentContext;
-    if (context != null) {
+    if (context != null && !_isModalOpen) {
+      _isModalOpen = true;
+
       showModalBottomSheet(
         context: context,
         isScrollControlled: true,
         backgroundColor: Colors.transparent,
         builder: (_) => ReportBottomSheet(
-          onClose: () => Navigator.of(context).pop(),
+          onClose: () {
+            Navigator.of(context).pop();
+            _isModalOpen = false;
+          },
         ),
-      );
+      ).whenComplete(() {
+        _isModalOpen = false; // fallback in case of swipe down
+      });
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

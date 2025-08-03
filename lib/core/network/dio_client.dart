@@ -56,7 +56,7 @@ class DioClient {
 
       return savePath;
     } catch (e) {
-      print('📕 PDF download error: $e');
+      print('PDF download error: $e');
       GlobalSnackBar.show(context, "Download failed: ${_friendlyError(e)}", type: SnackType.error);
       return null;
     }

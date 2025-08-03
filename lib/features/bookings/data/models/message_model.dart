@@ -42,7 +42,7 @@ class MessageModel {
     return MessageModel(
       text: message.text,
       senderId: message.senderId,
-      sender: UserModel.fallback, // 👈 dummy user object
+      sender: UserModel.fallback, // dummy user object
       timestamp: message.timestamp,
       status: message.status,
     );

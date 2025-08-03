@@ -20,7 +20,7 @@ void main() {
           home: MediaQuery(
             data: const MediaQueryData(size: Size(800, 1600)),
             child: Scaffold(
-              body: SingleChildScrollView( // ✅ fixes layout overflow in tests
+              body: SingleChildScrollView( // fixes layout overflow in tests
                 child: SignupForm(
                   nameController: nameController,
                   emailController: emailController,

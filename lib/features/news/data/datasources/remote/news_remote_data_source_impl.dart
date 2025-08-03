@@ -14,7 +14,7 @@ class NewsRemoteDataSourceImpl implements NewsRemoteDataSource {
     return (res.data as List).map((e) => NewsModel.fromJson(e)).toList();
   }
 
-  // ✅ Add Comment
+  //  Add Comment
   Future<List<Map<String, dynamic>>> addComment({
     required String newsId,
     required String commentText,

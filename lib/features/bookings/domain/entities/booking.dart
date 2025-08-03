@@ -5,7 +5,7 @@ class Booking {
   final String id;
   final User user;
   final User lawyer;
-  final LawyerProfile lawyerList; // ✅ always required
+  final LawyerProfile lawyerList;
   final String date;
   final String time;
   final int duration;

@@ -7,7 +7,7 @@ abstract class LawAiChatEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-/// 🚀 User sends a message
+///  User sends a message
 class SendMessage extends LawAiChatEvent {
   final String message;
   SendMessage(this.message);
@@ -16,10 +16,10 @@ class SendMessage extends LawAiChatEvent {
   List<Object?> get props => [message];
 }
 
-/// 🆕 Start a new empty chat
+///  Start a new empty chat
 class StartNewChatEvent extends LawAiChatEvent {}
 
-/// 📥 Load a saved chat by ID
+///  Load a saved chat by ID
 class LoadChatByIdEvent extends LawAiChatEvent {
   final String chatId;
   LoadChatByIdEvent(this.chatId);
@@ -28,7 +28,7 @@ class LoadChatByIdEvent extends LawAiChatEvent {
   List<Object?> get props => [chatId];
 }
 
-/// 💡 Load default prompt recommendations (optional)
+///  Load default prompt recommendations (optional)
 class LoadInitialRecommendationsEvent extends LawAiChatEvent {}
 
 

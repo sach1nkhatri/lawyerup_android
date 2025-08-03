@@ -1,8 +1,8 @@
 class LawyerModel {
   final String id;
-  final String user; // ✅ NEW: Lawyer's user ID
+  final String user;
   final String fullName;
-  final String specialization; // Used as bar reg number
+  final String specialization;
   final String email;
   final String phone;
   final String address;
@@ -20,7 +20,7 @@ class LawyerModel {
 
   LawyerModel({
     required this.id,
-    required this.user, // ✅ in constructor
+    required this.user,
     required this.fullName,
     required this.specialization,
     required this.email,
@@ -44,7 +44,7 @@ class LawyerModel {
       id: json['_id'],
       user: json['user'] is Map && json['user']['\$oid'] != null
           ? json['user']['\$oid']
-          : json['user'].toString(), // ✅ handles both formats
+          : json['user'].toString(),
       fullName: json['fullName'],
       specialization: json['specialization'],
       email: json['email'],
@@ -147,7 +147,7 @@ class ReviewModel {
 
   factory ReviewModel.fromJson(Map<String, dynamic> json) {
     return ReviewModel(
-      name: json['user'] ?? '', // ✅ FIXED: using 'user' field
+      name: json['user'] ?? '',
       comment: json['comment'] ?? '',
       rating: (json['rating'] ?? 0).toDouble(),
     );

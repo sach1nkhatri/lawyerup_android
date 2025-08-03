@@ -19,7 +19,7 @@ class LawyerRepositoryImpl implements LawyerRepository {
 
     return Lawyer(
       id: model.id,
-      user: model.user, // ✅ Added
+      user: model.user,
       fullName: model.fullName,
       specialization: specialization,
       barRegNumber: barRegNumber,
@@ -51,7 +51,7 @@ class LawyerRepositoryImpl implements LawyerRepository {
 
       return Lawyer(
         id: model.id,
-        user: model.user, // ✅ Added
+        user: model.user,
         fullName: model.fullName,
         specialization: specialization,
         barRegNumber: model.specialization,

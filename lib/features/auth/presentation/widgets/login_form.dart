@@ -55,7 +55,7 @@ class LoginForm extends StatelessWidget {
                         ),
                         const SizedBox(height: 30),
 
-                        /// ✅ EMAIL FIELD WITH KEY
+                        /// EMAIL FIELD WITH KEY
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           decoration: BoxDecoration(
@@ -73,7 +73,7 @@ class LoginForm extends StatelessWidget {
                         ),
                         const SizedBox(height: 16),
 
-                        /// ✅ PASSWORD FIELD WITH KEY
+                        /// PASSWORD FIELD WITH KEY
                         Container(
                           decoration: BoxDecoration(
                             color: tealFieldColor,
@@ -96,7 +96,7 @@ class LoginForm extends StatelessWidget {
                                 ),
                               ),
 
-                              /// ✅ LOGIN BUTTON
+                              /// LOGIN BUTTON
                               Container(
                                 height: 50,
                                 width: 50,
@@ -106,7 +106,7 @@ class LoginForm extends StatelessWidget {
                                   shape: BoxShape.circle,
                                 ),
                                 child: InkWell(
-                                  key: const Key('loginButton'), // 👈 for test tap
+                                  key: const Key('loginButton'),
                                   onTap: isLoading ? null : onLogin,
                                   child: isLoading
                                       ? const Padding(

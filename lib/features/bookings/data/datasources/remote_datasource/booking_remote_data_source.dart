@@ -11,7 +11,7 @@ class BookingRemoteDataSource {
     required String role, // 'user' or 'lawyer'
   }) async {
     try {
-      // 🔄 Dynamically choose endpoint
+      //  Dynamically choose endpoint
       final endpoint = role == 'lawyer'
           ? '/bookings/lawyer/$userId'
           : '/bookings/user/$userId';

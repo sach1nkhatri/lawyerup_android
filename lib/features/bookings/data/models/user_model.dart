@@ -25,7 +25,7 @@ class UserModel {
     this.plan,
   });
 
-  /// ✅ Fallback user for cases like missing sender info
+  /// Fallback user for cases like missing sender info
   static const fallback = UserModel(
     id: '',
     fullName: 'Unknown',
@@ -39,7 +39,7 @@ class UserModel {
     plan: '',
   );
 
-  /// ✅ From backend JSON
+  /// From backend JSON
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
       id: json['_id'] ?? '',
@@ -55,7 +55,7 @@ class UserModel {
     );
   }
 
-  /// ✅ To backend JSON
+  /// To backend JSON
   Map<String, dynamic> toJson() {
     return {
       '_id': id,
@@ -71,7 +71,7 @@ class UserModel {
     };
   }
 
-  /// ✅ Convert to domain entity
+  ///  Convert to domain entity
   domain.User toEntity() {
     return domain.User(
       id: id,
@@ -87,7 +87,7 @@ class UserModel {
     );
   }
 
-  /// ✅ Create from domain entity
+  ///  Create from domain entity
   factory UserModel.fromEntity(domain.User user) {
     return UserModel(
       id: user.id,
@@ -103,7 +103,7 @@ class UserModel {
     );
   }
 
-  /// ✅ (Optional) Create from ID-only map
+  /// (Optional) Create from ID-only map
   factory UserModel.fromIdOnly(Map<String, dynamic> json) {
     return UserModel(
       id: json[r'$oid'] ?? '',

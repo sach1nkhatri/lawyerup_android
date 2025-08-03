@@ -3,7 +3,7 @@ class Message {
   final String senderId;
   final DateTime timestamp;
   final String status;
-  final String? senderName; // ✅ optional name for UI display
+  final String? senderName;
 
   Message({
     required this.text,

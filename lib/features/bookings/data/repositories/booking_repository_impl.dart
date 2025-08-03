@@ -17,7 +17,7 @@ class BookingRepositoryImpl implements BookingRepository {
     required String role,
   }) async {
     final result = await remote.getBookings(userId: userId, role: role);
-    return result; // ✅ No .toEntity()
+    return result; //  No .toEntity()
   }
 
 

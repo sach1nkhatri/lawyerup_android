@@ -26,7 +26,7 @@ class _DashboardViewState extends State<DashboardView> {
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.dark, // ✅ Makes status bar icons dark
+      value: SystemUiOverlayStyle.dark, // Makes status bar icons dark
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: PreferredSize(

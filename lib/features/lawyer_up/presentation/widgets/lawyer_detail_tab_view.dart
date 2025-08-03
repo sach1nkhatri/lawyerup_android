@@ -87,11 +87,11 @@ class LawyerDetailTabView extends StatelessWidget {
 
     final imageUrl = "${ApiEndpoints.baseHost}${lawyer.profilePhoto}";
 
-    // ✅ Fetch current user from Hive
+    //  Fetch current user from Hive
     final userBox = Hive.box<UserHiveModel>(HiveConstants.userBox);
     final currentUser = userBox.get(HiveConstants.userKey);
 
-    // ✅ Logic to prevent lawyers from booking other lawyers or themselves
+    //  Logic to prevent lawyers from booking other lawyers or themselves
     final isLawyer = currentUser?.role == 'lawyer';
     final currentUserId = currentUser?.uid;
     final viewedLawyerCreatorId = lawyer.id;

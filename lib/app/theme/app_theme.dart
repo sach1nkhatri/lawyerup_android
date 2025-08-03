@@ -4,7 +4,7 @@ class AppTheme {
   static final ThemeData lightTheme = ThemeData(
     primarySwatch: Colors.deepPurple,
     scaffoldBackgroundColor: Colors.white,
-    fontFamily: 'Roboto', // 👈 This stays!
+    fontFamily: 'Roboto',
     textTheme: const TextTheme(
       headlineMedium: TextStyle(
         fontSize: 24,

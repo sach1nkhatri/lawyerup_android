@@ -46,8 +46,8 @@ class LawyerUpPage extends StatelessWidget {
                   onTap: () {
                     Navigator.pushNamed(
                       context,
-                      '/preview', // ✅ Ensure this route is defined in app_router.dart
-                      arguments: lawyer, // ✅ Passing lawyer data to preview
+                      '/preview', //  Ensure this route is defined in app_router.dart
+                      arguments: lawyer, // Passing lawyer data to preview
                     );
                   },
                   child: LawyerCard(lawyer: lawyer),

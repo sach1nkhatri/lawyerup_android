@@ -63,13 +63,13 @@ class AppRouter {
 
 
 
-    // ✅ Lawyer List Page
+    // Lawyer List Page
     lawyer: (context) => BlocProvider(
       create: (_) => sl<LawyerListBloc>()..add(FetchAllLawyersEvent()),
       child: const LawyerUpPage(),
     ),
 
-    // ✅ Lawyer Preview Page
+    // Lawyer Preview Page
     lawyerPreview: (context) {
       final lawyer = ModalRoute.of(context)!.settings.arguments as Lawyer;
       return LawyerUpPreviewPage(lawyer: lawyer); // Create this page!

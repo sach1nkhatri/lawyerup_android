@@ -85,7 +85,7 @@ class UserBookingCard extends StatelessWidget {
                       if (user == null) {
                         GlobalSnackBar.show(
                           context,
-                          "⚠️ Login required.",
+                          "Login required.",
                           type: SnackType.warning,
                         );
                         return;
@@ -172,7 +172,7 @@ class UserBookingCard extends StatelessWidget {
                           onSuccess: () {
                             GlobalSnackBar.show(
                               context,
-                              "✅ Review submitted!",
+                              "Review submitted!",
                               type: SnackType.success,
                             );
                             Navigator.of(context).pop(); // Close the modal

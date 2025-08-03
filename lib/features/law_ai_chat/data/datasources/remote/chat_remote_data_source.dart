@@ -4,7 +4,7 @@ import '../../models/chat_model.dart';
 
 abstract class ChatRemoteDataSource {
   Future<List<ChatModel>> getChats();
-  Future<void> deleteChat(String chatId); // ✅ declared here
+  Future<void> deleteChat(String chatId);
 }
 
 class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {

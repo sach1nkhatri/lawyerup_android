@@ -18,7 +18,7 @@ class _ChatBubbleAreaState extends State<ChatBubbleArea> {
   Widget build(BuildContext context) {
     return BlocBuilder<LawAiChatBloc, LawAiChatState>(
       builder: (context, state) {
-        final messages = state.messages; // ✅ clean getter from state
+        final messages = state.messages; //  clean getter from state
 
         // Auto-scroll to bottom
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -36,7 +36,7 @@ class _ChatBubbleAreaState extends State<ChatBubbleArea> {
         }
 
         return ListView.builder(
-          key: ValueKey(state.currentChatId), // 🔥 Forces refresh on prompt tap or chat change
+          key: ValueKey(state.currentChatId), //  Forces refresh on prompt tap or chat change
           controller: _scrollController,
           padding: const EdgeInsets.all(16),
           itemCount: messages.length,
@@ -118,7 +118,7 @@ class RecommendedPrompts extends StatelessWidget {
                 children: prompts.map((text) {
                   return InkWell(
                     onTap: () {
-                      // ✅ Trigger message and refresh chat bubble immediately
+                      //  Trigger message and refresh chat bubble immediately
                       innerContext.read<LawAiChatBloc>().add(SendMessage(text));
                     },
                     borderRadius: BorderRadius.circular(24),

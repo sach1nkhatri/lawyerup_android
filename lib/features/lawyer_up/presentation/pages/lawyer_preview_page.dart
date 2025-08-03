@@ -16,7 +16,7 @@ class LawyerUpPreviewPage extends StatelessWidget {
         title: const Text("Lawyer Details", style: TextStyle(color: Colors.white)),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: LawyerDetailTabView(lawyer: lawyer), // ✅ this renders full UI
+      body: LawyerDetailTabView(lawyer: lawyer),
     );
   }
 }

@@ -54,7 +54,7 @@ class LawyerCard extends StatelessWidget {
             ),
             const SizedBox(width: 12),
 
-            // 🧑 Lawyer Info
+            //  Lawyer Info
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

@@ -28,7 +28,7 @@ class _FeaturedLawyersWidgetState extends State<FeaturedLawyersWidget> {
 
   Future<void> loadFeaturedLawyer() async {
     try {
-      final remote = LawyerRemoteDataSourceImpl(DioClient()); // ✅ Fixed
+      final remote = LawyerRemoteDataSourceImpl(DioClient());
       final allLawyers = await remote.getAllLawyers() as List<LawyerModel>;
 
       if (allLawyers.isEmpty) throw Exception("No lawyers found.");
